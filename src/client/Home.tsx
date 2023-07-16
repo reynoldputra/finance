@@ -8,12 +8,16 @@ export const Home: React.FC<HomeProps> = (props) => {
   const info = `This app is using Chrome (v${window.appApi.chrome()}), Node.js (v${window.appApi.node()}), and Electron (v${window.appApi.electron()})`;
 
   const utils = trpc.useContext();
-  const users = trpc.users.useQuery();
-  const addUser = trpc.userCreate.useMutation({
-    onSuccess: () => {
-      utils.users.invalidate();
-    }
-  });
+  // const users = trpc.users.useQuery();
+  // const addUser = trpc.userCreate.useMutation({
+  //   onSuccess: () => {
+  //     utils.users.invalidate();
+  //   }
+  // });
+  const getAllTagihan = trpc.getAllTagihanByCustomerId.useQuery('clk4uf9r10000356k8qr4noyp ')
+  // function getAllTagihan(customerId: string) {
+  //   trpc.getAllTagihanByCustomerId.useQuery(customerId)
+  // }
 
   useEffect(() => {
     window.appApi.receive("app", (event) => {
@@ -35,9 +39,13 @@ export const Home: React.FC<HomeProps> = (props) => {
         })}>
           Add user
         </button>
-        {users.data?.map((user) => (
-          <div key={user.id}>{user.id}: {user.name} created on {user.dateCreated.toLocaleString()}</div>
-        ))}
+        {getAllTagihan.data && (
+          <ul>
+            {getAllTagihan.data.map((tagihan) => (
+              <li key={tagihan.id}>{tagihan.namaKolektor}{tagihan.keterangan}</li>
+            ))}
+          </ul>
+        )}
 
         <p>
           Edit <code>src/Home.tsx</code> and save to test HMR!

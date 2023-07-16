@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/client"
+  provider      = "prisma-client-js"
+  output        = "../src/generated/client"
   binaryTargets = ["native", "darwin", "darwin-arm64"]
 }
 
@@ -25,7 +25,7 @@ model Tagihan {
   id           String       @id @default(cuid())
   namaKolektor String       @map("nama_kolektor")
   tanggal      DateTime     @map("tanggal_tagihan")
-  keterangan   String
+  keterangan   String?
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
   customer     Customer     @relation(fields: [customerId], references: [id])
@@ -48,7 +48,7 @@ model Invoice {
 model CaraBayar {
   id           String     @id @default(cuid())
   invoice      Invoice    @relation(fields: [invoiceId], references: [id])
-  invoiceId    String     @unique
+  invoiceId    String
   pembayaran   Pembayaran @relation(fields: [pembayaranId], references: [id])
   pembayaranId String
 
@@ -63,7 +63,7 @@ model Pembayaran {
   createdAt   DateTime          @default(now()) @map("created_at")
   updatedAt   DateTime          @updatedAt @map("updated_at")
   tagihan     Tagihan           @relation(fields: [tagihanId], references: [id])
-  tagihanId   String            @unique
+  tagihanId   String
   metode      MetodePembayaran? @relation(fields: [metodeId], references: [id])
   metodeId    Int?              @unique
   Giro        Giro?

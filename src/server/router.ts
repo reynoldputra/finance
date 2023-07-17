@@ -8,61 +8,62 @@ const t = initTRPC.create({
 });
 
 export const appRouter = t.router({
-  // users: t.procedure
-  //   .query(() => {
-  //     return prisma.user.findMany();
-  //   }),
-  getAllTagihanByCustomerId: t.procedure
-    .input(z.string())
-    .query(({ input: customerId }) => {
-      return prisma.tagihan.findMany({
-        where: {
-          customerId,
+  getAllPembayaranByCustomerId: t.procedure.input(z.string()).query(({ input: customerId }) => {
+    return prisma.pembayaran.findMany({
+      where: {
+        PembayaranInvoice: {
+          some: {
+            invoice: {
+              customerId,
+            },
+          },
         },
-      });
-    }),
-  getAllTagihanByDate: t.procedure
-    .input(z.object({
-      startDate: z.string().transform((val) => new Date(val)),
-      endDate: z.string().transform((val) => new Date(val)),
-    }))
+      },
+    });
+  }),
+  getAllPembayaranByDate: t.procedure
+    .input(
+      z.object({
+        startDate: z.string().transform((val) => new Date(val)),
+        endDate: z.string().transform((val) => new Date(val)),
+      })
+    )
     .query(({ input: { startDate, endDate } }) => {
-      return prisma.tagihan.findMany({
-        where: {
-         tanggal: {
-          gte: startDate,
-          lte: endDate
-         }
-        },
-      });
-    }),
-  getAllPembayaranByInvoiceId: t.procedure
-    .input(z.string())
-    .query(({ input: invoiceId }) => {
       return prisma.pembayaran.findMany({
+        where: {
+          tanggal: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
         include: {
-          caraBayar: {
-            where : {
-              invoiceId
-            }
+          PembayaranInvoice: {
+            include: {
+              distribusiPembayaran: {
+                include: {
+                  CaraBayar: {
+                    include: {
+                      metode: true,
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       });
     }),
-  // userCreate: t.procedure
-  //   .input(z.object({
-  //     name: z.string(),
-  //     dateCreated: z.date()
-  //   }))
-  //   .mutation(async ({input: {name, dateCreated}}) => {
-  //     const user = await prisma.user.create({
-  //       data: {
-  //         name,
-  //         dateCreated
-  //       }
-  //     });
-  //     return user;
-  //   })
+  // getAllPembayaranByInvoiceId: t.procedure.input(z.string()).query(({ input: invoiceId }) => {
+  //   return prisma.pembayaran.findMany({
+  //     include: {
+  //       caraBayar: {
+  //         where: {
+  //           invoiceId,
+  //         },
+  //       },
+  //     },
+  //   });
+  // }),
 });
 
 export type AppRouter = typeof appRouter;

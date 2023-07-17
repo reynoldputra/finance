@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/client"
+  binaryTargets = ["native", "darwin", "darwin-arm64"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id           String    @id @default(cuid())
+  namaCustomer String    @map("nama_customer")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  invoices     Invoice[]
+  tagihan      Tagihan[]
+}
+
+model Tagihan {
+  id           String       @id @default(cuid())
+  namaKolektor String       @map("nama_kolektor")
+  tanggal      DateTime     @map("tanggal_tagihan")
+  keterangan   String?
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  customer     Customer     @relation(fields: [customerId], references: [id])
+  customerId   String
+  pembayaran   Pembayaran[]
+}
+
+model Invoice {
+  id               String      @id @default(cuid())
+  total            Int
+  namaSales        String      @map("nama_sales")
+  tanggalTransaksi DateTime    @map("tanggal_transaksi")
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+  customer         Customer    @relation(fields: [customerId], references: [id])
+  customerId       String
+  caraBayar        CaraBayar[]
+}
+
+model CaraBayar {
+  id           String     @id @default(cuid())
+  invoice      Invoice    @relation(fields: [invoiceId], references: [id])
+  invoiceId    String
+  pembayaran   Pembayaran @relation(fields: [pembayaranId], references: [id])
+  pembayaranId String
+
+  @@map("cara_bayar")
+}
+
+model Pembayaran {
+  id          String            @id @default(cuid())
+  jumlah      Int
+  tandaTerima Boolean           @map("tanda_terima")
+  caraBayar   CaraBayar[]
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  tagihan     Tagihan           @relation(fields: [tagihanId], references: [id])
+  tagihanId   String
+  metode      MetodePembayaran? @relation(fields: [metodeId], references: [id])
+  metodeId    Int?              @unique
+  Giro        Giro?
+  Transfer    Transfer?
+}
+
+model MetodePembayaran {
+  id         Int         @id @default(autoincrement())
+  jenis      String
+  pembayaran Pembayaran?
+
+  @@map("metode_pembayaran")
+}
+
+model Giro {
+  id           String     @id @default(cuid())
+  bank         String
+  nomor        Int
+  jatuhTempo   DateTime   @map("jatuh_tempo")
+  pembayaran   Pembayaran @relation(fields: [pembayaranId], references: [id])
+  pembayaranId String     @unique
+}
+
+model Transfer {
+  id           String     @id @default(cuid())
+  tanggal      DateTime
+  pembayaran   Pembayaran @relation(fields: [pembayaranId], references: [id])
+  pembayaranId String     @unique
+}

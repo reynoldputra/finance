@@ -8,6 +8,11 @@
     "build": "vite build && prisma generate && tsc --build && node copy-files.js && node install-engines-on-mac.js",
     "start": "npm run build && concurrently \"vite\" \"cross-env NODE_ENV=development electron .\"",
     "pack": "npm run build && electron-builder --dir",
+    "studio": "npx prisma studio",
+    "db:push": "npx prisma db push",
+    "db:seed": "",
+    "db:test": "npx ts-node --transpile-only --compiler-options '{\"module\":\"commonjs\"}' ./prisma/test/test.ts",
+    "migrate:dev": "npx prisma migrate dev",
     "dist": "npm run build && electron-builder",
     "publish": "npm run build && dotenv -- electron-builder -p always"
   },

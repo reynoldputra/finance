@@ -1,4 +1,4 @@
-tanggal_tagihan,nama_kolektor,nama_sales,customer_name,tanggal_transaksi,transaksi_id,tanda_terima,total_tagihan,cash,giro_id,giro_bank,no_giro,jatuh_tempo,giro_amount,transfer_id,tanggal_transfer,transfer_amount,nihil,keterangan
+tanggal_tagihan,nama_kolektor,nama_sales,nama_customer,tanggal_transaksi,transaksi_id,tanda_terima,total_tagihan,cash,giro_id,giro_bank,no_giro,jatuh_tempo,giro_amount,transfer_id,tanggal_transfer,transfer_amount,nihil,keterangan
 23/05/2023,Ade S,Eko,WIJAYA TEKNIK,15/02,23B00974,FALSE,1277721,,,,,,,,,,TRUE,
 23/05/2023,Ade S,Eko,GALAXY MOTOR (Jakbar),03/03,23C00076,TRUE,2942499,,,,,,,qYyk0K1l,19/05,2942499,FALSE,
 23/05/2023,Ade S,Hendra,BORNEO MOTOR (Jakut),11/03,23C00650,FALSE,3506990,3507000,,,,,,,,,FALSE,Lebih 10

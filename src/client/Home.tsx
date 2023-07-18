@@ -14,7 +14,7 @@ export const Home: React.FC<HomeProps> = (props) => {
   //     utils.users.invalidate();
   //   }
   // });
-  const getAllTagihan = trpc.getAllTagihanByCustomerId.useQuery('clk4uf9r10000356k8qr4noyp ')
+  // const getAllTagihan = trpc.getAllTagihanByCustomerId.useQuery('clk4uf9r10000356k8qr4noyp ')
   // function getAllTagihan(customerId: string) {
   //   trpc.getAllTagihanByCustomerId.useQuery(customerId)
   // }
@@ -33,19 +33,19 @@ export const Home: React.FC<HomeProps> = (props) => {
         {info}
 
         <h2>Users</h2>
-        <button onClick={() => addUser.mutate({
+        {/* <button onClick={() => addUser.mutate({
           name: "Test new user",
           dateCreated: new Date()
         })}>
           Add user
-        </button>
-        {getAllTagihan.data && (
+        </button> */}
+        {/* {getAllTagihan.data && (
           <ul>
             {getAllTagihan.data.map((tagihan) => (
               <li key={tagihan.id}>{tagihan.namaKolektor}{tagihan.keterangan}</li>
             ))}
           </ul>
-        )}
+        )} */}
 
         <p>
           Edit <code>src/Home.tsx</code> and save to test HMR!

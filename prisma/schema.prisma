@@ -78,13 +78,11 @@ model CaraBayar {
   tandaTerima          Boolean                @map("tanda_terima")
   distribusiPembayaran DistribusiPembayaran[]
   metodePembayaranId   Int?
-  transferId           String?                @unique
-  giroId               String?                @unique
 
+  Transfer  Transfer?
+  Giro      Giro?
   createdAt DateTime          @default(now()) @map("created_at")
   updatedAt DateTime          @updatedAt @map("updated_at")
-  Transfer  Transfer?         @relation(fields: [transferId], references: [id])
-  Giro      Giro?             @relation(fields: [giroId], references: [id])
   metode    MetodePembayaran? @relation(fields: [metodePembayaranId], references: [id])
 
   @@map("cata_bayar")
@@ -99,18 +97,17 @@ model MetodePembayaran {
 }
 
 model Giro {
-  id          String     @id @default(cuid())
+  id          String    @id @default(cuid())
   bank        String
   nomor       Int
-  jatuhTempo  DateTime   @map("jatuh_tempo")
-  caraBayarId String
-  CaraBayar   CaraBayar?
+  jatuhTempo  DateTime  @map("jatuh_tempo")
+  caraBayarId String    @unique
+  CaraBayar   CaraBayar @relation(fields: [caraBayarId], references: [id])
 }
 
 model Transfer {
-  id           String     @id @default(cuid())
-  tanggal      DateTime
-  pembayaranId String     @unique
-  caraBayarId  String
-  CaraBayar    CaraBayar?
+  id          String    @id @default(cuid())
+  tanggal     DateTime
+  caraBayarId String    @unique
+  CaraBayar   CaraBayar @relation(fields: [caraBayarId], references: [id])
 }

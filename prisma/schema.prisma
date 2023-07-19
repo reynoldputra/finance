@@ -61,13 +61,13 @@ model DistribusiPembayaran {
   jumlah         String
   status         String
   keterangan     String?
-  tanggalTagihan String  @map("tanggal_tagihan")
+  tanggalTagihan DateTime  @map("tanggal_tagihan")
   namaKolektor   String  @map("nama_kolektor")
-  caraBayarId    String
+  caraBayarId    String?
   invoiceId      String
 
   invoice   Invoice   @relation(fields: [invoiceId], references: [id])
-  CaraBayar CaraBayar @relation(fields: [caraBayarId], references: [id])
+  CaraBayar CaraBayar? @relation(fields: [caraBayarId], references: [id])
 
   @@map("distribusi_pembayaran")
 }

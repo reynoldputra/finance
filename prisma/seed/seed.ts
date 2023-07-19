@@ -85,7 +85,6 @@ async function main() {
               update: newInvoice,
             });
 
-            let totalPembayaranSatuTagihan = 0;
             const jatuhTempo = data.jatuh_tempo + "/2023";
             const [dayJt, monthJt, yearJt] = jatuhTempo.split("/");
             const jatuhTempoDate = new Date(
@@ -150,10 +149,8 @@ async function main() {
                   (total, curr) => (total += curr.jumlah),
                   0
                 );
-                sisaTagihan = invoice.total - telahDibayar - totalPembayaranSatuTagihan;
+                sisaTagihan = invoice.total - telahDibayar;
               }
-
-              totalPembayaranSatuTagihan += data.giro_amount;
 
               let tanggal_tagihan = data.tanggal_tagihan;
               const [day, month, year] = tanggal_tagihan.split("/");
@@ -181,6 +178,8 @@ async function main() {
                   },
                 },
               });
+
+              if(giro.id == "sYkY5B6q") console.log(distribusiPembayaran)
             }
 
             if (data.transfer_id) {
@@ -243,10 +242,8 @@ async function main() {
                   (total, curr) => (total += curr.jumlah),
                   0
                 );
-                sisaTagihan = invoice.total - telahDibayar - totalPembayaranSatuTagihan;
+                sisaTagihan = invoice.total - telahDibayar;
               }
-
-              totalPembayaranSatuTagihan += data.transfer_amount;
 
               let tanggal_tagihan = data.tanggal_tagihan;
               const [day, month, year] = tanggal_tagihan.split("/");
@@ -303,10 +300,11 @@ async function main() {
                   (total, curr) => (total += curr.jumlah),
                   0
                 );
-                sisaTagihan = invoice.total - telahDibayar - totalPembayaranSatuTagihan;
+                sisaTagihan = invoice.total - telahDibayar;
               }
+              
+              if(data.giro_id == "sYkY5B6q") console.log(sisaTagihan)
 
-              totalPembayaranSatuTagihan += data.cash;
               let tanggal_tagihan = data.tanggal_tagihan;
               const [day, month, year] = tanggal_tagihan.split("/");
               const tanggalTagihanDate = new Date(

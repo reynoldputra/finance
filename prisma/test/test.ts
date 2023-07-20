@@ -1,158 +1,119 @@
-import { PrismaClient } from "../../src/generated/client";
+import { CaraBayar, Invoice, PrismaClient } from "../../src/generated/client";
 const prisma = new PrismaClient();
 
 async function main() {
   try {
-    // testing prisma query
-    // const res = await prisma.pembayaran.findMany({
-    //   where: {
-    //     PembayaranInvoice: {
-    //       some: {
-    //         invoice: {
-    //           customerId: "1",
-    //         },
-    //       },
-    //     },
-    //   },
-    // });
-    // const res = await prisma.customer.create({
-    //   data : {
-    //     namaCustomer : "Inu jaya"
+    // where: {
+    //   tanggalTagihan: new Date("2023-05-22T17:00:00.000Z");
+    // }
+    // where: {
+    //   invoice: {
+    //     customerId: ""
     //   }
-    // })
-    // console.log(res);
-
-    // const res = await prisma.distribusiPembayaran.findMany({
-    //   where: {
-    //     invoice: {
-    //       customerId: "clk7q9lc60000um34zxj6ctcr",
-    //     },
-    //   },
-    //   include: {
-    //     invoice: {
-    //       include: {
-    //         customer: true,
-    //       },
-    //     },
-    //     CaraBayar: {
-    //       include: {
-    //         metode: true,
-    //         Transfer: true,
-    //         Giro: true,
-    //       },
-    //     },
-    //   },
-    //   orderBy: {
-    //     tanggalTagihan: "asc",
-    //   },
-    // });
-
-    // const res = await prisma.customer.findMany({
-    //   where: {
-    //     id: "clk7q9lc60000um34zxj6ctcr",
-    //   },
-    //   select: {
-    //     namaCustomer: true,
-    //     invoices: {
-    //       select: {
-    //         id: true,
-    //         distribusiPembayaran: {
-    //           select: {
-    //             tanggalTagihan: true,
-    //             CaraBayar: {
-    //               select: {
-    //                 metodePembayaranId: true,
-    //                 Transfer: true,
-    //                 Giro: true,
-    //               },
-    //             },
-    //           },
-    //         },
-    //       },
-    //     },
-    //   },
-    // });
-
-    // const res = await prisma.distribusiPembayaran.findMany({
-    //   where: {
-    //     invoice: {
-    //       customerId: "clk9acouv0000umqgh72pngxf",
-    //     },
-    //   },
-    //   select: {
-    //     tanggalTagihan: true,
-    //     invoice: {
-    //       select: {
-    //         id: true,
-    //         total: true,
-    //         tanggalTransaksi: true,
-    //         namaSales: true,
-    //         distribusiPembayaran: {
-    //           select: {
-    //             jumlah: true,
-    //             status: true,
-    //             namaKolektor: true,
-    //             CaraBayar: {
-    //               select: {
-    //                 total: true,
-    //                 metode: {
-    //                   select: {
-    //                     jenis: true,
-    //                   },
-    //                 },
-    //                 Giro: {
-    //                   select: {
-    //                     bank: true,
-    //                   },
-    //                 },
-    //                 Transfer: {
-    //                   select: {
-    //                     tanggal: true,
-    //                   },
-    //                 },
-    //               },
-    //             },
-    //           },
-    //         },
-    //       },
-    //     },
-    //   },
-    // });
-
+    // },
     const res = await prisma.distribusiPembayaran.findMany({
-      where: {
-        tanggalTagihan: new Date('2023-07-19T12:34:56'),
-      },
       select: {
         tanggalTagihan: true,
         invoice: {
           select: {
             customer: {
               select: {
-                namaCustomer: true
-              }
-            }
-            // id: true,
-            // distribusiPembayaran: {
-            //   select: {
-            //     tanggalTagihan: true,
-            //     CaraBayar: {
-            //       select: {
-            //         metodePembayaranId: true,
-            //         Transfer: true,
-            //         Giro: true,
-            //       },
-            //     },
-            //   },
-            // },
+                nama: true,
+                id: true,
+              },
+            },
+            id: true,
           },
         },
-        
+        CaraBayar: true,
       },
     });
 
-    // console.log("res", res);
-    console.dir(res, { depth: null });
+    interface Tinvoice {
+      invoice_id: string;
+      tanggalTagihan: Date;
+      customer: {
+        nama: string;
+        id: string;
+      };
+      cara_bayar: CaraBayar[];
+    }
+
+    interface Tcustomer {
+      customer_id: string;
+      customer_name: string;
+      tanggalTagihan: Date;
+      invoices: Invoices[];
+    }
+    type Invoices = {
+      id: string;
+      cara_bayar: CaraBayar[];
+    };
+
+    const invoiceArray: Tinvoice[] = [];
+    const customerArray: Tcustomer[] = [];
+
+    function findInvoiceIndex(id: string): number {
+      return invoiceArray.findIndex((item: any) => item.invoice_id === id);
+    }
+
+    function findCustomerIndex(id: string): number {
+      return customerArray.findIndex(
+        (item: Tcustomer) => item.customer_id === id
+      );
+    }
+
+    res.forEach((item) => {
+      const { tanggalTagihan, invoice, CaraBayar } = item;
+      const { id, customer } = invoice;
+      const existingIndex = findInvoiceIndex(id);
+      if (existingIndex !== -1) {
+        if (CaraBayar) {
+          invoiceArray[existingIndex].cara_bayar.push(CaraBayar);
+        }
+      } else {
+        const newInvoice: Tinvoice = {
+          invoice_id: id,
+          tanggalTagihan,
+          customer,
+          cara_bayar: CaraBayar ? [CaraBayar] : [],
+        };
+        invoiceArray.push(newInvoice);
+      }
+    });
+
+    invoiceArray.forEach((item) => {
+      const { invoice_id, tanggalTagihan, customer, cara_bayar } = item;
+      const existingIndex = findCustomerIndex(customer.id);
+      if (existingIndex !== -1) {
+        customerArray[existingIndex].invoices.push({
+          id: invoice_id,
+          cara_bayar,
+        });
+      } else {
+        const newCustomer: Tcustomer = {
+          customer_id: customer.id,
+          customer_name: customer.nama,
+          tanggalTagihan,
+          invoices: [
+            {
+              id: invoice_id,
+              cara_bayar,
+            },
+          ],
+        };
+        customerArray.push(newCustomer);
+      }
+    });
+
+    // raw from query
+    // console.dir(res, { depth: null });
+
+    // show based on invoice
+    // console.dir(invoiceArray, { depth: null });
+
+    // show based on customer
+    // console.dir(customerArray, { depth: null });
   } catch (err) {
     console.log("Error : ", err);
   }

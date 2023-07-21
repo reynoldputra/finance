@@ -13,12 +13,23 @@ datasource db {
 }
 
 model Customer {
-  id       String    @id @default(cuid())
-  nama     String    @unique @map("nama_customer")
-  invoices Invoice[]
+  id           String         @id @default(cuid())
+  nama         String         @unique @map("nama_customer")
+  CollectorLog CollectorLog[]
+  invoices     Invoice[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model CollectorLog {
+  id           String @id @default(cuid())
+  namaCustomer String @map("nama_customer")
+  namaKolektor String @map("nama_kolektor")
+  customerId   String
+
+  customer  Customer @relation(fields: [customerId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
 }
 
 model Invoice {

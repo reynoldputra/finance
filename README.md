@@ -1,12 +1,95 @@
-# Purpose
-This repo demonstrates:
-- Using tRPC over IPC to communicate between the main and renderer processes.
-- Using Prisma with an SQLite database.
-- End-to-end process of building, signing, notarizing, and publishing an Electron app with electron-builder on Mac and Windows.
+## Development
+### Folder stucture
 
-electron-prisma-trpc-example intends to provide a clean proof-of-concept that you can pick-and-choose from and integrate into your own Electron app.
+```
+    ├── README.md
+    ├── assets # static assets
+    │   └── cars-road-near-city.jpg
+    ├── prisma
+    │   ├── seed
+    │   │   ├── data # seeding data json/csv
+    │   │   │    └── tagihan.csv
+    │   │   └── seed.ts 
+    │   └── test
+    │       └── test.ts # testing query database
+    └── src
+        ├── client
+            ├── components
+            │   ├── Grid.tsx # single component
+            │   ├── Animate/ # component have index.tsx, capitalized
+            │   │   ├── Animate.tsx
+            │   │   ├── Fade.tsx
+            │   │   └── index.tsx # will import Animate.tsx
+            │   └── landing/ # not a component, used for grouping
+            │       ├── Banner.tsx # single component
+            │       └── ContactUs/ # a component, same as Animate
+            ├── context # store context
+            ├── data # ideally use for placeholder while API not ready (or not)
+            ├── hooks # stroing hooks
+            ├── lib # helper functions
+            └── pages
 
-This is the next generation of https://github.com/awohletz/electron-prisma-template, simplified, trimmed down, and updated for the latest Electron and other dependencies.
+├└─│├
+
+```
+
+## Naming Conventions
+  - **Extensions**: Use `.tsx` extension for React components. 
+  - **Filename**: Use PascalCase for filenames. E.g., `ReservationCard.tsx`.
+  - **Reference Naming**: Use PascalCase for React components and camelCase for their instances. 
+    ```tsx
+    // bad
+    import reservationCard from './ReservationCard';
+
+    // good
+    import ReservationCard from './ReservationCard';
+
+    // bad
+    const ReservationItem = <ReservationCard />;
+
+    // good
+    const reservationItem = <ReservationCard />;
+    ```
+
+  - **Component Naming**: Use the filename as the component name. For example, `ReservationCard.tsx` should have a reference name of `ReservationCard`. However, for root components of a directory, use `index.tsx` as the filename and use the directory name as the component name:
+
+    ```tsx
+    // bad
+    import Footer from './Footer/Footer';
+
+    // bad
+    import Footer from './Footer/index';
+
+    // good
+    import Footer from './Footer';
+    ```
+
+  - **Higher-order Component Naming**: Use a composite of the higher-order component’s name and the passed-in component’s name as the `displayName` on the generated component. For example, the higher-order component `withFoo()`, when passed a component `Bar` should produce a component with a `displayName` of `withFoo(Bar)`.
+
+    > Why? A component’s `displayName` may be used by developer tools or in error messages, and having a value that clearly expresses this relationship helps people understand what is happening.
+
+    ```tsx
+    // bad
+    export default function withFoo(WrappedComponent) {
+      return function WithFoo(props) {
+        return <WrappedComponent {...props} foo />;
+      }
+    }
+
+    // good
+    export default function withFoo(WrappedComponent) {
+      function WithFoo(props) {
+        return <WrappedComponent {...props} foo />;
+      }
+
+      const wrappedComponentName = WrappedComponent.displayName
+        || WrappedComponent.name
+        || 'Component';
+
+      WithFoo.displayName = `withFoo(${wrappedComponentName})`;
+      return WithFoo;
+    }
+    ```
 
 ## Getting started
 1. Clone this repo. Then in the project root directory, do the following:

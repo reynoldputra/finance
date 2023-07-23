@@ -1,20 +1,107 @@
-# Purpose
-This repo demonstrates:
-- Using tRPC over IPC to communicate between the main and renderer processes.
-- Using Prisma with an SQLite database.
-- End-to-end process of building, signing, notarizing, and publishing an Electron app with electron-builder on Mac and Windows.
+## Development
+### Folder stucture
 
-electron-prisma-trpc-example intends to provide a clean proof-of-concept that you can pick-and-choose from and integrate into your own Electron app.
+```
+    ├── README.md
+    ├── prisma
+    │   ├── seed
+    │   │   ├── data # seeding data json/csv
+    │   │   │    └── tagihan.csv
+    │   │   └── seed.ts 
+    │   └── test
+    │       └── test.ts # testing query database
+    └── src
+        ├── client
+        │   ├── assets # static assets
+        │   │   └── cars-road-near-city.jpg
+        │   ├── components
+        │   │   ├── Routes.tsx # Add new route hear
+        │   │   ├── Grid.tsx # single component
+        │   │   ├── Home / # component have index.tsx, capitalized
+        │   │   │   ├── Home.tsx
+        │   │   │   └── index.tsx # will import Home.tsx
+        │   │   └── landing/ # not a component, used for grouping
+        │   │       ├── Banner.tsx # single component
+        │   │       └── ContactUs/ # a component, same as Animate
+        │   ├── context # store context
+        │   ├── data # ideally use for placeholder while API not ready (or not)
+        │   ├── hooks # stroing hooks
+        │   ├── lib # helper functions
+        │   └── pages # pages component
+        └── server
+            ├── router.ts # group of trpc routes
+            └── collections
+                └── customer
+                    ├── customerRouter.ts # child trpc route
+                    └── customerService.ts # bussiness logic
 
-This is the next generation of https://github.com/awohletz/electron-prisma-template, simplified, trimmed down, and updated for the latest Electron and other dependencies.
+```
+
+## Naming Conventions
+  - **Extensions**: Use `.tsx` extension for React components. 
+  - **Filename**: Use PascalCase for filenames. E.g., `ReservationCard.tsx`.
+  - **Reference Naming**: Use PascalCase for React components and camelCase for their instances. 
+    ```tsx
+    // bad
+    import reservationCard from './ReservationCard';
+
+    // good
+    import ReservationCard from './ReservationCard';
+
+    // bad
+    const ReservationItem = <ReservationCard />;
+
+    // good
+    const reservationItem = <ReservationCard />;
+    ```
+
+  - **Component Naming**: Use the filename as the component name. For example, `ReservationCard.tsx` should have a reference name of `ReservationCard`. However, for root components of a directory, use `index.tsx` as the filename and use the directory name as the component name:
+
+    ```tsx
+    // bad
+    import Footer from './Footer/Footer';
+
+    // bad
+    import Footer from './Footer/index';
+
+    // good
+    import Footer from './Footer';
+    ```
+
+  - **Higher-order Component Naming**: Use a composite of the higher-order component’s name and the passed-in component’s name as the `displayName` on the generated component. For example, the higher-order component `withFoo()`, when passed a component `Bar` should produce a component with a `displayName` of `withFoo(Bar)`.
+
+    > Why? A component’s `displayName` may be used by developer tools or in error messages, and having a value that clearly expresses this relationship helps people understand what is happening.
+
+    ```tsx
+    // bad
+    export default function withFoo(WrappedComponent) {
+      return function WithFoo(props) {
+        return <WrappedComponent {...props} foo />;
+      }
+    }
+
+    // good
+    export default function withFoo(WrappedComponent) {
+      function WithFoo(props) {
+        return <WrappedComponent {...props} foo />;
+      }
+
+      const wrappedComponentName = WrappedComponent.displayName
+        || WrappedComponent.name
+        || 'Component';
+
+      WithFoo.displayName = `withFoo(${wrappedComponentName})`;
+      return WithFoo;
+    }
+    ```
 
 ## Getting started
 1. Clone this repo. Then in the project root directory, do the following:
 2. Run `npm install`.
 4. Edit electron-builder.yml to fill in productName, appId, copyright, and publisherName.
 5. Set up code signing. Follow the instructions in https://www.electron.build/code-signing to set up code signing certificates for your platform. Also see my articles: 
-    1. Windows: https://dev.to/awohletz/how-i-code-signed-an-electron-app-on-windows-30k5 
-    1. Mac: https://dev.to/awohletz/how-i-sign-and-notarize-my-electron-app-on-macos-59bb
+   1. Windows: https://dev.to/awohletz/how-i-code-signed-an-electron-app-on-windows-30k5 
+   2. Mac: https://dev.to/awohletz/how-i-sign-and-notarize-my-electron-app-on-macos-59bb
 5. Edit package.json to fill in your project details. Set the `repository` property to a Github repo where you will publish releases. When you run `npm run dist`, the app will be packaged and published to the Github repo.
    1. Create a Github repo for your app releases. See https://www.electron.build/configuration/publish#githuboptions
    2. Create an access token for your Github repo. See https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token

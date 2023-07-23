@@ -8,8 +8,9 @@ import {dbPath, dbUrl, isDev, latestMigration, Migration} from "./constants";
 import log from "electron-log";
 import {prisma, runPrismaCommand} from "./prisma";
 import {MenuBuilder} from "./menu";
+import { createFileRoute, createURLRoute } from "electron-router-dom";
 
-const createWindow = async () => {
+const createWindow = async (id : string) => {
 
   let needsMigration;
   const dbExists = fs.existsSync(dbPath);
@@ -83,11 +84,20 @@ const createWindow = async () => {
   const menuBuilder = MenuBuilder(win, app.name);
   menuBuilder.buildMenu();
 
+  const rendererUrl = "http://localhost:5173"
+
+  const fileRoute = createFileRoute(
+    path.join(__dirname, '..', 'index.html'),
+    id
+  )
+
+  const devServerURL = createURLRoute(rendererUrl, id)
+
   if (isDev) {
     // in dev mode, load the vite dev server
-    await win.loadURL("http://localhost:5173");
+    await win.loadURL(devServerURL);
   } else {
-    await win.loadFile(path.join(__dirname, '..', 'index.html'));
+    await win.loadFile(...fileRoute);
   }
   win.webContents.openDevTools()
 };
@@ -104,11 +114,11 @@ app.whenReady().then(() => {
     });
   })
 
-  createWindow();
+  createWindow('main');
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      createWindow('main');
     }
   });
 });

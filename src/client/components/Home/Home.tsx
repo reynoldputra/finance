@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
+<<<<<<< HEAD
 import { ExampleForm } from "./ExampleForm";
 import { Modal } from "../Modal";
 import Sidebar from "../Sidebar";
+=======
+>>>>>>> 6dea5b4 (rebase: master)
 import {
   Dialog,
   DialogContent,
@@ -29,6 +32,7 @@ export const Home: React.FC<HomeProps> = (props) => {
         <h1 className="font-bold text-xl mx-auto">Vite + React</h1>
         <div className="mx-auto">{info}</div>
       </div>
+<<<<<<< HEAD
       <div className="w-full flex justify-center items-center gap-x-4 mt-4">
         <Modal
           buttonTitle="Ini Modal"
@@ -41,6 +45,8 @@ export const Home: React.FC<HomeProps> = (props) => {
       <div className="px-64 mt-2">
         <ExampleForm />
       </div>
+=======
+>>>>>>> 6dea5b4 (rebase: master)
       <Dialog>
         {/* button */}
         <DialogTrigger>Open</DialogTrigger>

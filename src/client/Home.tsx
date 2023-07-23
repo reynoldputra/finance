@@ -1,8 +1,15 @@
-import React, {useEffect} from 'react';
-import {trpc} from "./util";
+import React, { useEffect } from "react";
+import { trpc } from "./util";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../@/components/ui/dialog";
 
-export interface HomeProps {
-}
+export interface HomeProps {}
 
 export const Home: React.FC<HomeProps> = (props) => {
   const info = `This app is using Chrome (v${window.appApi.chrome()}), Node.js (v${window.appApi.node()}), and Electron (v${window.appApi.electron()})`;
@@ -24,7 +31,7 @@ export const Home: React.FC<HomeProps> = (props) => {
       console.log("Received event from main ", event);
       alert("Received event from main " + event.action);
     });
-  }, [])
+  }, []);
 
   return (
     <div className="App">
@@ -33,19 +40,20 @@ export const Home: React.FC<HomeProps> = (props) => {
         {info}
 
         <h2>Users</h2>
-        {/* <button onClick={() => addUser.mutate({
-          name: "Test new user",
-          dateCreated: new Date()
-        })}>
-          Add user
-        </button> */}
-        {/* {getAllTagihan.data && (
-          <ul>
-            {getAllTagihan.data.map((tagihan) => (
-              <li key={tagihan.id}>{tagihan.namaKolektor}{tagihan.keterangan}</li>
-            ))}
-          </ul>
-        )} */}
+        <Dialog>
+          {/* button */}
+          <DialogTrigger>Open</DialogTrigger>
+          {/* modals */}
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you sure absolutely sure?</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently delete your
+                account and remove your data from our servers.
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
 
         <p>
           Edit <code>src/Home.tsx</code> and save to test HMR!
@@ -53,4 +61,4 @@ export const Home: React.FC<HomeProps> = (props) => {
       </div>
     </div>
   );
-}
+};

@@ -8,51 +8,51 @@ const t = initTRPC.create({
 });
 
 export const appRouter = t.router({
-  getAllPembayaranByCustomerId: t.procedure.input(z.string()).query(({ input: customerId }) => {
-    return prisma.pembayaran.findMany({
-      where: {
-        PembayaranInvoice: {
-          some: {
-            invoice: {
-              customerId,
-            },
-          },
-        },
-      },
-    });
-  }),
-  getAllPembayaranByDate: t.procedure
-    .input(
-      z.object({
-        startDate: z.string().transform((val) => new Date(val)),
-        endDate: z.string().transform((val) => new Date(val)),
-      })
-    )
-    .query(({ input: { startDate, endDate } }) => {
-      return prisma.pembayaran.findMany({
-        where: {
-          tanggal: {
-            gte: startDate,
-            lte: endDate,
-          },
-        },
-        include: {
-          PembayaranInvoice: {
-            include: {
-              distribusiPembayaran: {
-                include: {
-                  CaraBayar: {
-                    include: {
-                      metode: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-    }),
+  // getAllPembayaranByCustomerId: t.procedure.input(z.string()).query(({ input: customerId }) => {
+  //   return prisma.pembayaran.findMany({
+  //     where: {
+  //       PembayaranInvoice: {
+  //         some: {
+  //           invoice: {
+  //             customerId,
+  //           },
+  //         },
+  //       },
+  //     },
+  //   });
+  // }),
+  // getAllPembayaranByDate: t.procedure
+  //   .input(
+  //     z.object({
+  //       startDate: z.string().transform((val) => new Date(val)),
+  //       endDate: z.string().transform((val) => new Date(val)),
+  //     })
+  //   )
+  //   .query(({ input: { startDate, endDate } }) => {
+  //     return prisma.pembayaran.findMany({
+  //       where: {
+  //         tanggal: {
+  //           gte: startDate,
+  //           lte: endDate,
+  //         },
+  //       },
+  //       include: {
+  //         PembayaranInvoice: {
+  //           include: {
+  //             distribusiPembayaran: {
+  //               include: {
+  //                 CaraBayar: {
+  //                   include: {
+  //                     metode: true,
+  //                   },
+  //                 },
+  //               },
+  //             },
+  //           },
+  //         },
+  //       },
+  //     });
+  //   }),
   // getAllPembayaranByInvoiceId: t.procedure.input(z.string()).query(({ input: invoiceId }) => {
   //   return prisma.pembayaran.findMany({
   //     include: {

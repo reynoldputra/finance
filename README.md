@@ -1,5 +1,32 @@
-## Development
-### Folder stucture
+# Development
+
+## Getting started
+1. Clone this repo. Then in the project root directory, do the following:
+2. Run `npm install`.
+4. Edit electron-builder.yml to fill in productName, appId, copyright, and publisherName.
+5. Set up code signing. Follow the instructions in https://www.electron.build/code-signing to set up code signing certificates for your platform. Also see my articles: 
+   1. Windows: https://dev.to/awohletz/how-i-code-signed-an-electron-app-on-windows-30k5 
+   2. Mac: https://dev.to/awohletz/how-i-sign-and-notarize-my-electron-app-on-macos-59bb
+5. Edit package.json to fill in your project details. Set the `repository` property to a Github repo where you will publish releases. When you run `npm run dist`, the app will be packaged and published to the Github repo.
+   1. Create a Github repo for your app releases. See https://www.electron.build/configuration/publish#githuboptions
+   2. Create an access token for your Github repo. See https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+6. Create a `.env` file that looks like this:
+```
+DATABASE_URL=file:./app.db
+# If you are signing and notarizing the app on Mac
+APPLE_ID=your apple id
+APPLE_ID_PASSWORD=your apple password
+APPLE_TEAM_ID=your apple team ID
+# If you want to publish releases to Github
+GITHUB_TOKEN=your github access token
+# If you want to code sign on Windows
+CSC_LINK=yourWindowsCodeSigningCert.pfx
+CSC_KEY_PASSWORD=your password for the Windows code signing cert
+```
+5. Now you can run `npm start` to start in dev mode and check out the example app. If you want to test building and publishing a release, see the below sections.
+
+
+## Folder stucture
 
 ```
     ├── README.md
@@ -15,7 +42,7 @@
         │   ├── assets # static assets
         │   │   └── cars-road-near-city.jpg
         │   ├── components
-        │   │   ├── Routes.tsx # Add new route hear
+        │   │   ├── Routes.tsx # add new route hear
         │   │   ├── Grid.tsx # single component
         │   │   ├── Home / # component have index.tsx, capitalized
         │   │   │   ├── Home.tsx
@@ -95,30 +122,6 @@
     }
     ```
 
-## Getting started
-1. Clone this repo. Then in the project root directory, do the following:
-2. Run `npm install`.
-4. Edit electron-builder.yml to fill in productName, appId, copyright, and publisherName.
-5. Set up code signing. Follow the instructions in https://www.electron.build/code-signing to set up code signing certificates for your platform. Also see my articles: 
-   1. Windows: https://dev.to/awohletz/how-i-code-signed-an-electron-app-on-windows-30k5 
-   2. Mac: https://dev.to/awohletz/how-i-sign-and-notarize-my-electron-app-on-macos-59bb
-5. Edit package.json to fill in your project details. Set the `repository` property to a Github repo where you will publish releases. When you run `npm run dist`, the app will be packaged and published to the Github repo.
-   1. Create a Github repo for your app releases. See https://www.electron.build/configuration/publish#githuboptions
-   2. Create an access token for your Github repo. See https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
-6. Create a `.env` file that looks like this:
-```
-DATABASE_URL=file:./app.db
-# If you are signing and notarizing the app on Mac
-APPLE_ID=your apple id
-APPLE_ID_PASSWORD=your apple password
-APPLE_TEAM_ID=your apple team ID
-# If you want to publish releases to Github
-GITHUB_TOKEN=your github access token
-# If you want to code sign on Windows
-CSC_LINK=yourWindowsCodeSigningCert.pfx
-CSC_KEY_PASSWORD=your password for the Windows code signing cert
-```
-5. Now you can run `npm start` to start in dev mode and check out the example app. If you want to test building and publishing a release, see the below sections.
 
 ## Scripts
 ### `npm run build` 

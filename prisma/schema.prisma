@@ -4,7 +4,7 @@
 generator client {
   provider      = "prisma-client-js"
   output        = "../src/generated/client"
-  binaryTargets = ["native", "darwin", "darwin-arm64",  "native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl"]
+  binaryTargets = ["native", "darwin", "darwin-arm64", "native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl"]
 }
 
 datasource db {
@@ -13,23 +13,34 @@ datasource db {
 }
 
 model Customer {
-  id           String         @id @default(cuid())
-  nama         String         @unique @map("nama_customer")
-  CollectorLog CollectorLog[]
-  invoices     Invoice[]
+  id              String            @id @default(cuid())
+  nama            String            @unique @map("nama_customer")
+  invoices        Invoice[]
+  kolektorHistory KolektorHistory[]
+  kolektorId      String
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  currentKolektor Kolektor @relation(fields: [kolektorId], references: [id])
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 }
 
-model CollectorLog {
-  id           String @id @default(cuid())
-  namaCustomer String @map("nama_customer")
-  namaKolektor String @map("nama_kolektor")
-  customerId   String
+model KolektorHistory {
+  id         String @id @default(cuid())
+  customerId String
+  kolektorId String
 
   customer  Customer @relation(fields: [customerId], references: [id])
+  kolektor  Kolektor @relation(fields: [kolektorId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
+  @@map("kolektor_history")
+}
+
+model Kolektor {
+  id              String            @id @default(cuid())
+  nama            String            @unique @map("nama_kolektor")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  customer        Customer[]
+  lolektorHistory KolektorHistory[]
 }
 
 model Invoice {

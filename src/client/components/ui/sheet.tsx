@@ -1,7 +1,12 @@
 import * as React from "react"
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
+<<<<<<< HEAD
 import { X } from "lucide-react"
+=======
+// import { X } from "lucide-react"
+
+>>>>>>> 032c77e (feat: alias path)
 import { cn } from "@client/lib/cn"
 
 const Sheet = SheetPrimitive.Root

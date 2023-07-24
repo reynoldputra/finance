@@ -1,4 +1,4 @@
-import { cn } from "@client/lib/utils";
+import { cn } from "@client/lib/cn";
 import { FunctionComponent, ReactNode } from "react";
 
 interface GridProps {

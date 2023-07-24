@@ -10,6 +10,7 @@
     "start": "npm run build && concurrently \"vite\" \"cross-env NODE_ENV=development electron .\"",
     "pack": "npm run build && electron-builder --dir",
     "studio": "npx prisma studio",
+    "generate": "npx prisma generate",
     "db:push": "npx prisma db push",
     "db:seed": "npx ts-node --transpile-only --compiler-options '{\"module\":\"commonjs\"}' ./prisma/seed/seed.ts",
     "db:test": "npx ts-node --transpile-only --compiler-options '{\"module\":\"commonjs\"}' ./prisma/test/test.ts",

@@ -5,19 +5,12 @@
   "tsx": true,
   "tailwind": {
     "config": "tailwind.config.js",
-    "css": "src/globals.css",
+    "css": "src/client/index.css",
     "baseColor": "slate",
     "cssVariables": true
   },
   "aliases": {
-<<<<<<< HEAD
     "components": "@client/components",
     "utils": "@client/lib/cn"
   }
 }
-=======
-    "components": "@/components",
-    "utils": "@/lib/utils"
-  }
-}
->>>>>>> a0d926f (feat: modals, form, sidebar)

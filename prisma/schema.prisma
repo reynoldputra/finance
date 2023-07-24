@@ -32,7 +32,6 @@ model KolektorHistory {
   customer  Customer @relation(fields: [customerId], references: [id])
   kolektor  Kolektor @relation(fields: [kolektorId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
-
   @@map("kolektor_history")
 }
 

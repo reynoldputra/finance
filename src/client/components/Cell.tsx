@@ -1,5 +1,5 @@
 import { FunctionComponent, ReactNode } from "react";
-import clsxm from "../lib/clsxm";
+import { cn as cslx } from "@client/lib/cn";
 
 interface CellProps {
   children: ReactNode,
@@ -47,7 +47,7 @@ const Cell: FunctionComponent<CellProps> = ({
   if (rowsLg) cn.push(`lg:_rows-${rowsLg}`);
   if (rowsXl) cn.push(`xl:_rows-${rowsXl}`);
 
-  return <div className={clsxm(cn, className)} {...rest} />;
+  return <div className={cslx(cn, className)} {...rest} />;
 };
 
 export default Cell;

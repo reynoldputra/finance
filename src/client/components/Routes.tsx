@@ -1,6 +1,6 @@
 import { Router, Route } from "electron-router-dom";
-import CustomerPage from "../pages/customer";
-import HomePage from "../pages/home";
+import CustomerPage from "@client/pages/customer";
+import HomePage from "@client/pages/home";
 
 export function AppRoutes() {
   return (

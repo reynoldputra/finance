@@ -1,10 +1,8 @@
 import React, { useEffect } from "react";
-<<<<<<< HEAD
 import { ExampleForm } from "./ExampleForm";
 import { Modal } from "../Modal";
 import Sidebar from "../Sidebar";
-=======
->>>>>>> 6dea5b4 (rebase: master)
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +16,7 @@ export interface HomeProps {}
 
 export const Home: React.FC<HomeProps> = (props) => {
   const info = `This app is using Chrome (v${window.appApi.chrome()}), Node.js (v${window.appApi.node()}), and Electron (v${window.appApi.electron()})`;
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.appApi.receive("app", (event) => {
@@ -32,7 +31,6 @@ export const Home: React.FC<HomeProps> = (props) => {
         <h1 className="font-bold text-xl mx-auto">Vite + React</h1>
         <div className="mx-auto">{info}</div>
       </div>
-<<<<<<< HEAD
       <div className="w-full flex justify-center items-center gap-x-4 mt-4">
         <Modal
           buttonTitle="Ini Modal"
@@ -45,22 +43,23 @@ export const Home: React.FC<HomeProps> = (props) => {
       <div className="px-64 mt-2">
         <ExampleForm />
       </div>
-=======
->>>>>>> 6dea5b4 (rebase: master)
-      <Dialog>
-        {/* button */}
-        <DialogTrigger>Open</DialogTrigger>
-        {/* modals */}
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Are you sure absolutely sure?</DialogTitle>
-            <DialogDescription>
-              This action cannot be undone. This will permanently delete your account and remove
-              your data from our servers.
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      <div>
+        <Dialog>
+          {/* button */}
+          <DialogTrigger>Open</DialogTrigger>
+          {/* modals */}
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you sure absolutely sure?</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently delete your account and remove
+                your data from our servers.
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      </div>
+      <div onClick={() => navigate("/customer")}>Go to customer</div>
     </div>
   );
 };

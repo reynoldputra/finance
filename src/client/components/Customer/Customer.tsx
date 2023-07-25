@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import Table from "./Table"
+import CustomerTable from "./CustomerTable"
 
 export default function Customer () {
   const navigate = useNavigate()
@@ -7,7 +7,7 @@ export default function Customer () {
     <div>
       <p>Customer page</p>
       <div onClick={() => navigate("/")}>Go to home page</div>
-      <Table />
+      <CustomerTable />
     </div>
   );
 }

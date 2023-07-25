@@ -1,7 +1,7 @@
 import { Button } from "@client/components/ui/button";
 import { Input } from "@client/components/ui/input";
 import { Cross2Icon } from "@radix-ui/react-icons";
-import { DataTableFacetedFilter } from "@client/components/table/DataTable/data-table-faceted-filter";
+import { DataTableFacetedFilter } from "@client/components/table/DataTable/DataTableFacatedFilter";
 import { priorities, statuses } from "./data/data";
 import { Table } from "@tanstack/react-table";
 

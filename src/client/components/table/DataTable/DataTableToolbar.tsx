@@ -1,6 +1,6 @@
 import { Table } from "@tanstack/react-table";
 import { ReactNode } from "react";
-import { DataTableViewOptions } from "./data-table-view-options";
+import { DataTableViewOptions } from "./DataTableViewOptions";
 
 interface DataTableToolbarProps<TData> {
   children: ReactNode;

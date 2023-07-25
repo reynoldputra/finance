@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@client/components/ui/table";
 
-import { DataTablePagination } from "./data-table-pagination";
+import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar } from "./DataTableToolbar";
 import { ReactTableProvider } from "@client/provider/TableContext";
 

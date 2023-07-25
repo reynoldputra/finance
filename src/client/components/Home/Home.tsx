@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +13,7 @@ export interface HomeProps {}
 
 export const Home: React.FC<HomeProps> = (props) => {
   const info = `This app is using Chrome (v${window.appApi.chrome()}), Node.js (v${window.appApi.node()}), and Electron (v${window.appApi.electron()})`;
+  const navigate = useNavigate()
 
   useEffect(() => {
     window.appApi.receive("app", (event) => {
@@ -29,20 +31,23 @@ export const Home: React.FC<HomeProps> = (props) => {
           Edit <code>src/Home.tsx</code> and save to test HMR!
         </p>
       </div>
-      <Dialog>
-        {/* button */}
-        <DialogTrigger>Open</DialogTrigger>
-        {/* modals */}
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Are you sure absolutely sure?</DialogTitle>
-            <DialogDescription>
-              This action cannot be undone. This will permanently delete your account and remove
-              your data from our servers.
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      <div>
+        <Dialog>
+          {/* button */}
+          <DialogTrigger>Open</DialogTrigger>
+          {/* modals */}
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you sure absolutely sure?</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently delete your account and remove
+                your data from our servers.
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      </div>
+      <div onClick={() => navigate("/customer")}>Go to customer</div>
     </div>
   );
 };

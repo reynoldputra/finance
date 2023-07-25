@@ -37,6 +37,7 @@ export default function useDataTable<TData, TValue> ({
       columnFilters,
     },
     enableRowSelection: true,
+    enableMultiSort: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

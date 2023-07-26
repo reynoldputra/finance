@@ -15,7 +15,12 @@
     "inlineSources": false,
     "sourceMap": false,
     "removeComments": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      // "@client/*": ["../../src/client/*"],
+      "@server/*": ["./*"]
+    }
   },
   "references": [{
     "path": "../../tsconfig.node.json"

@@ -2,7 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@client/*": ["./src/client/*"]
+      "@client/*": ["./src/client/*"],
+      "@server/*": ["./src/server/*"]
     }
   },
   "files": [],

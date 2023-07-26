@@ -4,7 +4,10 @@ import path from "path";
 export default defineConfig({
     plugins: [react()],
     resolve: {
-        alias: { "@client": path.resolve(__dirname, "./src/client") }
+        alias: {
+            "@client": path.resolve(__dirname, "./src/client"),
+            "@server": path.resolve(__dirname, "./src/server")
+        }
     },
     build: {
         // sourcemaps have to be inline due to https://github.com/electron/electron/issues/22996

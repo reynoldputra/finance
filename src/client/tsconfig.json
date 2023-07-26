@@ -18,7 +18,9 @@
     "jsx": "react-jsx",
     "baseUrl": "./",
     "paths": {
-      "@client/*": ["../../src/client/*"]
+      "@client/*": ["./*"],
+      "@server/*": ["../server/*"],
+      "@global/*": ["../*"]
     }
   },
   "include": [

@@ -1,11 +1,11 @@
-import { prisma } from "../../prisma";
 import { MainTrpc } from "../../trpc";
+import { CustomerService } from "./customerService";
 
 const customerTrpc = new MainTrpc()
 
 export const CustomerRouter = customerTrpc.router({
-  customers: customerTrpc.publicProcedure
+  customerTable: customerTrpc.publicProcedure
     .query(() => {
-      return prisma.customer.findMany();
+      return CustomerService.getCustomerTable();
     }),
 })

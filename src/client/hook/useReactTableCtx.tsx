@@ -1,5 +1,5 @@
 import { RowData, Table } from '@tanstack/react-table';
-import { ReactTableContext } from '@client/provider/TableContext';
+import { ReactTableContext } from '@client/provider/ReactTableProvider';
 import React from 'react'
 
 export const useReactTableCtx = () => {

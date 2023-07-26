@@ -1,5 +1,5 @@
 import React from "react";
-import { RowData, Table, TableOptions, useReactTable } from "@tanstack/react-table";
+import { RowData, Table } from "@tanstack/react-table";
 
 export const ReactTableContext = React.createContext<Table<RowData> | undefined>(undefined);
 

@@ -1,4 +1,3 @@
-import * as React from "react";
 import { ColumnDef, flexRender, Table as TableType } from "@tanstack/react-table";
 
 import {
@@ -11,25 +10,44 @@ import {
 } from "@client/components/ui/table";
 
 import { DataTablePagination } from "./DataTablePagination";
-import { DataTableToolbar } from "./DataTableToolbar";
-import { ReactTableProvider } from "@client/provider/TableContext";
+import { ReactTableProvider } from "@client/provider/ReactTableProvider";
+import { Button } from "@client/components/ui/button";
+import { Cross2Icon } from "@radix-ui/react-icons";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  toolBar?: React.ReactNode;
   table: TableType<TData>;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  toolBar,
-  table,
-}: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, table }: DataTableProps<TData, TValue>) {
+  const isFiltered = table.getState().columnFilters.length > 0;
+  const isSorted = table.getState().sorting.length > 0;
   return (
     <ReactTableProvider table={table}>
-      <div className="space-y-4">
-        <DataTableToolbar table={table}>{toolBar}</DataTableToolbar>
+      <div className="space-y-4 p-8">
         <div className="rounded-md border">
+          <div className="px-4 py-2 flex justify-end">
+            {isSorted && (
+              <Button
+                variant="ghost"
+                onClick={() => table.resetSorting()}
+                className="h-8 px-2 lg:px-3 bg-slate-100"
+              >
+                Reset Sort
+                <Cross2Icon className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+            {isFiltered && (
+              <Button
+                variant="ghost"
+                onClick={() => table.resetColumnFilters()}
+                className="h-8 px-2 lg:px-3 bg-slate-100"
+              >
+                Reset Filter
+                <Cross2Icon className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

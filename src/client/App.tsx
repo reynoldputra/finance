@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { trpc } from "./util";
+import { trpc } from "@client/lib/trpc";
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { IpcRequest } from "../api";

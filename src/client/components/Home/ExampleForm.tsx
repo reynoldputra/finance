@@ -28,7 +28,7 @@ const formSchema = z.object({
   Language: z.string(),
 });
 
-export function FormComponent() {
+export function ExampleForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

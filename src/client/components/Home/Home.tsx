@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { FormComponent } from "./Form";
+import { ExampleForm } from "./ExampleForm";
 import { Modal } from "../Modal";
 import Sidebar from "../Sidebar";
 
@@ -31,7 +31,7 @@ export const Home: React.FC<HomeProps> = (props) => {
         <Sidebar />
       </div>
       <div className="px-64 mt-2">
-        <FormComponent />
+        <ExampleForm />
       </div>
     </div>
   );

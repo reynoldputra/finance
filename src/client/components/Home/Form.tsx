@@ -3,22 +3,21 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { Form } from "@client/components/ui/form";
 import { Button } from "@client/components/ui/button";
-import InputForm from "../InputForm";
+import InputForm from "../form/InputForm/InputForm";
 
-// combobox value
 const languages = [
-  { label: "English", value: "en" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Spanish", value: "es" },
-  { label: "Portuguese", value: "pt" },
-  { label: "Russian", value: "ru" },
-  { label: "Japanese", value: "ja" },
-  { label: "Korean", value: "ko" },
-  { label: "Chinese", value: "zh" },
+  { title: "English", value: "en" },
+  { title: "French", value: "fr" },
+  { title: "German", value: "de" },
+  { title: "Spanish", value: "es" },
+  { title: "Portuguese", value: "pt" },
+  { title: "Russian", value: "ru" },
+  { title: "Japanese", value: "ja" },
+  { title: "Korean", value: "ko" },
+  { title: "Chinese", value: "zh" },
 ] as const;
 
-export const formSchema = z.object({
+const formSchema = z.object({
   Username: z.string().min(2, {
     message: "Username must be at least 2 characters.",
   }),
@@ -45,22 +44,19 @@ export function FormComponent() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <InputForm
-          control={form.control}
           type="text"
-          label="Username"
+          title="Username"
           description="This is your public display name."
         />
         <InputForm
-          control={form.control}
           type="number"
-          label="Total"
+          title="Total"
           description="This is Your Total"
         />
-        <InputForm label="Date" type="datepicker" control={form.control} />
+        <InputForm title="Date" type="datepicker" />
         <InputForm
-          label="Language"
+          title="Language"
           type="combobox"
-          control={form.control}
           options={languages}
         />
         <Button type="submit">Submit</Button>

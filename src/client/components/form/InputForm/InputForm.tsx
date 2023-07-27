@@ -21,49 +21,45 @@ import {
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@client/lib/cn";
 import { Button } from "@client/components/ui/button";
-import * as z from "zod";
 import { Input } from "@client/components/ui/input";
-import { Control, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { Calendar } from "@client/components/ui/calendar";
 import { format } from "date-fns";
 
 interface Option {
-  label: string;
+  title: string;
   value: string;
 }
 
 // change the schema
-import { formSchema as schema } from "./Home/Form";
 interface CustomFormFieldProps {
-  label: keyof z.infer<typeof schema>;
+  title: string;
   description?: string;
   errorMessage?: string;
   type: "text" | "number" | "combobox" | "datepicker";
-  control: Control<z.infer<typeof schema>>;
-  options?: Option[];
+  options?: readonly Option[];
 }
 
 const InputForm: React.FC<CustomFormFieldProps> = ({
-  label,
+  title,
   description,
   errorMessage,
   type,
-  control,
   options,
 }) => {
   const form = useFormContext();
   if (type === "number" || type === "text") {
     return (
       <FormField
-        control={control}
-        name={label}
+        control={form.control}
+        name={title}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{label}</FormLabel>
+            <FormLabel>{title}</FormLabel>
             <FormControl>
               <Input
                 type={type}
-                value={String(field.value)}
+                value={String(field.value) ?? ""}
                 onChange={(e) => field.onChange(e.target.value)}
                 onBlur={field.onBlur}
               />
@@ -77,11 +73,11 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
   } else if (type === "combobox") {
     return (
       <FormField
-        control={control}
-        name={label}
+        control={form.control}
+        name={title}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{label}</FormLabel>
+            <FormLabel>{title}</FormLabel>
             <Popover>
               <PopoverTrigger asChild>
                 <FormControl>
@@ -96,7 +92,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
                     {field.value
                       ? options?.find(
                           (language) => language.value === field.value
-                        )?.label
+                        )?.title
                       : "Select language"}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -112,7 +108,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
                         value={language.value}
                         key={language.value}
                         onSelect={(value) => {
-                          form.setValue("language", value);
+                          form.setValue("Language", value);
                         }}
                       >
                         <Check
@@ -123,7 +119,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
                               : "opacity-0"
                           )}
                         />
-                        {language.label}
+                        {language.title}
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -139,8 +135,8 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
   } else if (type === "datepicker") {
     return (
       <FormField
-        control={control}
-        name={label}
+        control={form.control}
+        name={title}
         render={({ field }) => (
           <FormItem className="flex flex-col">
             <FormLabel>Date</FormLabel>
@@ -155,7 +151,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
                     )}
                   >
                     {field.value ? (
-                      format(field.value, "PPP")
+                      format(new Date(field.value), "PPP")
                     ) : (
                       <span>Pick a date</span>
                     )}
@@ -166,7 +162,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="single"
-                  selected={field.value}
+                  selected={new Date(field.value)}
                   onSelect={field.onChange}
                   disabled={(date) => date < new Date("1900-01-01")}
                   initialFocus

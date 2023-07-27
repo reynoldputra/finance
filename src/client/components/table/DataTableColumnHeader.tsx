@@ -36,11 +36,10 @@ export function DataTableColumnHeader<TData, TValue>({
 
   return (
     <div className="py-2">
-      <div className={cn("flex items-center space-x-2", className)}>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+      <div className={cn("flex items-center text-black", className)}>
+        <DropdownMenu> <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-accent">
-              <span>{title}</span>
+              <span className="font-bold">{title}</span>
               {column.getIsSorted() === "desc" ? (
                 <ArrowDownIcon className="ml-2 h-4 w-4" />
               ) : column.getIsSorted() === "asc" ? (

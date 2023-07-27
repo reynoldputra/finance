@@ -1,5 +1,5 @@
 import { ICustomerTable } from "@server/types/customer";
-import { prisma } from "@server/prisma";
+import { prisma } from "../../prisma";
 
 export class CustomerService {
   public static async getCustomerTable(): Promise<ICustomerTable[]> {

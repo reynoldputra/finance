@@ -6,6 +6,7 @@ import { Checkbox } from "@client/components/ui/checkbox";
 import { labels } from "./data/data";
 import { DataTableColumnHeader } from "@client/components/table/DataTableColumnHeader";
 import { ICustomerTable } from "@server/types/customer";
+import { RowAction } from "./RowAction";
 
 export const CustomerColumn: ColumnDef<ICustomerTable>[] = [
   {
@@ -36,7 +37,7 @@ export const CustomerColumn: ColumnDef<ICustomerTable>[] = [
   },
   {
     accessorKey: "kolektorNama",
-    header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Kolektor Nama" />,
+    header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Nama Kolektor" />,
     cell: ({ row }) => <div className="w-[180px]">{row.getValue("kolektorNama")}</div>,
     enableSorting: true,
     enableHiding: true,
@@ -67,8 +68,8 @@ export const CustomerColumn: ColumnDef<ICustomerTable>[] = [
       );
     },
   },
-  // {
-  //   id: "actions",
-  //   cell: ({ row }) => <RowAction row={row} />,
-  // },
+  {
+    id: "actions",
+    cell: ({ row }) => <RowAction row={row} />,
+  },
 ];

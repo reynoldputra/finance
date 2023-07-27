@@ -51,5 +51,4 @@ export default function useDataTable<TData, TValue> ({
   });
 
   return table
-
 }

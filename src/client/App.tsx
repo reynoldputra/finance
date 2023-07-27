@@ -56,10 +56,10 @@ function App() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <AppRoutes />
+          <AppRoutes />
       </QueryClientProvider>
     </trpc.Provider>
   );
 }
 
-export default App;
+export default App

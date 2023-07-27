@@ -1,16 +1,7 @@
 import React, { useEffect } from "react";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "../ui/sheet";
-import { Button } from "../ui/button";
 import { FormComponent } from "./Form";
 import { Modal } from "../Modal";
-import { Sidebar } from "../Sidebar";
+import { Sidebar } from "../Sidebar/Sidebar";
 
 export interface HomeProps {}
 

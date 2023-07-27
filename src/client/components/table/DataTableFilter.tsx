@@ -1,6 +1,8 @@
 import { Column, Table } from "@tanstack/react-table"
 import * as React from "react"
 import { Input } from "@client/components/ui/input"
+import { Combobox } from "../form/Combobox"
+import { ComboboxItem } from "@client/types/form/ComboboxItem"
 
 export default function DataTableFilter({
   column,
@@ -22,6 +24,13 @@ export default function DataTableFilter({
         : Array.from(column.getFacetedUniqueValues().keys()).sort(),
     [column.getFacetedUniqueValues()]
   )
+
+  const comboboxItems : ComboboxItem[] = sortedUniqueValues.map((s) => {
+    return {
+      label : s,
+      value : s
+    }
+  })
 
   return typeof firstValue === 'number' ? (
     <div>
@@ -61,20 +70,21 @@ export default function DataTableFilter({
     </div>
   ) : (
     <>
-      <datalist id={column.id + 'list'}>
-        {sortedUniqueValues.slice(0, 5000).map((value: any) => (
-          <option value={value} key={value} />
-        ))}
-      </datalist>
-      <DebouncedInput
-        type="text"
-        value={(columnFilterValue ?? '') as string}
-        onChange={value => column.setFilterValue(value)}
-        placeholder={`Search... (${column.getFacetedUniqueValues().size})`}
-        className="w-full border shadow rounded"
-        list={column.id + 'list'}
-      />
-      <div className="h-1" />
+      {/* <datalist className="max-h-48 overflow-hidden" id={column.id + 'list'}> */}
+      {/*   {sortedUniqueValues.slice(0, 5000).map((value: any) => ( */}
+      {/*     <option value={value} key={value} /> */}
+      {/*   ))} */}
+      {/* </datalist> */}
+      {/* <DebouncedInput */}
+      {/*   type="text" */}
+      {/*   value={(columnFilterValue ?? '') as string} */}
+      {/*   onChange={value => column.setFilterValue(value)} */}
+      {/*   placeholder={`Search... (${column.getFacetedUniqueValues().size})`} */}
+      {/*   className="w-full border shadow rounded" */}
+      {/*   list={column.id + 'list'} */}
+      {/* /> */}
+      {/* <div className="h-1" /> */}
+      <Combobox items={comboboxItems} placeholder={`Search... (${column.getFacetedUniqueValues().size})`} onChange={value => column.setFilterValue(value)}  />
     </>
   )
 }

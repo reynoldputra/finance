@@ -5,12 +5,10 @@ import { CustomerColumn } from "./CustomerColumn";
 
 export default function CustomerTable () {
   const data = trpc.customer.customerTable.useQuery()
-  console.log(data.data)
   const table = useDataTable({
     columns : CustomerColumn,
     data : data.data ?? [],
   })
-
 
   return (
     <>

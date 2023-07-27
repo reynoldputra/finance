@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { FormComponent } from "./Form";
 import { Modal } from "../Modal";
-import { Sidebar } from "../Sidebar/Sidebar";
+import Sidebar from "../Sidebar";
 
 export interface HomeProps {}
 

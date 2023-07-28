@@ -13,11 +13,14 @@
     "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
+    // "isolatedModules": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
-      "@client/*": ["../../src/client/*"]
+      "@client/*": ["./*"],
+      "@server/*": ["../server/*"],
+      "@global/*": ["../*"]
     }
   },
   "include": [

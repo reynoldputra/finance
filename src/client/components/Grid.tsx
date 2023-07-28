@@ -1,5 +1,5 @@
-import clsxm from "../lib/clsxm";
-import { FunctionComponent, ReactNode } from "react"
+import { cn } from "@client/lib/cn";
+import { FunctionComponent, ReactNode } from "react";
 
 interface GridProps {
   contentStart?: boolean;
@@ -36,14 +36,14 @@ const Grid: FunctionComponent<GridProps> = ({
     xl:gap-[20px]
 
     relative
-    ${contentStart ? 'place-content-start' : 'place-content-center'}
+    ${contentStart ? "place-content-start" : "place-content-center"}
 
     ${screenHeight ? "min-h-screen" : ""}
   `;
 
   return (
     <>
-      <div className={clsxm(className, baseCN)} {...rest}>
+      <div className={cn(className, baseCN)} {...rest}>
         {children}
       </div>
     </>

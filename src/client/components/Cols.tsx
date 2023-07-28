@@ -1,5 +1,5 @@
 import { FunctionComponent, ReactNode } from "react";
-import clsxm from "../lib/clsxm";
+import {cn as clsxm} from "@client/lib/cn";
 
 interface CellProps {
   children: ReactNode,

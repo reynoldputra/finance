@@ -14,7 +14,11 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@client/*": ["../../src/client/*"]
+    }
   },
   "include": [
     "**/*",
@@ -23,5 +27,5 @@
   "exclude": [
     "../../node_modules",
     "../server"
-  ],
+  ]
 }

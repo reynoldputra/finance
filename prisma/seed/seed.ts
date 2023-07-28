@@ -158,7 +158,7 @@ async function main() {
               if (findGiro) {
                 newGiro = {
                   ...newGiro,
-                  CaraBayar: {
+                  caraBayar: {
                     connect: {
                       id: findGiro.caraBayarId,
                     },
@@ -167,7 +167,7 @@ async function main() {
               } else {
                 newGiro = {
                   ...newGiro,
-                  CaraBayar: {
+                  caraBayar: {
                     create: {
                       total: parseInt(data.giro_amount),
                       tandaTerima: data.tanda_terima == "TRUE",
@@ -182,7 +182,7 @@ async function main() {
                 create: newGiro,
                 update: newGiro,
                 include: {
-                  CaraBayar: true,
+                  caraBayar: true,
                 },
               });
 
@@ -215,16 +215,16 @@ async function main() {
                 data: {
                   invoiceId: invoice.id,
                   caraBayarId: giro.caraBayarId,
-                  jumlah: giro.CaraBayar.total > sisaTagihan ? sisaTagihan : giro.CaraBayar.total,
-                  status: sisaTagihan - giro.CaraBayar.total <= 100 ? "LUNAS" : "CICILAN",
+                  jumlah: giro.caraBayar.total > sisaTagihan ? sisaTagihan : giro.caraBayar.total,
+                  status: sisaTagihan - giro.caraBayar.total <= 100 ? "LUNAS" : "CICILAN",
                   tanggalTagihan: tanggalTagihanDate,
-                  namaKolektor: colectorName,
+                  kolektorId: kolektor.id,
                   keterangan: data.keterangan,
                 },
                 include: {
-                  CaraBayar: {
+                  caraBayar: {
                     include: {
-                      Giro: true,
+                      giro: true,
                     },
                   },
                 },
@@ -251,7 +251,7 @@ async function main() {
               if (findTransfer) {
                 newTransfer = {
                   ...newTransfer,
-                  CaraBayar: {
+                  caraBayar: {
                     connect: {
                       id: findTransfer.caraBayarId,
                     },
@@ -260,7 +260,7 @@ async function main() {
               } else {
                 newTransfer = {
                   ...newTransfer,
-                  CaraBayar: {
+                  caraBayar: {
                     create: {
                       total: parseInt(data.transfer_amount),
                       tandaTerima: data.tanda_terima == "TRUE",
@@ -275,7 +275,7 @@ async function main() {
                 create: newTransfer,
                 update: newTransfer,
                 include: {
-                  CaraBayar: true,
+                  caraBayar: true,
                 },
               });
 
@@ -311,15 +311,19 @@ async function main() {
                     id: invoice.id,
                   },
                 },
-                CaraBayar: {
+                caraBayar: {
                   connect: {
                     id: transfer.caraBayarId,
                   },
                 },
                 jumlah:
-                  transfer.CaraBayar.total > sisaTagihan ? sisaTagihan : transfer.CaraBayar.total,
-                status: sisaTagihan - transfer.CaraBayar.total <= 100 ? "LUNAS" : "CICILAN",
-                namaKolektor: colectorName,
+                  transfer.caraBayar.total > sisaTagihan ? sisaTagihan : transfer.caraBayar.total,
+                status: sisaTagihan - transfer.caraBayar.total <= 100 ? "LUNAS" : "CICILAN",
+                kolektor : {
+                  connect  : {
+                    id : kolektor.id
+                  }
+                },
                 keterangan: data.keterangan,
               };
 
@@ -371,7 +375,7 @@ async function main() {
                   jumlah: caraBayar.total > sisaTagihan ? sisaTagihan : caraBayar.total,
                   status: sisaTagihan - caraBayar.total <= 100 ? "LUNAS" : "CICILAN",
                   tanggalTagihan: tanggalTagihanDate.toISOString(),
-                  namaKolektor: colectorName,
+                  kolektorId: kolektor.id,
                   keterangan: data.keterangan,
                 },
               });
@@ -392,7 +396,7 @@ async function main() {
                   jumlah: 0,
                   status: "NIHIL",
                   tanggalTagihan: tanggalTagihanDate.toISOString(),
-                  namaKolektor: colectorName,
+                  kolektorId: kolektor.id,
                   keterangan: data.keterangan,
                 },
               });

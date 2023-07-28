@@ -2,6 +2,14 @@ import React, { useEffect } from "react";
 import { ExampleForm } from "./ExampleForm";
 import { Modal } from "../Modal";
 import Sidebar from "../Sidebar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
 
 export interface HomeProps {}
 
@@ -33,6 +41,20 @@ export const Home: React.FC<HomeProps> = (props) => {
       <div className="px-64 mt-2">
         <ExampleForm />
       </div>
+      <Dialog>
+        {/* button */}
+        <DialogTrigger>Open</DialogTrigger>
+        {/* modals */}
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you sure absolutely sure?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete your account and remove
+              your data from our servers.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

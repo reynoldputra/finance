@@ -11,7 +11,7 @@ async function main() {
     { id: 3, jenis: "TRANSFER" },
   ];
 
-  console.log("Deleting cara_bayar and distribusi_pembayaran ... ");
+  await prisma.$queryRawUnsafe(`DELETE FROM kolektor_history`);
   await prisma.$queryRawUnsafe(`DELETE FROM giro;`);
   await prisma.$queryRawUnsafe(`DELETE FROM transfer;`);
   await prisma.$queryRawUnsafe(`DELETE FROM cara_bayar;`);
@@ -50,9 +50,24 @@ async function main() {
           if (data.nama_kolektor) colectorName = data.nama_kolektor;
 
           await prisma.$transaction(async (ctx) => {
+            const newKolektor : Prisma.KolektorCreateInput = {
+              nama : colectorName
+            }
+
+            const kolektor = await ctx.kolektor.upsert({
+              where : {nama : colectorName},
+              create : newKolektor,
+              update : newKolektor
+            })
+
             // creating customer
             const newCust: Prisma.CustomerCreateWithoutInvoicesInput = {
               nama: data.nama_customer ? data.nama_customer : (currentCustName as string),
+              currentKolektor : {
+                connect : {
+                  id : kolektor.id
+                }
+              }
             };
 
             const customer = await ctx.customer.upsert({
@@ -62,6 +77,42 @@ async function main() {
               update: newCust,
               create: newCust,
             });
+
+            const daftarCollector = await ctx.kolektorHistory.findMany({
+              where: {
+                customerId: customer.id,
+              },
+              include : {
+                kolektor : true
+              },
+              orderBy: {
+                createdAt: "desc",
+              },
+            });
+
+            if (daftarCollector.length) {
+              if (colectorName != daftarCollector[0].kolektor.nama) {
+                await ctx.kolektorHistory.create({
+                  data: {
+                    kolektorId : kolektor.id,
+                    customerId : customer.id
+                  },
+                });
+                await ctx.customer.update({
+                  where : {id : customer.id},
+                  data : {
+                    kolektorId : kolektor.id
+                  }
+                })
+              }
+            } else {
+              await ctx.kolektorHistory.create({
+                data: {
+                  kolektorId : kolektor.id,
+                  customerId : customer.id
+                },
+              });
+            }
 
             // creating invoice
             let tanggalTransaksi = data.tanggal_transaksi + "/2023";
@@ -107,7 +158,7 @@ async function main() {
               if (findGiro) {
                 newGiro = {
                   ...newGiro,
-                  CaraBayar: {
+                  caraBayar: {
                     connect: {
                       id: findGiro.caraBayarId,
                     },
@@ -116,7 +167,7 @@ async function main() {
               } else {
                 newGiro = {
                   ...newGiro,
-                  CaraBayar: {
+                  caraBayar: {
                     create: {
                       total: parseInt(data.giro_amount),
                       tandaTerima: data.tanda_terima == "TRUE",
@@ -131,7 +182,7 @@ async function main() {
                 create: newGiro,
                 update: newGiro,
                 include: {
-                  CaraBayar: true,
+                  caraBayar: true,
                 },
               });
 
@@ -164,22 +215,22 @@ async function main() {
                 data: {
                   invoiceId: invoice.id,
                   caraBayarId: giro.caraBayarId,
-                  jumlah: giro.CaraBayar.total > sisaTagihan ? sisaTagihan : giro.CaraBayar.total,
-                  status: sisaTagihan - giro.CaraBayar.total <= 100 ? "LUNAS" : "CICILAN",
+                  jumlah: giro.caraBayar.total > sisaTagihan ? sisaTagihan : giro.caraBayar.total,
+                  status: sisaTagihan - giro.caraBayar.total <= 100 ? "LUNAS" : "CICILAN",
                   tanggalTagihan: tanggalTagihanDate,
-                  namaKolektor: colectorName,
-                  keterangan : data.keterangan
+                  kolektorId: kolektor.id,
+                  keterangan: data.keterangan,
                 },
                 include: {
-                  CaraBayar: {
+                  caraBayar: {
                     include: {
-                      Giro: true,
+                      giro: true,
                     },
                   },
                 },
               });
 
-              if(giro.id == "sYkY5B6q") console.log(distribusiPembayaran)
+              if (giro.id == "sYkY5B6q") console.log(distribusiPembayaran);
             }
 
             if (data.transfer_id) {
@@ -200,16 +251,16 @@ async function main() {
               if (findTransfer) {
                 newTransfer = {
                   ...newTransfer,
-                  CaraBayar : {
-                    connect : {
-                      id : findTransfer.caraBayarId
-                    }
-                  }
-                }
+                  caraBayar: {
+                    connect: {
+                      id: findTransfer.caraBayarId,
+                    },
+                  },
+                };
               } else {
                 newTransfer = {
                   ...newTransfer,
-                  CaraBayar: {
+                  caraBayar: {
                     create: {
                       total: parseInt(data.transfer_amount),
                       tandaTerima: data.tanda_terima == "TRUE",
@@ -224,7 +275,7 @@ async function main() {
                 create: newTransfer,
                 update: newTransfer,
                 include: {
-                  CaraBayar: true,
+                  caraBayar: true,
                 },
               });
 
@@ -260,16 +311,20 @@ async function main() {
                     id: invoice.id,
                   },
                 },
-                CaraBayar: {
+                caraBayar: {
                   connect: {
                     id: transfer.caraBayarId,
                   },
                 },
                 jumlah:
-                  transfer.CaraBayar.total > sisaTagihan ? sisaTagihan : transfer.CaraBayar.total,
-                status: sisaTagihan - transfer.CaraBayar.total <= 100 ? "LUNAS" : "CICILAN",
-                namaKolektor: colectorName,
-                keterangan : data.keterangan
+                  transfer.caraBayar.total > sisaTagihan ? sisaTagihan : transfer.caraBayar.total,
+                status: sisaTagihan - transfer.caraBayar.total <= 100 ? "LUNAS" : "CICILAN",
+                kolektor : {
+                  connect  : {
+                    id : kolektor.id
+                  }
+                },
+                keterangan: data.keterangan,
               };
 
               await ctx.distribusiPembayaran.create({
@@ -302,8 +357,8 @@ async function main() {
                 );
                 sisaTagihan = invoice.total - telahDibayar;
               }
-              
-              if(data.giro_id == "sYkY5B6q") console.log(sisaTagihan)
+
+              if (data.giro_id == "sYkY5B6q") console.log(sisaTagihan);
 
               let tanggal_tagihan = data.tanggal_tagihan;
               const [day, month, year] = tanggal_tagihan.split("/");
@@ -320,14 +375,14 @@ async function main() {
                   jumlah: caraBayar.total > sisaTagihan ? sisaTagihan : caraBayar.total,
                   status: sisaTagihan - caraBayar.total <= 100 ? "LUNAS" : "CICILAN",
                   tanggalTagihan: tanggalTagihanDate.toISOString(),
-                  namaKolektor: colectorName,
-                  keterangan : data.keterangan
+                  kolektorId: kolektor.id,
+                  keterangan: data.keterangan,
                 },
               });
             }
 
-            if(!data.cash && !data.transfer_id && !data.giro_id) {
-              console.log("nihil")
+            if (!data.cash && !data.transfer_id && !data.giro_id) {
+              console.log("nihil");
               let tanggal_tagihan = data.tanggal_tagihan;
               const [day, month, year] = tanggal_tagihan.split("/");
               const tanggalTagihanDate = new Date(
@@ -336,15 +391,15 @@ async function main() {
                 parseInt(day)
               );
               const distribusi = await ctx.distribusiPembayaran.create({
-                data : {
+                data: {
                   invoiceId: invoice.id,
                   jumlah: 0,
                   status: "NIHIL",
                   tanggalTagihan: tanggalTagihanDate.toISOString(),
-                  namaKolektor: colectorName,
-                  keterangan : data.keterangan
-                }
-              })
+                  kolektorId: kolektor.id,
+                  keterangan: data.keterangan,
+                },
+              });
             }
           });
         }

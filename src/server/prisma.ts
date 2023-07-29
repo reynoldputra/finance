@@ -7,6 +7,8 @@ import {fork} from "child_process";
 log.info("DB URL", dbUrl);
 log.info("QE Path", qePath);
 
+console.log(dbUrl, qePath)
+
 export const prisma = new PrismaClient({
   log: ['info', 'warn', 'error',
     //     {

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "esModuleInterop": true,
+    "types" : ["node", "jest"],
     "baseUrl": ".",
     "paths": {
       "@client/*": ["./src/client/*"],
@@ -8,8 +10,8 @@
   },
   "files": [],
   "references": [
-    { "path": "./src/client" },
     { "path": "./src/server" },
+    { "path": "./src/client" },
     { "path": "./tsconfig.node.json" }
   ]
 }

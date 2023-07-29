@@ -7,10 +7,9 @@ const SidebarMenus: React.FC = () => {
   const navigate = useNavigate();
   return (
     <div className="h-full flex flex-col justify-start mt-4 gap-y-6">
-      {SidebarItems.map((menu: ISidebarItem, index: number) => (
-        <SheetTrigger asChild>
+      {SidebarItems.map((menu: ISidebarItem) => (
+        <SheetTrigger asChild key={menu.route}>
           <div
-            key={index}
             onClick={() => navigate(menu.route)}
             className="w-full flex items-center gap-x-4 cursor-pointer"
           >

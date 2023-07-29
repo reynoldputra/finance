@@ -1,4 +1,5 @@
-import { ICustomerTable } from "@server/types/customer";
+import { ICustomerTable, ICustomer } from "@server/types/customer";
+import { TCreateCustomerInput, createCustomerInput } from "./customerSchema";
 import { prisma } from "../../prisma";
 
 export class CustomerService {
@@ -47,4 +48,71 @@ export class CustomerService {
 
     return customerTable;
   }
+
+  public static async createCustomer(customer: TCreateCustomerInput) {
+    const { id, nama, currentKolektor } = customer;
+    const res = await prisma.customer.create({
+      data: {
+        id: id,
+        nama: nama,
+        currentKolektor: {
+          connect: {
+            id: currentKolektor,
+          },
+        },
+      },
+      include: {
+        kolektorHistory: {
+          include: {
+            kolektor: true,
+          },
+        },
+      },
+    });
+    return res;
+  }
+
+  // public static async updateCostumer(customer: TCreateCustomerInput) {
+  //   const res = await prisma.customer;
+  // }
+
+  public static async deleteCustumer(customerId: string): Promise<boolean> {
+    await prisma.customer.delete({
+      where: {
+        id: customerId,
+      },
+    });
+    return true;
+  }
+
+  // public static async getAllCostumers(): Promise<ICustomer[]> {
+  //   const result = await prisma.customer.findMany({
+  //     select: {
+  //       id: true,
+  //       nama: true,
+  //       kolektorHistory: {
+  //         select: {
+  //           kolektor: {
+  //             select: {
+  //               nama: true,
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   });
+  //   const allCustomer: ICustomer[] = result.map((customer) => {
+  //     const kolektorHistory = customer.kolektorHistory.map((item) => {
+  //       return {
+  //         nama_kolektor: item.kolektor.nama,
+  //       };
+  //     });
+  //     return {
+  //       id: customer.id,
+  //       nama: customer.nama,
+  //       kolektorHistory,
+  //     };
+  //   });
+  //   return allCustomer;
+  // }
 }

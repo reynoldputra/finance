@@ -1,6 +1,7 @@
 import { MainTrpc } from "../../trpc";
 import { InvoiceService } from "./invoiceService";
-import { createInvoiceInput, TCreateInvoiceInput } from "./invoiceSchema";
+import { createInvoiceInput, TCreateInvoiceInput, updateInvoiceInput, TUpdateInvoiceInput } from "./invoiceSchema";
+import { z } from "zod";
 
 const invoiceTrpc = new MainTrpc();
 
@@ -20,4 +21,51 @@ export const InvoiceRouter = invoiceTrpc.router({
         };
       }
     }),
+
+  updateInvoice : invoiceTrpc.publicProcedure
+    .input(updateInvoiceInput)
+    .mutation(async ({input} : {input : TUpdateInvoiceInput}) => {
+      try {
+        const res = await InvoiceService.updateInvoice(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
+
+  deleteInvoice : invoiceTrpc.publicProcedure
+    .input(z.string())
+    .mutation( async ({input : id}) => {
+      try {
+        const res = await InvoiceService.deleteInvoice(id);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
+
+  getInvoices : invoiceTrpc.publicProcedure
+    .query(async () => {
+      try {
+        const res = await InvoiceService.getAllInvoices();
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    })
 });

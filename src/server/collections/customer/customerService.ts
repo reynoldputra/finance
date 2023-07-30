@@ -1,5 +1,9 @@
 import { ICustomerTable, ICustomer } from "@server/types/customer";
-import { TCreateCustomerInput, createCustomerInput } from "./customerSchema";
+import {
+  TCreateCustomerInput,
+  TUpdateCustomerInput,
+  createCustomerInput,
+} from "./customerSchema";
 import { prisma } from "../../prisma";
 
 export class CustomerService {
@@ -49,6 +53,11 @@ export class CustomerService {
     return customerTable;
   }
 
+  public static async getAllCustomer() {
+    const res = await prisma.customer.findMany();
+    return res;
+  }
+
   public static async createCustomer(customer: TCreateCustomerInput) {
     const { id, nama, currentKolektor } = customer;
     const res = await prisma.customer.create({
@@ -61,20 +70,56 @@ export class CustomerService {
           },
         },
       },
-      include: {
-        kolektorHistory: {
-          include: {
-            kolektor: true,
-          },
-        },
-      },
     });
     return res;
   }
 
-  // public static async updateCostumer(customer: TCreateCustomerInput) {
-  //   const res = await prisma.customer;
-  // }
+  public static async updateCostumer(customer: TUpdateCustomerInput) {
+    const { id, nama, currentKolektor } = customer;
+    const updatedCustomer = await prisma.$transaction(async (tx) => {
+      const updateCostumer = await tx.customer.update({
+        where: { id: id },
+        data: {
+          id,
+          nama,
+          currentKolektor: {
+            connect: {
+              id: currentKolektor,
+            },
+          },
+        },
+      });
+      await tx.kolektorHistory.create({
+        data: {
+          customerId: id,
+          kolektorId: currentKolektor,
+        },
+      });
+      return updateCostumer;
+    });
+    return updatedCustomer;
+    // const updateData = await prisma.customer.update({
+    //   where: { id: id },
+    //   data: {
+    //     id,
+    //     nama,
+    //     currentKolektor: {
+    //       connect: {
+    //         id: currentKolektor,
+    //       },
+    //     },
+    //   },
+    // });
+    // const createHistory = await prisma.kolektorHistory.create({
+    //   data: {
+    //     customerId: id,
+    //     kolektorId: currentKolektor,
+    //   },
+    // });
+
+    // const res = await prisma.$transaction([updateData, createHistory]);
+    // return res;
+  }
 
   public static async deleteCustumer(customerId: string): Promise<boolean> {
     await prisma.customer.delete({
@@ -84,35 +129,4 @@ export class CustomerService {
     });
     return true;
   }
-
-  // public static async getAllCostumers(): Promise<ICustomer[]> {
-  //   const result = await prisma.customer.findMany({
-  //     select: {
-  //       id: true,
-  //       nama: true,
-  //       kolektorHistory: {
-  //         select: {
-  //           kolektor: {
-  //             select: {
-  //               nama: true,
-  //             },
-  //           },
-  //         },
-  //       },
-  //     },
-  //   });
-  //   const allCustomer: ICustomer[] = result.map((customer) => {
-  //     const kolektorHistory = customer.kolektorHistory.map((item) => {
-  //       return {
-  //         nama_kolektor: item.kolektor.nama,
-  //       };
-  //     });
-  //     return {
-  //       id: customer.id,
-  //       nama: customer.nama,
-  //       kolektorHistory,
-  //     };
-  //   });
-  //   return allCustomer;
-  // }
 }

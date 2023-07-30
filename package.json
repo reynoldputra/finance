@@ -9,7 +9,7 @@
     "dev": "concurrently \"vite\" \"cross-env NODE_ENV=development electron .\"",
     "start": "npm run build && concurrently \"vite\" \"cross-env NODE_ENV=development electron .\"",
     "pack": "npm run build && electron-builder --dir",
-    "test": "TESTING=true NODE_ENV=development npx jest ./src/server/__tests__/",
+    "test": "cross-env TESTING=true NODE_ENV=development npx jest ./src/server/_tests_/",
     "studio": "npx prisma studio",
     "generate": "npx prisma generate",
     "db:push": "npx prisma db push",
@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
+    "@kayahr/jest-electron-runner": "^29.7.0",
     "@prisma/client": "^4.7.1",
     "@prisma/engines": "^4.7.1",
     "@radix-ui/react-checkbox": "^1.0.4",

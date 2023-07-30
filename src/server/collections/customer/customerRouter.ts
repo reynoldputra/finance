@@ -2,12 +2,11 @@ import { MainTrpc } from "../../trpc";
 import { CustomerService } from "./customerService";
 import {
   TCreateCustomerInput,
-  TDeleteCustomerInput,
   TUpdateCustomerInput,
   createCustomerInput,
-  deleteCustomerInput,
   updateCustomerInput,
 } from "./customerSchema";
+import { z } from "zod";
 
 const customerTrpc = new MainTrpc();
 
@@ -46,10 +45,25 @@ export const CustomerRouter = customerTrpc.router({
       }
     }),
   deleteCustomer: customerTrpc.publicProcedure
-    .input(deleteCustomerInput)
-    .mutation(async ({ input }: { input: TDeleteCustomerInput }) => {
+    .input(z.string())
+    .mutation(async ({ input }: { input: string }) => {
       try {
         const res = await CustomerService.deleteCustomer(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
+  getKolektorHistory: customerTrpc.publicProcedure
+    .input(z.string())
+    .mutation(async ({ input }: { input: string }) => {
+      try {
+        const res = await CustomerService.getKolektorHistory(input);
         return {
           status: true,
           data: res,

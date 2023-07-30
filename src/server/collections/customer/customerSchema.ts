@@ -12,8 +12,5 @@ export const updateCustomerInput = z.object({
   currentKolektor: z.string(),
 });
 
-export const deleteCustomerInput = z.string();
-
 export type TCreateCustomerInput = z.infer<typeof createCustomerInput>;
-export type TDeleteCustomerInput = z.infer<typeof deleteCustomerInput>;
 export type TUpdateCustomerInput = z.infer<typeof updateCustomerInput>

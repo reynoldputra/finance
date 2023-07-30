@@ -53,6 +53,75 @@ export class CustomerService {
     return customerTable;
   }
 
+  public static async getKolektorHistory(customerId: string) {
+    const res = await prisma.customer.findMany({
+      // where: {
+      //   kolektorId: kolektorId,
+      // },
+      // select: {
+      //   id: true,
+      //   kolektorHistory: true,
+      //   currentKolektor: {
+      //     select: {
+      //       nama: true,
+      //     },
+      //   },
+      // },
+      where: {
+        id: customerId,
+      },
+      select: {
+        id: true,
+        nama: true,
+        kolektorHistory: {
+          select: {
+            id: true,
+            customerId: true,
+            kolektorId: true,
+            kolektor: {
+              select: {
+                nama: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return res;
+    // [
+    //   {
+    //     "customerId": "...",
+    //     "kolektorHistory": [
+    //       {
+    //         "id": "...",
+    //         "customerId": "...",
+    //         "kolektorId": "somekolektorid"
+    //       },
+    //     ],
+    //     "kolektor": {
+    //       "nama": ".."
+    //     }
+    //   },
+    // ]
+
+    // [
+    //   {
+    //     "id": "..",
+    //     "nama": "..",
+    //     "kolektorHistory": [
+    //       {
+    //         "id": "..",
+    //         "customerid": "..",
+    //         "kolektorid": "..",
+    //         "kolektor": {
+    //           "nama": ".."
+    //         }
+    //       },
+    //     ]
+    //   }
+    // ]
+  }
+
   public static async getAllCustomer() {
     const res = await prisma.customer.findMany();
     return res;

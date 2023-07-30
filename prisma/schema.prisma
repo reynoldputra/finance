@@ -32,25 +32,41 @@ model KolektorHistory {
   customer  Customer @relation(fields: [customerId], references: [id])
   kolektor  Kolektor @relation(fields: [kolektorId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
+
   @@map("kolektor_history")
 }
 
 model Kolektor {
+  id              String            @id @default(cuid())
+  nama            String            @unique @map("nama_kolektor")
+  customer        Customer[]
+  kolektorHistory KolektorHistory[]
+  penagihan       Penagihan[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Penagihan {
   id                   String                 @id @default(cuid())
-  nama                 String                 @unique @map("nama_kolektor")
-  createdAt            DateTime               @default(now()) @map("created_at")
-  customer             Customer[]
-  kolektorHistory      KolektorHistory[]
+  tanggalTagihan       DateTime               @map("tanggal_tagihan")
+  invoiceId            String
+  kolektorId           String
   distribusiPembayaran DistribusiPembayaran[]
+  status               String
+  keterangan           String?
+
+  invoice  Invoice  @relation(fields: [invoiceId], references: [id])
+  kolektor Kolektor @relation(fields: [kolektorId], references: [id])
 }
 
 model Invoice {
-  id                   String                 @id @default(cuid())
-  total                Int
-  namaSales            String                 @map("nama_sales")
-  tanggalTransaksi     DateTime               @map("tanggal_transaksi")
-  customerId           String
-  distribusiPembayaran DistribusiPembayaran[]
+  id               String      @id @default(cuid())
+  total            Int
+  tanggalTransaksi DateTime    @map("tanggal_transaksi")
+  namaSales        String      @map("nama_sales")
+  penagihan        Penagihan[]
+  customerId       String
 
   customer  Customer @relation(fields: [customerId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
@@ -58,18 +74,13 @@ model Invoice {
 }
 
 model DistribusiPembayaran {
-  id             String   @id @default(cuid())
-  jumlah         Int
-  status         String
-  keterangan     String?
-  tanggalTagihan DateTime @map("tanggal_tagihan")
-  kolektorId     String
-  caraBayarId    String?
-  invoiceId      String
+  id          String @id @default(cuid())
+  jumlah      Int
+  caraBayarId String
+  penagihanId String
 
-  kolektor  Kolektor   @relation(fields: [kolektorId], references: [id])
-  invoice   Invoice    @relation(fields: [invoiceId], references: [id])
-  caraBayar CaraBayar? @relation(fields: [caraBayarId], references: [id], onDelete: Cascade)
+  penagihan Penagihan @relation(fields: [penagihanId], references: [id])
+  caraBayar CaraBayar @relation(fields: [caraBayarId], references: [id], onDelete: Cascade)
 
   @@map("distribusi_pembayaran")
 }

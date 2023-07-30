@@ -1,6 +1,11 @@
 import { MainTrpc } from "@server/trpc";
 import { KolektorService } from "./kolektorService";
-import { createKolektorInput, TCreateKolektorInput } from "./kolektorSchema";
+import {
+  createKolektorInput,
+  TCreateKolektorInput,
+  TUpdateKolektorInput,
+  updateKolektorInput,
+} from "./kolektorSchema";
 import { z } from "zod";
 
 const kolektorTrpc = new MainTrpc();
@@ -39,6 +44,21 @@ export const KolektorRouter = kolektorTrpc.router({
     .mutation(async ({ input }: { input: string }) => {
       try {
         const res = await KolektorService.deleteKolektor(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
+  updateKolektor: kolektorTrpc.publicProcedure
+    .input(updateKolektorInput)
+    .mutation(async ({ input }: { input: TUpdateKolektorInput }) => {
+      try {
+        const res = await KolektorService.updateKolektor(input);
         return {
           status: true,
           data: res,

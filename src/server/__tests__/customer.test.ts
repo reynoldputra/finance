@@ -40,7 +40,7 @@ describe("Delete Customer", (): void => {
     await CustomerService.createCustomer(newCustomer);
   });
 
-  it("delete one invoice", async () => {
+  it("delete one customer", async () => {
     expect(newCustomer.id).toBeTruthy();
     const allCustomerBefore = await CustomerService.getAllCustomer();
     if (newCustomer.id) {
@@ -52,7 +52,7 @@ describe("Delete Customer", (): void => {
   });
 });
 
-describe("Update Invoice", (): void => {
+describe("Update Customer", (): void => {
   let newCustomer: TCreateCustomerInput;
 
   beforeAll(async () => {
@@ -68,7 +68,7 @@ describe("Update Invoice", (): void => {
     if (newCustomer.id) await CustomerService.deleteCustomer(newCustomer.id);
   });
 
-  it("update invoice", async () => {
+  it("update customer", async () => {
     expect(newCustomer).toBeTruthy();
     if (newCustomer.id) {
       // change name & currentKolektor

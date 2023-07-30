@@ -74,6 +74,15 @@ export class CustomerService {
     return res;
   }
 
+  public static async deleteCustomer(customerId: string): Promise<boolean> {
+    await prisma.customer.delete({
+      where: {
+        id: customerId,
+      },
+    });
+    return true;
+  }
+
   public static async updateCostumer(customer: TUpdateCustomerInput) {
     const { id, nama, currentKolektor } = customer;
     const updatedCustomer = await prisma.$transaction(async (prisma) => {
@@ -95,7 +104,7 @@ export class CustomerService {
           kolektorId: currentKolektor,
         },
       });
-      return { updateCostumer, createHistory };
+      return updateCostumer;
     });
     return updatedCustomer;
     // const updateData = await prisma.customer.update({
@@ -119,14 +128,5 @@ export class CustomerService {
 
     // const res = await prisma.$transaction([updateData, createHistory]);
     // return res;
-  }
-
-  public static async deleteCustumer(customerId: string): Promise<boolean> {
-    await prisma.customer.delete({
-      where: {
-        id: customerId,
-      },
-    });
-    return true;
   }
 }

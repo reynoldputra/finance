@@ -49,7 +49,7 @@ export const CustomerRouter = customerTrpc.router({
     .input(deleteCustomerInput)
     .mutation(async ({ input }: { input: TDeleteCustomerInput }) => {
       try {
-        const res = await CustomerService.deleteCustumer(input);
+        const res = await CustomerService.deleteCustomer(input);
         return {
           status: true,
           data: res,

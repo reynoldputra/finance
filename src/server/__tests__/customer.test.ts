@@ -12,7 +12,7 @@ describe("Create Customer", (): void => {
     newCustomer = {
       id: "asdfasdf",
       nama: "bagyo",
-      currentKolektor: "clkmtkznl0001umjwmdxlqpq5",
+      kolektorId: "clkmtkznl0001umjwmdxlqpq5",
     };
   });
 
@@ -24,7 +24,7 @@ describe("Create Customer", (): void => {
     const result = await CustomerService.createCustomer(newCustomer);
     expect(result.id).toEqual(newCustomer.id);
     expect(result.nama).toEqual(newCustomer.nama);
-    // expect(result.currentKolektor).toEqual(newCustomer.currentKolektor);
+    // expect(result.kolektorId).toEqual(newCustomer.kolektorId);
   });
 });
 
@@ -35,7 +35,7 @@ describe("Delete Customer", (): void => {
     newCustomer = {
       id: "asdfasdf",
       nama: "wika",
-      currentKolektor: "clkmtkzvy0078umjw6mdcppcj",
+      kolektorId: "clkmtkzvy0078umjw6mdcppcj",
     };
     await CustomerService.createCustomer(newCustomer);
   });
@@ -59,7 +59,7 @@ describe("Update Customer", (): void => {
     newCustomer = {
       id: "asdfasdf",
       nama: "wika",
-      currentKolektor: "clkmtkzvy0078umjw6mdcppcj",
+      kolektorId: "clkmtkzvy0078umjw6mdcppcj",
     };
     await CustomerService.createCustomer(newCustomer);
   });
@@ -71,16 +71,16 @@ describe("Update Customer", (): void => {
   it("update customer", async () => {
     expect(newCustomer).toBeTruthy();
     if (newCustomer.id) {
-      // change name & currentKolektor
+      // change name & kolektorId
       let updateCostumer: TUpdateCustomerInput = {
         id: newCustomer.id,
         nama: "wika updated",
-        currentKolektor: "clkmtkznl0001umjwmdxlqpq5",
+        kolektorId: "clkmtkznl0001umjwmdxlqpq5",
       };
       const res = await CustomerService.updateCostumer(updateCostumer);
       expect(res.id).toEqual(updateCostumer.id);
       expect(res.nama).toEqual(updateCostumer.nama);
-      //   expect(res.currentKolektor).toEqual(updateCostumer.currentKolektor);
+      //   expect(res.kolektorId).toEqual(updateCostumer.kolektorId);
     }
   });
 });

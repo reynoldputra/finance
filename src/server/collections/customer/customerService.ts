@@ -5,6 +5,7 @@ import {
   createCustomerInput,
 } from "./customerSchema";
 import { prisma } from "../../prisma";
+import { Prisma } from "../../../generated/client";
 
 export class CustomerService {
   public static async getCustomerTable(): Promise<ICustomerTable[]> {
@@ -54,72 +55,16 @@ export class CustomerService {
   }
 
   public static async getKolektorHistory(customerId: string) {
-    const res = await prisma.customer.findMany({
-      // where: {
-      //   kolektorId: kolektorId,
-      // },
-      // select: {
-      //   id: true,
-      //   kolektorHistory: true,
-      //   currentKolektor: {
-      //     select: {
-      //       nama: true,
-      //     },
-      //   },
-      // },
+    const res = await prisma.kolektorHistory.findMany({
       where: {
-        id: customerId,
+        customerId: customerId,
       },
-      select: {
-        id: true,
-        nama: true,
-        kolektorHistory: {
-          select: {
-            id: true,
-            customerId: true,
-            kolektorId: true,
-            kolektor: {
-              select: {
-                nama: true,
-              },
-            },
-          },
-        },
+      include: {
+        customer: true,
+        kolektor: true,
       },
     });
     return res;
-    // [
-    //   {
-    //     "customerId": "...",
-    //     "kolektorHistory": [
-    //       {
-    //         "id": "...",
-    //         "customerId": "...",
-    //         "kolektorId": "somekolektorid"
-    //       },
-    //     ],
-    //     "kolektor": {
-    //       "nama": ".."
-    //     }
-    //   },
-    // ]
-
-    // [
-    //   {
-    //     "id": "..",
-    //     "nama": "..",
-    //     "kolektorHistory": [
-    //       {
-    //         "id": "..",
-    //         "customerid": "..",
-    //         "kolektorid": "..",
-    //         "kolektor": {
-    //           "nama": ".."
-    //         }
-    //       },
-    //     ]
-    //   }
-    // ]
   }
 
   public static async getAllCustomer() {
@@ -128,17 +73,8 @@ export class CustomerService {
   }
 
   public static async createCustomer(customer: TCreateCustomerInput) {
-    const { id, nama, currentKolektor } = customer;
     const res = await prisma.customer.create({
-      data: {
-        id: id,
-        nama: nama,
-        currentKolektor: {
-          connect: {
-            id: currentKolektor,
-          },
-        },
-      },
+      data: customer,
     });
     return res;
   }
@@ -153,49 +89,27 @@ export class CustomerService {
   }
 
   public static async updateCostumer(customer: TUpdateCustomerInput) {
-    const { id, nama, currentKolektor } = customer;
+    const { id, nama, kolektorId } = customer;
+
+    const updateCustomerData: Prisma.CustomerUncheckedUpdateInput = {};
+    if (nama) updateCustomerData.nama = nama;
+    if (kolektorId) updateCustomerData.kolektorId = nama;
+
     const updatedCustomer = await prisma.$transaction(async (prisma) => {
       const updateCostumer = await prisma.customer.update({
         where: { id: id },
-        data: {
-          id,
-          nama,
-          currentKolektor: {
-            connect: {
-              id: currentKolektor,
-            },
+        data: updateCustomerData,
+      });
+      if (kolektorId) {
+        const createHistory = await prisma.kolektorHistory.create({
+          data: {
+            customerId: id,
+            kolektorId: kolektorId,
           },
-        },
-      });
-      const createHistory = await prisma.kolektorHistory.create({
-        data: {
-          customerId: id,
-          kolektorId: currentKolektor,
-        },
-      });
+        });
+      }
       return updateCostumer;
     });
     return updatedCustomer;
-    // const updateData = await prisma.customer.update({
-    //   where: { id: id },
-    //   data: {
-    //     id,
-    //     nama,
-    //     currentKolektor: {
-    //       connect: {
-    //         id: currentKolektor,
-    //       },
-    //     },
-    //   },
-    // });
-    // const createHistory = await prisma.kolektorHistory.create({
-    //   data: {
-    //     customerId: id,
-    //     kolektorId: currentKolektor,
-    //   },
-    // });
-
-    // const res = await prisma.$transaction([updateData, createHistory]);
-    // return res;
   }
 }

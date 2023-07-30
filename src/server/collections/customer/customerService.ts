@@ -76,8 +76,8 @@ export class CustomerService {
 
   public static async updateCostumer(customer: TUpdateCustomerInput) {
     const { id, nama, currentKolektor } = customer;
-    const updatedCustomer = await prisma.$transaction(async (tx) => {
-      const updateCostumer = await tx.customer.update({
+    const updatedCustomer = await prisma.$transaction(async (prisma) => {
+      const updateCostumer = await prisma.customer.update({
         where: { id: id },
         data: {
           id,
@@ -89,13 +89,13 @@ export class CustomerService {
           },
         },
       });
-      await tx.kolektorHistory.create({
+      const createHistory = await prisma.kolektorHistory.create({
         data: {
           customerId: id,
           kolektorId: currentKolektor,
         },
       });
-      return updateCostumer;
+      return { updateCostumer, createHistory };
     });
     return updatedCustomer;
     // const updateData = await prisma.customer.update({

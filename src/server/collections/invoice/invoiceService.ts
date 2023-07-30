@@ -1,5 +1,4 @@
 import { prisma } from "../../prisma";
-import { PrismaClient } from "../../../generated/client";
 import { TCreateInvoiceInput } from "./invoiceSchema";
 
 export class InvoiceService {

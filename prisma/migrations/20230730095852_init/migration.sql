@@ -22,15 +22,28 @@ CREATE TABLE "kolektor_history" (
 CREATE TABLE "Kolektor" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "nama_kolektor" TEXT NOT NULL,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Penagihan" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "tanggal_tagihan" DATETIME NOT NULL,
+    "invoiceId" TEXT NOT NULL,
+    "kolektorId" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "keterangan" TEXT,
+    CONSTRAINT "Penagihan_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Penagihan_kolektorId_fkey" FOREIGN KEY ("kolektorId") REFERENCES "Kolektor" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
 CREATE TABLE "Invoice" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "total" INTEGER NOT NULL,
-    "nama_sales" TEXT NOT NULL,
     "tanggal_transaksi" DATETIME NOT NULL,
+    "nama_sales" TEXT NOT NULL,
     "customerId" TEXT NOT NULL,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL,
@@ -41,14 +54,9 @@ CREATE TABLE "Invoice" (
 CREATE TABLE "distribusi_pembayaran" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "jumlah" INTEGER NOT NULL,
-    "status" TEXT NOT NULL,
-    "keterangan" TEXT,
-    "tanggal_tagihan" DATETIME NOT NULL,
-    "kolektorId" TEXT NOT NULL,
-    "caraBayarId" TEXT,
-    "invoiceId" TEXT NOT NULL,
-    CONSTRAINT "distribusi_pembayaran_kolektorId_fkey" FOREIGN KEY ("kolektorId") REFERENCES "Kolektor" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "distribusi_pembayaran_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    "caraBayarId" TEXT NOT NULL,
+    "penagihanId" TEXT NOT NULL,
+    CONSTRAINT "distribusi_pembayaran_penagihanId_fkey" FOREIGN KEY ("penagihanId") REFERENCES "Penagihan" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "distribusi_pembayaran_caraBayarId_fkey" FOREIGN KEY ("caraBayarId") REFERENCES "cara_bayar" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 

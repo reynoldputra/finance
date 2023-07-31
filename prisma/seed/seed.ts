@@ -1,5 +1,8 @@
-import { PrismaClient, Prisma } from "../../src/generated/client";
-import * as csv from "csv-parser";
+import { PrismaClient, Prisma, Invoice, Penagihan } from "../../src/generated/client";
+// import * as csvParser from "csv-parser";
+const csvParser = require("csv-parser")
+// const csv = require("csv-parser")
+import { parse } from "csv-parse";
 import * as fs from "fs";
 import * as path from "path";
 const prisma = new PrismaClient();
@@ -17,6 +20,7 @@ async function main() {
   await prisma.$queryRawUnsafe(`DELETE FROM cara_bayar;`);
   await prisma.$queryRawUnsafe(`DELETE FROM distribusi_pembayaran;`);
   await prisma.$queryRawUnsafe(`DELETE FROM invoice`);
+  await prisma.$queryRawUnsafe(`DELETE FROM penagihan`);
 
   for (let idx in metodePembayaran) {
     const m = metodePembayaran[idx];
@@ -35,7 +39,7 @@ async function main() {
 
   try {
     fs.createReadStream(path.resolve(__dirname, "./data/tagihan.csv"))
-      .pipe(csv())
+      .pipe(csvParser())
       .on("data", (data: any) => {
         allData.push(data);
       })
@@ -48,6 +52,9 @@ async function main() {
           if (data.nama_customer) currentCustName = data.nama_customer;
           if (data.nama_sales) salesName = data.nama_sales;
           if (data.nama_kolektor) colectorName = data.nama_kolektor;
+          let totalPembayaran = 0
+          let invoiceId = ""
+          let penagihanId = ""
 
           await prisma.$transaction(async (ctx) => {
             const newKolektor : Prisma.KolektorCreateInput = {
@@ -135,6 +142,7 @@ async function main() {
               create: newInvoice,
               update: newInvoice,
             });
+            invoiceId = invoice.id
 
             const jatuhTempo = data.jatuh_tempo + "/2023";
             const [dayJt, monthJt, yearJt] = jatuhTempo.split("/");
@@ -143,6 +151,29 @@ async function main() {
               parseInt(monthJt) - 1,
               parseInt(dayJt)
             );
+
+
+            let tanggal_tagihan = data.tanggal_tagihan;
+            const [d, m, y] = tanggal_tagihan.split("/");
+            const tanggalTagihanDate = new Date(
+              parseInt(d),
+              parseInt(m) - 1,
+              parseInt(y)
+            );
+
+            const penagihan = await ctx.penagihan.create({
+              data : {
+                tanggalTagihan : tanggalTagihanDate,
+                invoiceId : invoice.id,
+                kolektorId : kolektor.id,
+                status : 'WAITING'
+              }
+            })
+
+            penagihanId = penagihan.id
+
+            console.log(penagihan)
+
 
             if (data.giro_id) {
               let newGiro: Prisma.GiroCreateWithoutCaraBayarInput | Prisma.GiroCreateInput = {
@@ -189,17 +220,24 @@ async function main() {
               const findInvoice = await ctx.invoice.findFirst({
                 where: { id: invoice.id },
                 include: {
-                  distribusiPembayaran: true,
+                  penagihan : {
+                    include : {
+                      distribusiPembayaran : true
+                    }
+                  }
                 },
               });
 
               let sisaTagihan = 0;
 
               if (findInvoice) {
-                let telahDibayar = findInvoice.distribusiPembayaran.reduce(
-                  (total, curr) => (total += curr.jumlah),
-                  0
-                );
+                const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
+                  const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
+                    return tot += cur.jumlah
+                  }, 0)
+
+                  return tot += pem
+                }, 0)
                 sisaTagihan = invoice.total - telahDibayar;
               }
 
@@ -213,13 +251,9 @@ async function main() {
 
               const distribusiPembayaran = await ctx.distribusiPembayaran.create({
                 data: {
-                  invoiceId: invoice.id,
+                  penagihanId: penagihan.id,
                   caraBayarId: giro.caraBayarId,
                   jumlah: giro.caraBayar.total > sisaTagihan ? sisaTagihan : giro.caraBayar.total,
-                  status: sisaTagihan - giro.caraBayar.total <= 100 ? "LUNAS" : "CICILAN",
-                  tanggalTagihan: tanggalTagihanDate,
-                  kolektorId: kolektor.id,
-                  keterangan: data.keterangan,
                 },
                 include: {
                   caraBayar: {
@@ -230,7 +264,7 @@ async function main() {
                 },
               });
 
-              if (giro.id == "sYkY5B6q") console.log(distribusiPembayaran);
+              totalPembayaran += giro.caraBayar.total
             }
 
             if (data.transfer_id) {
@@ -282,34 +316,32 @@ async function main() {
               const findInvoice = await ctx.invoice.findFirst({
                 where: { id: invoice.id },
                 include: {
-                  distribusiPembayaran: true,
+                  penagihan : {
+                    include : {
+                      distribusiPembayaran : true
+                    }
+                  }
                 },
               });
 
               let sisaTagihan = 0;
 
               if (findInvoice) {
-                let telahDibayar = findInvoice.distribusiPembayaran.reduce(
-                  (total, curr) => (total += curr.jumlah),
-                  0
-                );
+                const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
+                  const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
+                    return tot += cur.jumlah
+                  }, 0)
+
+                  return tot += pem
+                }, 0)
                 sisaTagihan = invoice.total - telahDibayar;
               }
 
-              let tanggal_tagihan = data.tanggal_tagihan;
-              const [day, month, year] = tanggal_tagihan.split("/");
-              const tanggalTagihanDate = new Date(
-                parseInt(year),
-                parseInt(month) - 1,
-                parseInt(day)
-              );
-
               const newDistribusi: Prisma.DistribusiPembayaranCreateInput = {
-                tanggalTagihan: tanggalTagihanDate,
-                invoice: {
-                  connect: {
-                    id: invoice.id,
-                  },
+                penagihan : {
+                  connect : {
+                    id : penagihan.id
+                  }
                 },
                 caraBayar: {
                   connect: {
@@ -318,18 +350,13 @@ async function main() {
                 },
                 jumlah:
                   transfer.caraBayar.total > sisaTagihan ? sisaTagihan : transfer.caraBayar.total,
-                status: sisaTagihan - transfer.caraBayar.total <= 100 ? "LUNAS" : "CICILAN",
-                kolektor : {
-                  connect  : {
-                    id : kolektor.id
-                  }
-                },
-                keterangan: data.keterangan,
               };
 
               await ctx.distribusiPembayaran.create({
                 data: newDistribusi,
               });
+
+              totalPembayaran += transfer.caraBayar.total
             }
 
             if (data.cash) {
@@ -344,64 +371,79 @@ async function main() {
               const findInvoice = await ctx.invoice.findFirst({
                 where: { id: invoice.id },
                 include: {
-                  distribusiPembayaran: true,
+                  penagihan : {
+                    include : {
+                      distribusiPembayaran : true
+                    }
+                  }
                 },
               });
 
               let sisaTagihan = 0;
 
               if (findInvoice) {
-                let telahDibayar = findInvoice.distribusiPembayaran.reduce(
-                  (total, curr) => (total += curr.jumlah),
-                  0
-                );
+                const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
+                  const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
+                    return tot += cur.jumlah
+                  }, 0)
+
+                  return tot += pem
+                }, 0)
                 sisaTagihan = invoice.total - telahDibayar;
               }
 
-              if (data.giro_id == "sYkY5B6q") console.log(sisaTagihan);
-
-              let tanggal_tagihan = data.tanggal_tagihan;
-              const [day, month, year] = tanggal_tagihan.split("/");
-              const tanggalTagihanDate = new Date(
-                parseInt(year),
-                parseInt(month) - 1,
-                parseInt(day)
-              );
-
               const distribusiPembayaran = await ctx.distribusiPembayaran.create({
                 data: {
-                  invoiceId: invoice.id,
+                  penagihanId : penagihan.id,
                   caraBayarId: caraBayar.id,
                   jumlah: caraBayar.total > sisaTagihan ? sisaTagihan : caraBayar.total,
-                  status: sisaTagihan - caraBayar.total <= 100 ? "LUNAS" : "CICILAN",
-                  tanggalTagihan: tanggalTagihanDate.toISOString(),
-                  kolektorId: kolektor.id,
-                  keterangan: data.keterangan,
-                },
-              });
-            }
-
-            if (!data.cash && !data.transfer_id && !data.giro_id) {
-              console.log("nihil");
-              let tanggal_tagihan = data.tanggal_tagihan;
-              const [day, month, year] = tanggal_tagihan.split("/");
-              const tanggalTagihanDate = new Date(
-                parseInt(year),
-                parseInt(month) - 1,
-                parseInt(day)
-              );
-              const distribusi = await ctx.distribusiPembayaran.create({
-                data: {
-                  invoiceId: invoice.id,
-                  jumlah: 0,
-                  status: "NIHIL",
-                  tanggalTagihan: tanggalTagihanDate.toISOString(),
-                  kolektorId: kolektor.id,
-                  keterangan: data.keterangan,
                 },
               });
             }
           });
+
+           
+          if (!data.cash && !data.transfer_id && !data.giro_id) {
+            await prisma.penagihan.update({
+              where : {
+                id : penagihanId
+              },
+              data : {
+                status : "NIHIL"
+              }
+            })
+          } else {
+            const findInvoice = await prisma.invoice.findFirst({
+              where: { id: invoiceId },
+              include: {
+                penagihan : {
+                  include : {
+                    distribusiPembayaran : true
+                  }
+                }
+              },
+            });
+
+            let sisaTagihan = 0;
+
+            if (findInvoice) {
+              const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
+                const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
+                  return tot += cur.jumlah
+                }, 0)
+
+                return tot += pem
+              }, 0)
+              sisaTagihan = findInvoice.total - telahDibayar;
+            }
+
+            await prisma.penagihan.update({
+              where : {id : penagihanId},
+              data : {
+                status : sisaTagihan - 10 <= totalPembayaran ? "LUNAS" : "CICILAN"
+              }
+            })
+          }
         }
       });
   } catch (err) {

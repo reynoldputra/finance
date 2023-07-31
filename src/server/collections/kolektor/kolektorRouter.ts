@@ -1,4 +1,4 @@
-import { MainTrpc } from "@server/trpc";
+import { MainTrpc } from "../../trpc";
 import { KolektorService } from "./kolektorService";
 import {
   createKolektorInput,

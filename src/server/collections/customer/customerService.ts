@@ -1,11 +1,8 @@
-import { ICustomerTable, ICustomer } from "@server/types/customer";
-import {
-  TCreateCustomerInput,
-  TUpdateCustomerInput,
-  createCustomerInput,
-} from "./customerSchema";
+import { ICustomerTable } from "@server/types/customer";
+import { TCreateCustomerInput, TUpdateCustomerInput } from "./customerSchema";
 import { prisma } from "../../prisma";
 import { Prisma } from "../../../generated/client";
+import { InvoiceService } from "../invoice/invoiceService";
 
 export class CustomerService {
   public static async getCustomerTable(): Promise<ICustomerTable[]> {
@@ -17,30 +14,27 @@ export class CustomerService {
         kolektorId: true,
         invoices: {
           where: {
-            distribusiPembayaran: {
+            penagihan: {
               some: {
                 status: "LUNAS",
               },
             },
           },
           select: {
-            distribusiPembayaran: true,
+            penagihan: {
+              select: {
+                distribusiPembayaran: true,
+              },
+            },
           },
         },
       },
     });
-
     const customerTable: ICustomerTable[] = result.map((r): ICustomerTable => {
-      const jumlahTagihan = r.invoices.reduce((totalInv, currInv) => {
-        const jumlahTerbayar = currInv.distribusiPembayaran.reduce(
-          (totalTerbayar, currPembayaran) => {
-            return (totalTerbayar += currPembayaran.jumlah);
-          },
-          0
-        );
-        return (totalInv += jumlahTerbayar);
-      }, 0);
-
+      const invoicesArray = r?.invoices ?? [];
+      const jumlahTagihan = CustomerService.getTotalPembayaran({
+        penagihan: invoicesArray.map((invoice) => invoice.penagihan),
+      });
       return {
         id: r.id,
         nama: r.nama,
@@ -50,8 +44,21 @@ export class CustomerService {
         jumlahTagihan,
       };
     });
-
     return customerTable;
+  }
+
+  public static getTotalPembayaran(queryRes: any): number {
+    const penagihanArray = queryRes?.penagihan ?? [];
+    const distribusiPembayaranArray = penagihanArray
+      .flatMap((penagihan: any) => penagihan)
+      .flatMap((penagihan: any) => penagihan.distribusiPembayaran ?? []);
+    const totalPembayaran = distribusiPembayaranArray.reduce(
+      (total: number, cur: any) => {
+        return (total += cur.jumlah);
+      },
+      0
+    );
+    return totalPembayaran;
   }
 
   public static async getKolektorHistory(customerId: string) {

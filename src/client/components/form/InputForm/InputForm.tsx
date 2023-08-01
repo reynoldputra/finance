@@ -8,6 +8,7 @@ interface Option {
 }
 
 interface CustomFormFieldProps {
+  name: string;
   title: string;
   description?: string;
   errorMessage?: string;
@@ -16,6 +17,7 @@ interface CustomFormFieldProps {
 }
 
 const InputForm: React.FC<CustomFormFieldProps> = ({
+  name,
   title,
   description,
   errorMessage,
@@ -25,6 +27,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
   if (type === "number" || type === "text") {
     return (
       <DefaultInput
+        name={name}
         title={title}
         description={description}
         errorMessage={errorMessage}
@@ -34,6 +37,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
   } else if (type === "combobox") {
     return (
       <ComboboxInput
+        name={name}
         title={title}
         description={description}
         errorMessage={errorMessage}
@@ -43,6 +47,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
   } else if (type === "datepicker") {
     return (
       <DateInput
+        name={name}
         title={title}
         description={description}
         errorMessage={errorMessage}

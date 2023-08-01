@@ -10,6 +10,7 @@ import { useFormContext } from "react-hook-form";
 import { Input } from "@client/components/ui/input";
 
 interface DefaultInputProps {
+  name: string;
   title: string;
   description?: string;
   errorMessage?: string;
@@ -17,6 +18,7 @@ interface DefaultInputProps {
 }
 
 const DefaultInput: React.FC<DefaultInputProps> = ({
+  name,
   title,
   description,
   errorMessage,
@@ -26,7 +28,7 @@ const DefaultInput: React.FC<DefaultInputProps> = ({
   return (
     <FormField
       control={form.control}
-      name={title}
+      name={name}
       render={({ field }) => (
         <FormItem>
           <FormLabel>{title}</FormLabel>

@@ -29,6 +29,7 @@ interface Option {
 }
 
 interface ComboboxInputProps {
+  name: string;
   title: string;
   description?: string;
   errorMessage?: string;
@@ -36,6 +37,7 @@ interface ComboboxInputProps {
 }
 
 const ComboboxInput: React.FC<ComboboxInputProps> = ({
+  name,
   title,
   description,
   errorMessage,
@@ -45,7 +47,7 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
   return (
     <FormField
       control={form.control}
-      name={title}
+      name={name}
       render={({ field }) => (
         <FormItem>
           <FormLabel>{title}</FormLabel>

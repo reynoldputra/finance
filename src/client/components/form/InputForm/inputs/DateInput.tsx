@@ -19,12 +19,14 @@ import { Button } from "@client/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 
 interface DateInputProps {
+  name: string;
   title: string;
   description?: string;
   errorMessage?: string;
 }
 
 const DateInput: React.FC<DateInputProps> = ({
+  name,
   title,
   description,
   errorMessage,
@@ -33,10 +35,10 @@ const DateInput: React.FC<DateInputProps> = ({
   return (
     <FormField
       control={form.control}
-      name={title}
+      name={name}
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel>Date</FormLabel>
+          <FormLabel>{title}</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>

@@ -72,6 +72,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
+    "cuid": "^3.0.0",
     "electron-log": "^4.4.8",
     "electron-router-dom": "^1.0.5",
     "lucide-react": "^0.261.0",

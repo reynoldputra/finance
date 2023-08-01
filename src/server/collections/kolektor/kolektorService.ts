@@ -1,9 +1,12 @@
 import { prisma } from "../../prisma";
-import { CustomerService } from "../customer/customerService";
-import { TCreateKolektorInput, TUpdateKolektorInput } from "./kolektorSchema";
+import {
+  TCreateKolektorInput,
+  TKolektorTable,
+  TUpdateKolektorInput,
+} from "./kolektorSchema";
 
 export class KolektorService {
-  public static async getKolektorTable() {
+  public static async getKolektorTable(): Promise<TKolektorTable[]> {
     const res = await prisma.kolektor.findMany({
       select: {
         id: true,
@@ -11,11 +14,6 @@ export class KolektorService {
         penagihan: {
           select: {
             status: true,
-            distribusiPembayaran: {
-              select: {
-                jumlah: true,
-              },
-            },
           },
           // ganti jadi waiting
           where: {
@@ -24,17 +22,14 @@ export class KolektorService {
         },
       },
     });
-    const kolektorTable = res.map((r) => {
-      const jumlahTagihanWaiting = CustomerService.getTotalPembayaran(r);
+    const kolektorTable: TKolektorTable[] = res.map((r): TKolektorTable => {
       return {
         id: r.id,
         nama: r.nama,
         penagihanWaiting: r.penagihan.length,
-        jumlahTagihanWaiting,
       };
     });
-    console.dir(kolektorTable, { depth: null });
-    return res;
+    return kolektorTable;
   }
 
   public static async getAllKolektor() {

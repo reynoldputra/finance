@@ -8,6 +8,7 @@ import {
   TUpdateKolektorInput,
   updateKolektorInput,
 } from "@server/collections/kolektor/kolektorSchema";
+import { useToast } from "@client/components/ui/use-toast";
 
 interface kolektorData {
   id: string;
@@ -19,6 +20,8 @@ interface EditKolektorProps {
 }
 
 export default function EditKolektorForm({ kolektorData }: EditKolektorProps) {
+  const { toast } = useToast();
+
   const form = useForm<TUpdateKolektorInput>({
     resolver: zodResolver(updateKolektorInput),
     defaultValues: {
@@ -33,7 +36,9 @@ export default function EditKolektorForm({ kolektorData }: EditKolektorProps) {
     try {
       const { data } = await updateKolektorMutation.mutateAsync(values);
       if (data) {
-        console.log("Kolektor berhasil diedit:", data);
+        toast({
+          description: `Kolektor ${data.nama} successfully edited`,
+        });
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);

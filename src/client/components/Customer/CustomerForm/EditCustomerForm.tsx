@@ -8,6 +8,7 @@ import {
   updateCustomerInput,
 } from "@server/collections/customer/customerSchema";
 import { trpc } from "@client/lib/trpc";
+import { useToast } from "@client/components/ui/use-toast";
 
 interface Option {
   title: string;
@@ -25,6 +26,8 @@ interface EditCustomerProps {
 }
 
 export default function EditCustomerForm({ customerData }: EditCustomerProps) {
+  const { toast } = useToast();
+
   const form = useForm<TUpdateCustomerInput>({
     resolver: zodResolver(updateCustomerInput),
     defaultValues: {
@@ -47,7 +50,9 @@ export default function EditCustomerForm({ customerData }: EditCustomerProps) {
     try {
       const { data } = await updateCustumerMutation.mutateAsync(values);
       if (data) {
-        console.log("Customer berhasil dibuat:", data);
+        toast({
+          description: `Customer ${data.nama} successfully edited`,
+        });
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);

@@ -22,9 +22,8 @@ export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
         row.original.id
       );
       if (data) {
-        console.log("Customer berhasil dihapus:", data);
         toast({
-          description: `Customer ${data.nama} berhasil dihapus`,
+          description: `Customer ${data.nama} successfully deleted`,
         });
       }
     } catch (error) {

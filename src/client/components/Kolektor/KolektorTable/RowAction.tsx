@@ -7,12 +7,14 @@ import { Row } from "@tanstack/react-table";
 import { DataTableRowActions } from "@client/components/table/DataTableRowActions";
 import { TKolektorTable } from "../../../../server/collections/kolektor/kolektorSchema";
 import { trpc } from "@client/lib/trpc";
+import { useToast } from "@client/components/ui/use-toast";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
 }
 
 export function RowAction({ row }: RowActionsProps<TKolektorTable>) {
+  const { toast } = useToast();
   const deleteKolektorMutation = trpc.kolektor.deleteKolektor.useMutation();
   async function handleDelete() {
     try {
@@ -20,7 +22,9 @@ export function RowAction({ row }: RowActionsProps<TKolektorTable>) {
         row.original.id
       );
       if (data) {
-        console.log("Kolektor berhasil dihapus:", data);
+        toast({
+          description: `Kolektor ${data.nama} successfully deleted`,
+        });
       }
     } catch (error) {
       console.log(error);

@@ -43,9 +43,8 @@ export function CreateCustomerForm() {
       }
       const { data } = await createCustomerMutation.mutateAsync(values);
       if (data) {
-        console.log("Customer berhasil dibuat:", data);
         toast({
-          description: `Customer ${data.nama} berhasil dibuat`,
+          description: `Customer ${data.nama} successfully created`,
         });
       }
     } catch (err) {

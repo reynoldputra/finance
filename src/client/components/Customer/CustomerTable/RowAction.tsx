@@ -2,24 +2,40 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-} from "@client/components/ui/dropdown-menu"
-import { Row } from "@tanstack/react-table"
-import { DataTableRowActions } from "@client/components/table/DataTableRowActions"
+} from "@client/components/ui/dropdown-menu";
+import { Row } from "@tanstack/react-table";
+import { DataTableRowActions } from "@client/components/table/DataTableRowActions";
+import { ICustomerTable } from "../../../../server/types/customer";
+import { trpc } from "@client/lib/trpc";
 
 interface RowActionsProps<TData> {
-  row: Row<TData>
+  row: Row<TData>;
 }
 
-export function RowAction<TData>({
-  row,
-}: RowActionsProps<TData>) {
+export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
+  const deleteCustomerMutation = trpc.customer.deleteCustomer.useMutation();
+  async function handleDelete() {
+    try {
+      const { data } = await deleteCustomerMutation.mutateAsync(
+        row.original.id
+      );
+      if (data) {
+        console.log("Customer berhasil dihapus:", data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <DataTableRowActions>
       <DropdownMenuItem>Edit</DropdownMenuItem>
-      <DropdownMenuItem>Make a copy</DropdownMenuItem>
-      <DropdownMenuItem>Favorite</DropdownMenuItem>
+      <DropdownMenuItem
+        onClick={() => navigator.clipboard.writeText(row.original.id)}
+      >
+        Copy Kolektor ID
+      </DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem>
+      <DropdownMenuItem onClick={handleDelete}>
         Delete
         <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
       </DropdownMenuItem>

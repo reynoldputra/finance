@@ -32,7 +32,7 @@ export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
       <DropdownMenuItem
         onClick={() => navigator.clipboard.writeText(row.original.id)}
       >
-        Copy Kolektor ID
+        Copy Customer ID
       </DropdownMenuItem>
       <DropdownMenuSeparator />
       <DropdownMenuItem onClick={handleDelete}>

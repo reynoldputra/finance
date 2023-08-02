@@ -24,6 +24,7 @@ export class InvoiceService {
             distribusiPembayaran: true,
           },
         },
+        customer : true
       },
     });
     const parsed = [];
@@ -38,8 +39,13 @@ export class InvoiceService {
       }, 0);
 
       parsed.push({
-        ...inv,
         totalPembayaran,
+        id : inv.id,
+        tanggalTransaksi : new Date(inv.tanggalTransaksi),
+        namaSales : inv.namaSales,
+        status : (inv.total - totalPembayaran > 0 ) ? "BELUM" : "LUNAS",
+        namaCustomer : inv.customer.nama,
+        total : inv.total
       });
     }
     return parsed;
@@ -56,6 +62,7 @@ export class InvoiceService {
             distribusiPembayaran: true,
           },
         },
+        customer : true
       },
     });
     const totalPembayaran = res.penagihan.reduce((tot, cur) => {
@@ -68,6 +75,7 @@ export class InvoiceService {
 
     return {
       ...res,
+      namaCustomer : res.customer.nama,
       totalPembayaran
     };
   }

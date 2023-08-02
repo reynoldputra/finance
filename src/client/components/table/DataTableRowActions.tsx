@@ -1,9 +1,9 @@
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
 import { Row } from "@tanstack/react-table"
+import * as DropdownPrimitive from "@radix-ui/react-dropdown-menu"
 
 import { Button } from "@client/components/ui/button"
 import {
-  DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@client/components/ui/dropdown-menu"
@@ -19,7 +19,7 @@ export function DataTableRowActions({
 }: DataTableRowActionsProps) {
 
   return (
-    <DropdownMenu>
+    <DropdownPrimitive.Root>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
@@ -32,7 +32,7 @@ export function DataTableRowActions({
       <DropdownMenuContent align="end" className="w-[160px]">
         {children}
       </DropdownMenuContent>
-    </DropdownMenu>
+    </DropdownPrimitive.Root>
   )
 }
 

@@ -17,7 +17,7 @@ interface Option {
 
 interface customerData {
   id: string;
-  name: string;
+  nama: string;
   kolektorId: string;
 }
 
@@ -31,7 +31,7 @@ export default function EditCustomerForm({ customerData }: EditCustomerProps) {
   const form = useForm<TUpdateCustomerInput>({
     resolver: zodResolver(updateCustomerInput),
     defaultValues: {
-      nama: customerData.name,
+      nama: customerData.nama,
       id: customerData.id,
       kolektorId: customerData.kolektorId,
     },
@@ -44,7 +44,12 @@ export default function EditCustomerForm({ customerData }: EditCustomerProps) {
     value: item.id,
   }));
 
-  const updateCustumerMutation = trpc.customer.updateCustomer.useMutation();
+  const utils = trpc.useContext();
+  const updateCustumerMutation = trpc.customer.updateCustomer.useMutation({
+    onSuccess: () => {
+      utils.customer.invalidate();
+    },
+  });
 
   async function onSubmit(values: TUpdateCustomerInput) {
     try {

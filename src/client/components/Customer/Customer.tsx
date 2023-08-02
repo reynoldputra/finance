@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import CustomerTable from "./CustomerTable";
-import CreateCustomerForm from "./CustomerForm";
+import { CreateCustomerForm } from "./customerForm/CreateCustomerForm";
 import { Toaster } from "../ui/toaster";
 
 export default function Customer() {

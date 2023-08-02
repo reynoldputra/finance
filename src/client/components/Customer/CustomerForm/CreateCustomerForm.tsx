@@ -34,7 +34,13 @@ export function CreateCustomerForm() {
     value: item.id,
   }));
 
-  const createCustomerMutation = trpc.customer.createCustomer.useMutation();
+  const utils = trpc.useContext();
+
+  const createCustomerMutation = trpc.customer.createCustomer.useMutation({
+    onSuccess: () => {
+      utils.customer.invalidate();
+    },
+  });
 
   async function onSubmit(values: TCreateCustomerInput) {
     try {

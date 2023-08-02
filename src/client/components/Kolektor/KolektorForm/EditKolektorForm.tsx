@@ -12,7 +12,7 @@ import { useToast } from "@client/components/ui/use-toast";
 
 interface kolektorData {
   id: string;
-  name: string;
+  nama: string;
 }
 
 interface EditKolektorProps {
@@ -25,12 +25,18 @@ export default function EditKolektorForm({ kolektorData }: EditKolektorProps) {
   const form = useForm<TUpdateKolektorInput>({
     resolver: zodResolver(updateKolektorInput),
     defaultValues: {
-      nama: kolektorData.name,
+      nama: kolektorData.nama,
       id: kolektorData.id,
     },
   });
 
-  const updateKolektorMutation = trpc.kolektor.updateKolektor.useMutation();
+  const utils = trpc.useContext();
+
+  const updateKolektorMutation = trpc.kolektor.updateKolektor.useMutation({
+    onSuccess: () => {
+      utils.kolektor.invalidate();
+    },
+  });
 
   async function onSubmit(values: TUpdateKolektorInput) {
     try {

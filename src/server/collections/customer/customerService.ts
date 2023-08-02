@@ -100,7 +100,7 @@ export class CustomerService {
 
     const updateCustomerData: Prisma.CustomerUncheckedUpdateInput = {};
     if (nama) updateCustomerData.nama = nama;
-    if (kolektorId) updateCustomerData.kolektorId = nama;
+    if (kolektorId) updateCustomerData.kolektorId = kolektorId;
 
     const updatedCustomer = await prisma.$transaction(async (prisma) => {
       const updateCostumer = await prisma.customer.update({

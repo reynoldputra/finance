@@ -20,7 +20,13 @@ export function CreateKolektorForm() {
     },
   });
 
-  const createKolektorMutation = trpc.kolektor.createKolektor.useMutation();
+  const utils = trpc.useContext();
+
+  const createKolektorMutation = trpc.kolektor.createKolektor.useMutation({
+    onSuccess: () => {
+      utils.kolektor.invalidate();
+    },
+  });
 
   async function onSubmit(values: TCreateCustomerInput) {
     try {
@@ -54,6 +60,9 @@ export function CreateKolektorForm() {
           description="Input Nama Kolektor Here"
         />
         <Button type="submit">Submit</Button>
+        {/* <ModalDropdownItem triggerChildren="Edit">
+          <EditKolektorForm kolektorData={row.original} />
+        </ModalDropdownItem> */}
       </form>
     </Form>
   );

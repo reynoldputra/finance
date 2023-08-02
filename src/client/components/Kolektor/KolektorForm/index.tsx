@@ -1,3 +1,3 @@
-import { KolektorForm } from "./KolektorForm";
+import { CreateKolektorForm } from "./CreateKolektorForm";
 
-export default KolektorForm;
+export default CreateKolektorForm;

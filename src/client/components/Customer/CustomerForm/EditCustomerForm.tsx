@@ -6,7 +6,7 @@ import InputForm from "../../form/InputForm/InputForm";
 import {
   TUpdateCustomerInput,
   updateCustomerInput,
-} from "../../../../server/collections/customer/customerSchema";
+} from "@server/collections/customer/customerSchema";
 import { trpc } from "@client/lib/trpc";
 
 interface Option {
@@ -60,14 +60,14 @@ export default function EditCustomerForm({ customerData }: EditCustomerProps) {
         <InputForm
           name="id"
           type="text"
-          title="ID Kolektor"
-          description="Edit ID Kolektor Here"
+          title="ID Customer"
+          description="Edit ID Customer Here"
         />
         <InputForm
           name="nama"
           type="text"
           title="Nama Customer"
-          description="Edit Nama Kolektor Here"
+          description="Edit Nama Customer Here"
         />
         <InputForm
           name="kolektorId"

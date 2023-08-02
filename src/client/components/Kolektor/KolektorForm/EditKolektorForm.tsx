@@ -3,30 +3,37 @@ import { useForm } from "react-hook-form";
 import { Form } from "@client/components/ui/form";
 import { Button } from "@client/components/ui/button";
 import InputForm from "../../form/InputForm/InputForm";
-import { createKolektorInput } from "../../../../server/collections/kolektor/kolektorSchema";
-import { TCreateCustomerInput } from "../../../../server/collections/customer/customerSchema";
 import { trpc } from "@client/lib/trpc";
-import cuid from "cuid";
+import {
+  TUpdateKolektorInput,
+  updateKolektorInput,
+} from "@server/collections/kolektor/kolektorSchema";
 
-export function KolektorForm() {
-  const form = useForm<TCreateCustomerInput>({
-    resolver: zodResolver(createKolektorInput),
+interface kolektorData {
+  id: string;
+  name: string;
+}
+
+interface EditKolektorProps {
+  kolektorData: kolektorData;
+}
+
+export default function EditKolektorForm({ kolektorData }: EditKolektorProps) {
+  const form = useForm<TUpdateKolektorInput>({
+    resolver: zodResolver(updateKolektorInput),
     defaultValues: {
-      nama: "inu",
-      id: "",
+      nama: kolektorData.name,
+      id: kolektorData.id,
     },
   });
 
-  const createKolektorMutation = trpc.kolektor.createKolektor.useMutation();
+  const updateKolektorMutation = trpc.kolektor.updateKolektor.useMutation();
 
-  async function onSubmit(values: TCreateCustomerInput) {
+  async function onSubmit(values: TUpdateKolektorInput) {
     try {
-      if (!values.id) {
-        values.id = cuid();
-      }
-      const { data } = await createKolektorMutation.mutateAsync(values);
+      const { data } = await updateKolektorMutation.mutateAsync(values);
       if (data) {
-        console.log("Kolektor berhasil dibuat:", data);
+        console.log("Kolektor berhasil diedit:", data);
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
@@ -40,13 +47,13 @@ export function KolektorForm() {
           name="id"
           type="text"
           title="ID Kolektor"
-          description="ID kolektor will be generated automatically when empty"
+          description="Edit ID Kolektor Here"
         />
         <InputForm
           name="nama"
           type="text"
           title="Nama Kolektor"
-          description="Input Nama Kolektor Here"
+          description="Edit Nama Kolektor Here"
         />
         <Button type="submit">Submit</Button>
       </form>

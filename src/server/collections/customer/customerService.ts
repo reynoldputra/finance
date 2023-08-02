@@ -1,6 +1,6 @@
 import { ICustomerTable } from "@server/types/customer";
 import { TCreateCustomerInput, TUpdateCustomerInput } from "./customerSchema";
-import { prisma } from "../../prisma";
+import { prisma } from "@server/prisma";
 import { Prisma } from "../../../generated/client";
 import { InvoiceService } from "../invoice/invoiceService";
 

@@ -7,12 +7,14 @@ import { Row } from "@tanstack/react-table";
 import { DataTableRowActions } from "@client/components/table/DataTableRowActions";
 import { ICustomerTable } from "../../../../server/types/customer";
 import { trpc } from "@client/lib/trpc";
+import { useToast } from "@client/components/ui/use-toast";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
 }
 
 export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
+  const { toast } = useToast();
   const deleteCustomerMutation = trpc.customer.deleteCustomer.useMutation();
   async function handleDelete() {
     try {
@@ -21,6 +23,9 @@ export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
       );
       if (data) {
         console.log("Customer berhasil dihapus:", data);
+        toast({
+          description: `Customer ${data.nama} berhasil dihapus`,
+        });
       }
     } catch (error) {
       console.log(error);

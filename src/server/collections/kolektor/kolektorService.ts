@@ -1,7 +1,37 @@
 import { prisma } from "../../prisma";
-import { TCreateKolektorInput, TUpdateKolektorInput } from "./kolektorSchema";
+import {
+  TCreateKolektorInput,
+  TKolektorTable,
+  TUpdateKolektorInput,
+} from "./kolektorSchema";
 
 export class KolektorService {
+  public static async getKolektorTable(): Promise<TKolektorTable[]> {
+    const res = await prisma.kolektor.findMany({
+      select: {
+        id: true,
+        nama: true,
+        penagihan: {
+          select: {
+            status: true,
+          },
+          // ganti jadi waiting
+          where: {
+            status: "CICILAN",
+          },
+        },
+      },
+    });
+    const kolektorTable: TKolektorTable[] = res.map((r): TKolektorTable => {
+      return {
+        id: r.id,
+        nama: r.nama,
+        penagihanWaiting: r.penagihan.length,
+      };
+    });
+    return kolektorTable;
+  }
+
   public static async getAllKolektor() {
     const res = await prisma.kolektor.findMany();
     return res;

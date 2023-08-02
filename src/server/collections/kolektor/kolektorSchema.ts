@@ -10,5 +10,10 @@ export const updateKolektorInput = z.object({
   nama: z.string(),
 });
 
+export const kolektorTable = updateKolektorInput.extend({
+  penagihanWaiting: z.number(),
+});
+
 export type TCreateKolektorInput = z.infer<typeof createKolektorInput>;
 export type TUpdateKolektorInput = z.infer<typeof updateKolektorInput>;
+export type TKolektorTable = z.infer<typeof kolektorTable>;

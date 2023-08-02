@@ -44,21 +44,19 @@ export function ExampleForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <InputForm
+          name="Username"
           type="text"
           title="Username"
           description="This is your public display name."
         />
         <InputForm
+          name="Total"
           type="number"
           title="Total"
           description="This is Your Total"
         />
-        <InputForm title="Date" type="datepicker" />
-        <InputForm
-          title="Language"
-          type="combobox"
-          options={languages}
-        />
+        <InputForm name="Date" title="Date" type="datepicker" />
+        <InputForm name="Language" title="Language" type="combobox" options={languages} />
         <Button type="submit">Submit</Button>
       </form>
     </Form>

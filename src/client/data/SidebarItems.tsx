@@ -1,4 +1,4 @@
-import { Home, LucideIcon, Users2 } from "lucide-react";
+import { Home, LucideIcon, UserCog2, Users2 } from "lucide-react";
 
 export interface ISidebarItem {
   title: string;
@@ -9,6 +9,7 @@ export interface ISidebarItem {
 const SidebarItems: ISidebarItem[] = [
   { title: "Home", route: "/", icon: Home },
   { title: "Customer", route: "/customer", icon: Users2 },
+  { title: "Kolektor", route: "/kolektor", icon: UserCog2 },
 ];
 
 export default SidebarItems;

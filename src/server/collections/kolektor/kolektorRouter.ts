@@ -1,4 +1,4 @@
-import { MainTrpc } from "@server/trpc";
+import { MainTrpc } from "../../trpc";
 import { KolektorService } from "./kolektorService";
 import {
   createKolektorInput,
@@ -11,6 +11,19 @@ import { z } from "zod";
 const kolektorTrpc = new MainTrpc();
 
 export const KolektorRouter = kolektorTrpc.router({
+  kolektorTable: kolektorTrpc.publicProcedure.query(async () => {
+    try {
+      const res = await KolektorService.getKolektorTable();
+      return {
+        status: true,
+        data: res,
+      };
+    } catch (err) {
+      return {
+        status: false,
+      };
+    }
+  }),
   getAllKolektor: kolektorTrpc.publicProcedure.query(async () => {
     try {
       const res = await KolektorService.getAllKolektor();

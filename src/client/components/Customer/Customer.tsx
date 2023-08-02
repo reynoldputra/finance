@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import CustomerTable from "./CustomerTable";
-import CustomerForm from "./CustomerForm";
+import CreateCustomerForm from "./CustomerForm";
 
 export default function Customer() {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ export default function Customer() {
       <p>Customer page</p>
       <div onClick={() => navigate("/")}>Go to home page</div>
       <CustomerTable />
-      <CustomerForm />
+      <CreateCustomerForm />
     </div>
   );
 }

@@ -1,3 +1,3 @@
-import { CustomerForm } from "./CustomerForm";
+import { CreateCustomerForm } from "./CreateCustomerForm";
 
-export default CustomerForm;
+export default CreateCustomerForm;

@@ -15,7 +15,7 @@ interface Option {
   value: string;
 }
 
-export function CustomerForm() {
+export function CreateCustomerForm() {
   const form = useForm<TCreateCustomerInput>({
     resolver: zodResolver(createCustomerInput),
     defaultValues: {

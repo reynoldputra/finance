@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import KolektorTable from "./KolektorTable";
-import { KolektorForm } from "./KolektorForm";
+import KolektorForm from "./KolektorForm";
 
 export default function Kolektor() {
   const navigate = useNavigate();

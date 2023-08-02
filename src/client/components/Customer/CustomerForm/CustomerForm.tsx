@@ -2,31 +2,33 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form } from "@client/components/ui/form";
 import { Button } from "@client/components/ui/button";
-import InputForm from "../form/InputForm/InputForm";
-import { createKolektorInput } from "../../../server/collections/kolektor/kolektorSchema";
-import { TCreateCustomerInput } from "../../../server/collections/customer/customerSchema";
+import InputForm from "../../form/InputForm/InputForm";
+import {
+  TCreateCustomerInput,
+  createCustomerInput,
+} from "../../../../server/collections/customer/customerSchema";
 import { trpc } from "@client/lib/trpc";
 import cuid from "cuid";
 
-export function KolektorForm() {
+export function CustomerForm() {
   const form = useForm<TCreateCustomerInput>({
-    resolver: zodResolver(createKolektorInput),
+    resolver: zodResolver(createCustomerInput),
     defaultValues: {
       nama: "inu",
       id: "",
     },
   });
 
-  const createKolektorMutation = trpc.kolektor.createKolektor.useMutation();
+  const createCustomerMutation = trpc.customer.createCustomer.useMutation();
 
   async function onSubmit(values: TCreateCustomerInput) {
     try {
       if (!values.id) {
         values.id = cuid();
       }
-      const { data } = await createKolektorMutation.mutateAsync(values);
+      const { data } = await createCustomerMutation.mutateAsync(values);
       if (data) {
-        console.log("Kolektor berhasil dibuat:", data);
+        console.log("Customer berhasil dibuat:", data);
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
@@ -45,8 +47,15 @@ export function KolektorForm() {
         <InputForm
           name="nama"
           type="text"
-          title="Nama Kolektor"
+          title="Nama Customer"
           description="Input Nama Kolektor Here"
+        />
+        <InputForm
+        name="kolektor"
+        type="combobox"
+        title="Nama Kolektor"
+        description="Choose Nama Kolektor Here"
+        // options={}
         />
         <Button type="submit">Submit</Button>
       </form>

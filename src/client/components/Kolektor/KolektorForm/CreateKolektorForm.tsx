@@ -7,8 +7,11 @@ import { createKolektorInput } from "../../../../server/collections/kolektor/kol
 import { TCreateCustomerInput } from "../../../../server/collections/customer/customerSchema";
 import { trpc } from "@client/lib/trpc";
 import cuid from "cuid";
+import { useToast } from "@client/components/ui/use-toast";
 
 export function CreateKolektorForm() {
+  const { toast } = useToast();
+
   const form = useForm<TCreateCustomerInput>({
     resolver: zodResolver(createKolektorInput),
     defaultValues: {
@@ -26,7 +29,9 @@ export function CreateKolektorForm() {
       }
       const { data } = await createKolektorMutation.mutateAsync(values);
       if (data) {
-        console.log("Kolektor berhasil dibuat:", data);
+        toast({
+          description: `Kolektor ${data.nama} successfully created`,
+        });
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);

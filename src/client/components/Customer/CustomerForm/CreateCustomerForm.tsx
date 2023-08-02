@@ -9,6 +9,7 @@ import {
 } from "../../../../server/collections/customer/customerSchema";
 import { trpc } from "@client/lib/trpc";
 import cuid from "cuid";
+import { useToast } from "@client/components/ui/use-toast";
 
 interface Option {
   title: string;
@@ -16,6 +17,8 @@ interface Option {
 }
 
 export function CreateCustomerForm() {
+  const { toast } = useToast();
+
   const form = useForm<TCreateCustomerInput>({
     resolver: zodResolver(createCustomerInput),
     defaultValues: {
@@ -41,6 +44,9 @@ export function CreateCustomerForm() {
       const { data } = await createCustomerMutation.mutateAsync(values);
       if (data) {
         console.log("Customer berhasil dibuat:", data);
+        toast({
+          description: `Customer ${data.nama} berhasil dibuat`,
+        });
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);

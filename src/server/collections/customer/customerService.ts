@@ -86,13 +86,13 @@ export class CustomerService {
     return res;
   }
 
-  public static async deleteCustomer(customerId: string): Promise<boolean> {
-    await prisma.customer.delete({
+  public static async deleteCustomer(customerId: string) {
+    const res = await prisma.customer.delete({
       where: {
         id: customerId,
       },
     });
-    return true;
+    return res;
   }
 
   public static async updateCostumer(customer: TUpdateCustomerInput) {

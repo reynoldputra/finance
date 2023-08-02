@@ -10,6 +10,11 @@ import {
 import { trpc } from "@client/lib/trpc";
 import cuid from "cuid";
 
+interface Option {
+  title: string;
+  value: string;
+}
+
 export function CustomerForm() {
   const form = useForm<TCreateCustomerInput>({
     resolver: zodResolver(createCustomerInput),
@@ -18,6 +23,13 @@ export function CustomerForm() {
       id: "",
     },
   });
+
+  const data = trpc.kolektor.getAllKolektor.useQuery();
+  const result = data.data?.data ?? [];
+  const kolektors: Option[] = result.map((item) => ({
+    title: item.nama,
+    value: item.id,
+  }));
 
   const createCustomerMutation = trpc.customer.createCustomer.useMutation();
 
@@ -51,11 +63,11 @@ export function CustomerForm() {
           description="Input Nama Kolektor Here"
         />
         <InputForm
-        name="kolektor"
-        type="combobox"
-        title="Nama Kolektor"
-        description="Choose Nama Kolektor Here"
-        // options={}
+          name="kolektorId"
+          type="combobox"
+          title="Nama Kolektor"
+          description="Choose Nama Kolektor Here"
+          options={kolektors}
         />
         <Button type="submit">Submit</Button>
       </form>

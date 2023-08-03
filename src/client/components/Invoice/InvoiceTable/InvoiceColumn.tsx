@@ -28,7 +28,7 @@ export const InvoiceColumn : ColumnDef<TInvoiceSchema>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
+    accessorKey: "transaksiId",
     id : "Id Transaksi",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Id Transaksi" />,
     cell: ({ row }) => <div className="w-[180px]">{row.getValue("Id Transaksi")}</div>,

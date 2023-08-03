@@ -1,6 +1,6 @@
 import { PrismaClient, Prisma, Invoice, Penagihan } from "../../src/generated/client";
 // import * as csvParser from "csv-parser";
-const csvParser = require("csv-parser")
+const csvParser = require("csv-parser");
 // const csv = require("csv-parser")
 import { parse } from "csv-parse";
 import * as fs from "fs";
@@ -52,29 +52,29 @@ async function main() {
           if (data.nama_customer) currentCustName = data.nama_customer;
           if (data.nama_sales) salesName = data.nama_sales;
           if (data.nama_kolektor) colectorName = data.nama_kolektor;
-          let totalPembayaran = 0
-          let invoiceId = ""
-          let penagihanId = ""
+          let totalPembayaran = 0;
+          let invoiceId = "";
+          let penagihanId = "";
 
           await prisma.$transaction(async (ctx) => {
-            const newKolektor : Prisma.KolektorCreateInput = {
-              nama : colectorName
-            }
+            const newKolektor: Prisma.KolektorCreateInput = {
+              nama: colectorName,
+            };
 
             const kolektor = await ctx.kolektor.upsert({
-              where : {nama : colectorName},
-              create : newKolektor,
-              update : newKolektor
-            })
+              where: { nama: colectorName },
+              create: newKolektor,
+              update: newKolektor,
+            });
 
             // creating customer
             const newCust: Prisma.CustomerCreateWithoutInvoicesInput = {
               nama: data.nama_customer ? data.nama_customer : (currentCustName as string),
-              currentKolektor : {
-                connect : {
-                  id : kolektor.id
-                }
-              }
+              currentKolektor: {
+                connect: {
+                  id: kolektor.id,
+                },
+              },
             };
 
             const customer = await ctx.customer.upsert({
@@ -89,8 +89,8 @@ async function main() {
               where: {
                 customerId: customer.id,
               },
-              include : {
-                kolektor : true
+              include: {
+                kolektor: true,
               },
               orderBy: {
                 createdAt: "desc",
@@ -101,22 +101,22 @@ async function main() {
               if (colectorName != daftarCollector[0].kolektor.nama) {
                 await ctx.kolektorHistory.create({
                   data: {
-                    kolektorId : kolektor.id,
-                    customerId : customer.id
+                    kolektorId: kolektor.id,
+                    customerId: customer.id,
                   },
                 });
                 await ctx.customer.update({
-                  where : {id : customer.id},
-                  data : {
-                    kolektorId : kolektor.id
-                  }
-                })
+                  where: { id: customer.id },
+                  data: {
+                    kolektorId: kolektor.id,
+                  },
+                });
               }
             } else {
               await ctx.kolektorHistory.create({
                 data: {
-                  kolektorId : kolektor.id,
-                  customerId : customer.id
+                  kolektorId: kolektor.id,
+                  customerId: customer.id,
                 },
               });
             }
@@ -126,7 +126,7 @@ async function main() {
             const [day, month, year] = tanggalTransaksi.split("/");
             const tanggal_transaksi = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
             const newInvoice: Prisma.InvoiceCreateInput = {
-              id: data.transaksi_id,
+              transaksiId: data.transaksi_id,
               tanggalTransaksi: tanggal_transaksi,
               total: parseInt(data.total_tagihan) as number,
               namaSales: salesName,
@@ -138,11 +138,11 @@ async function main() {
             };
 
             const invoice = await ctx.invoice.upsert({
-              where: { id: data.transaksi_id },
+              where: { transaksiId: data.transaksi_id },
               create: newInvoice,
               update: newInvoice,
             });
-            invoiceId = invoice.id
+            invoiceId = invoice.id;
 
             const jatuhTempo = data.jatuh_tempo + "/2023";
             const [dayJt, monthJt, yearJt] = jatuhTempo.split("/");
@@ -152,28 +152,22 @@ async function main() {
               parseInt(dayJt)
             );
 
-
             let tanggal_tagihan = data.tanggal_tagihan;
             const [d, m, y] = tanggal_tagihan.split("/");
-            const tanggalTagihanDate = new Date(
-              parseInt(d),
-              parseInt(m) - 1,
-              parseInt(y)
-            );
+            const tanggalTagihanDate = new Date(parseInt(d), parseInt(m) - 1, parseInt(y));
 
             const penagihan = await ctx.penagihan.create({
-              data : {
-                tanggalTagihan : tanggalTagihanDate,
-                invoiceId : invoice.id,
-                kolektorId : kolektor.id,
-                status : 'WAITING'
-              }
-            })
+              data: {
+                tanggalTagihan: tanggalTagihanDate,
+                invoiceId: invoice.id,
+                kolektorId: kolektor.id,
+                status: "WAITING",
+              },
+            });
 
-            penagihanId = penagihan.id
+            penagihanId = penagihan.id;
 
-            console.log(penagihan)
-
+            console.log(penagihan);
 
             if (data.giro_id) {
               let newGiro: Prisma.GiroCreateWithoutCaraBayarInput | Prisma.GiroCreateInput = {
@@ -220,11 +214,11 @@ async function main() {
               const findInvoice = await ctx.invoice.findFirst({
                 where: { id: invoice.id },
                 include: {
-                  penagihan : {
-                    include : {
-                      distribusiPembayaran : true
-                    }
-                  }
+                  penagihan: {
+                    include: {
+                      distribusiPembayaran: true,
+                    },
+                  },
                 },
               });
 
@@ -233,11 +227,11 @@ async function main() {
               if (findInvoice) {
                 const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
                   const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
-                    return tot += cur.jumlah
-                  }, 0)
+                    return (tot += cur.jumlah);
+                  }, 0);
 
-                  return tot += pem
-                }, 0)
+                  return (tot += pem);
+                }, 0);
                 sisaTagihan = invoice.total - telahDibayar;
               }
 
@@ -264,7 +258,7 @@ async function main() {
                 },
               });
 
-              totalPembayaran += giro.caraBayar.total
+              totalPembayaran += giro.caraBayar.total;
             }
 
             if (data.transfer_id) {
@@ -316,11 +310,11 @@ async function main() {
               const findInvoice = await ctx.invoice.findFirst({
                 where: { id: invoice.id },
                 include: {
-                  penagihan : {
-                    include : {
-                      distribusiPembayaran : true
-                    }
-                  }
+                  penagihan: {
+                    include: {
+                      distribusiPembayaran: true,
+                    },
+                  },
                 },
               });
 
@@ -329,19 +323,19 @@ async function main() {
               if (findInvoice) {
                 const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
                   const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
-                    return tot += cur.jumlah
-                  }, 0)
+                    return (tot += cur.jumlah);
+                  }, 0);
 
-                  return tot += pem
-                }, 0)
+                  return (tot += pem);
+                }, 0);
                 sisaTagihan = invoice.total - telahDibayar;
               }
 
               const newDistribusi: Prisma.DistribusiPembayaranCreateInput = {
-                penagihan : {
-                  connect : {
-                    id : penagihan.id
-                  }
+                penagihan: {
+                  connect: {
+                    id: penagihan.id,
+                  },
                 },
                 caraBayar: {
                   connect: {
@@ -356,7 +350,7 @@ async function main() {
                 data: newDistribusi,
               });
 
-              totalPembayaran += transfer.caraBayar.total
+              totalPembayaran += transfer.caraBayar.total;
             }
 
             if (data.cash) {
@@ -371,11 +365,11 @@ async function main() {
               const findInvoice = await ctx.invoice.findFirst({
                 where: { id: invoice.id },
                 include: {
-                  penagihan : {
-                    include : {
-                      distribusiPembayaran : true
-                    }
-                  }
+                  penagihan: {
+                    include: {
+                      distribusiPembayaran: true,
+                    },
+                  },
                 },
               });
 
@@ -384,17 +378,17 @@ async function main() {
               if (findInvoice) {
                 const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
                   const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
-                    return tot += cur.jumlah
-                  }, 0)
+                    return (tot += cur.jumlah);
+                  }, 0);
 
-                  return tot += pem
-                }, 0)
+                  return (tot += pem);
+                }, 0);
                 sisaTagihan = invoice.total - telahDibayar;
               }
 
               const distribusiPembayaran = await ctx.distribusiPembayaran.create({
                 data: {
-                  penagihanId : penagihan.id,
+                  penagihanId: penagihan.id,
                   caraBayarId: caraBayar.id,
                   jumlah: caraBayar.total > sisaTagihan ? sisaTagihan : caraBayar.total,
                 },
@@ -402,25 +396,24 @@ async function main() {
             }
           });
 
-           
           if (!data.cash && !data.transfer_id && !data.giro_id) {
             await prisma.penagihan.update({
-              where : {
-                id : penagihanId
+              where: {
+                id: penagihanId,
               },
-              data : {
-                status : "NIHIL"
-              }
-            })
+              data: {
+                status: "NIHIL",
+              },
+            });
           } else {
             const findInvoice = await prisma.invoice.findFirst({
               where: { id: invoiceId },
               include: {
-                penagihan : {
-                  include : {
-                    distribusiPembayaran : true
-                  }
-                }
+                penagihan: {
+                  include: {
+                    distribusiPembayaran: true,
+                  },
+                },
               },
             });
 
@@ -429,20 +422,20 @@ async function main() {
             if (findInvoice) {
               const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
                 const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
-                  return tot += cur.jumlah
-                }, 0)
+                  return (tot += cur.jumlah);
+                }, 0);
 
-                return tot += pem
-              }, 0)
+                return (tot += pem);
+              }, 0);
               sisaTagihan = findInvoice.total - telahDibayar;
             }
 
             await prisma.penagihan.update({
-              where : {id : penagihanId},
-              data : {
-                status : sisaTagihan - 10 <= totalPembayaran ? "LUNAS" : "CICILAN"
-              }
-            })
+              where: { id: penagihanId },
+              data: {
+                status: sisaTagihan - 10 <= totalPembayaran ? "LUNAS" : "CICILAN",
+              },
+            });
           }
         }
       });

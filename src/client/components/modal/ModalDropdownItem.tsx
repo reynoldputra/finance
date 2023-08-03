@@ -3,24 +3,22 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 
-interface IModalItemProps {
+interface IModalItemProps extends Dialog.DialogProps {
   triggerChildren: React.ReactNode;
   children: React.ReactNode;
   // buttonVariant?: ButtonVariant;
   modalTitle?: string;
   description?: string;
   onSelect?: () => void;
-  onOpenChange?: () => void;
 }
 
 const ModalDropdownItem = React.forwardRef<HTMLDivElement, IModalItemProps>(
   (props, forwardedRef) => {
-    const { triggerChildren, children, onSelect, onOpenChange, ...itemProps } = props;
+    const { triggerChildren, children, onSelect, onOpenChange, open, ...itemProps } = props;
     return (
-      <Dialog.Root>
+      <Dialog.Root open={open} onOpenChange={onOpenChange} {...itemProps}>
         <Dialog.Trigger asChild>
           <DropdownMenuItem
-            {...itemProps}
             ref={forwardedRef}
             className="DropdownMenuItem"
             onSelect={(event) => {
@@ -54,4 +52,4 @@ const ModalDropdownItem = React.forwardRef<HTMLDivElement, IModalItemProps>(
   }
 );
 
-export default ModalDropdownItem
+export default ModalDropdownItem;

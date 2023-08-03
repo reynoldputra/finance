@@ -7,6 +7,7 @@ export class InvoiceService {
     const res = await prisma.invoice.create({
       data: {
         id: invoice.id,
+        transaksiId : invoice.transaksiId,
         customerId: invoice.customerId,
         tanggalTransaksi: invoice.tanggalTransaksi,
         namaSales: invoice.namaSales,
@@ -41,6 +42,7 @@ export class InvoiceService {
       parsed.push({
         sisa : inv.total - totalPembayaran,
         id : inv.id,
+        transaksiId : inv.transaksiId,
         tanggalTransaksi : new Date(inv.tanggalTransaksi),
         namaSales : inv.namaSales,
         status : (inv.total - totalPembayaran > 0 ) ? "BELUM" : "LUNAS",
@@ -82,15 +84,10 @@ export class InvoiceService {
   }
 
   public static async updateInvoice(invoice: TUpdateInvoiceInput) {
-    let updateData: Prisma.InvoiceUncheckedUpdateInput = {};
-    if (invoice.customerId) updateData.customerId = invoice.customerId;
-    if (invoice.namaSales) updateData.namaSales = invoice.namaSales;
-    if (invoice.total) updateData.total = invoice.total;
-    if (invoice.tanggalTransaksi) updateData.tanggalTransaksi = invoice.tanggalTransaksi;
 
     const res = await prisma.invoice.update({
       where: { id: invoice.id },
-      data: updateData,
+      data: invoice,
     });
 
     return res;

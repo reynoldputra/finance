@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { SheetTrigger } from "../ui/sheet";
-import { ISidebarItem } from "../../data/SidebarItems";
-import SidebarItems from "../../data/SidebarItems";
+import { ISidebarItem } from "@client/types/SidebarItem";
+import SidebarItems from "../../data/sidebarItems";
 
 const SidebarMenus: React.FC = () => {
   const navigate = useNavigate();

@@ -9,15 +9,22 @@ import {
 
 import { Button } from "@client/components/ui/button";
 import { ReactNode } from "react";
+import { DialogProps } from "@radix-ui/react-dialog";
 
-type ButtonVariant = "outline" | "link" | "default" | "destructive" | "secondary" | "ghost";
+type ButtonVariant =
+  | "outline"
+  | "link"
+  | "default"
+  | "destructive"
+  | "secondary"
+  | "ghost";
 
-interface IModalsProps {
+interface IModalsProps extends DialogProps {
   buttonTitle: string;
   buttonVariant?: ButtonVariant;
   modalTitle?: string;
   description?: string;
-  children : ReactNode
+  children: ReactNode;
 }
 
 export default function Modal({
@@ -25,18 +32,21 @@ export default function Modal({
   buttonVariant = "outline",
   modalTitle,
   description,
-  children
-}: IModalsProps ) {
+  children,
+  ...rest
+}: IModalsProps) {
   return (
     <>
-      <Dialog>
+      <Dialog {...rest}>
         <DialogTrigger asChild>
           <Button variant={buttonVariant}>{buttonTitle}</Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
             {modalTitle && <DialogTitle>{modalTitle}</DialogTitle>}
-            {description && <DialogDescription>{description}</DialogDescription>}
+            {description && (
+              <DialogDescription>{description}</DialogDescription>
+            )}
           </DialogHeader>
           {children}
         </DialogContent>

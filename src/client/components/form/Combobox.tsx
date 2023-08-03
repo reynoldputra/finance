@@ -33,7 +33,7 @@ export function Combobox({ items, placeholder, onChange }: ComboboxProps) {
           className="w-[200px] justify-between truncate"
         >
           {value
-            ? items.find((item) => item.value.toLowerCase() === value)?.label
+            ? items.find((item) => item.value.toLowerCase() === value)?.title
             : "Search..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -59,7 +59,7 @@ export function Combobox({ items, placeholder, onChange }: ComboboxProps) {
                     value === item.value ? "opacity-100" : "opacity-0"
                   )}
                 />
-                {item.label}
+                {item.title}
               </CommandItem>
             ))}
           </CommandGroup>

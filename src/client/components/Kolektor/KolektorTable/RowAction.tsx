@@ -6,7 +6,7 @@ import {
 import * as Dialog from "@radix-ui/react-dialog";
 import { Row } from "@tanstack/react-table";
 import { DataTableRowActions } from "@client/components/table/DataTableRowActions";
-import { TKolektorTable } from "../../../../server/collections/kolektor/kolektorSchema";
+import { TKolektorTable } from "@server/collections/kolektor/kolektorSchema";
 import { trpc } from "@client/lib/trpc";
 import { useToast } from "@client/components/ui/use-toast";
 import ModalDropdownItem from "@client/components/modal/ModalDropdownItem";

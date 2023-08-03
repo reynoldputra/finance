@@ -3,13 +3,17 @@ import { useForm } from "react-hook-form";
 import { Form } from "@client/components/ui/form";
 import { Button } from "@client/components/ui/button";
 import InputForm from "../../form/InputForm/InputForm";
-import { createKolektorInput } from "../../../../server/collections/kolektor/kolektorSchema";
-import { TCreateCustomerInput } from "../../../../server/collections/customer/customerSchema";
+import { createKolektorInput } from "@server/collections/kolektor/kolektorSchema";
+import { TCreateCustomerInput } from "@server/collections/customer/customerSchema";
 import { trpc } from "@client/lib/trpc";
 import cuid from "cuid";
 import { useToast } from "@client/components/ui/use-toast";
 
-export function CreateKolektorForm() {
+interface CreateKolektorFormProps {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function CreateKolektorForm({ setOpen }: CreateKolektorFormProps) {
   const { toast } = useToast();
 
   const form = useForm<TCreateCustomerInput>({
@@ -33,8 +37,9 @@ export function CreateKolektorForm() {
       if (!values.id) {
         values.id = cuid();
       }
-      const { data } = await createKolektorMutation.mutateAsync(values);
-      if (data) {
+      const { data, status } = await createKolektorMutation.mutateAsync(values);
+      if (status && data) {
+        setOpen(false);
         toast({
           description: `Kolektor ${data.nama} successfully created`,
         });
@@ -60,9 +65,6 @@ export function CreateKolektorForm() {
           description="Input Nama Kolektor Here"
         />
         <Button type="submit">Submit</Button>
-        {/* <ModalDropdownItem triggerChildren="Edit">
-          <EditKolektorForm kolektorData={row.original} />
-        </ModalDropdownItem> */}
       </form>
     </Form>
   );

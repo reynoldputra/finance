@@ -7,6 +7,7 @@ import { labels } from "./data/data";
 import { DataTableColumnHeader } from "@client/components/table/DataTableColumnHeader";
 import { ICustomerTable } from "@server/types/customer";
 import { RowAction } from "./RowAction";
+import { idr } from "@client/lib/idr";
 
 export const CustomerColumn: ColumnDef<ICustomerTable>[] = [
   {
@@ -63,7 +64,7 @@ export const CustomerColumn: ColumnDef<ICustomerTable>[] = [
       return (
         <div className="flex space-x-2">
           {label && <Badge variant="outline">{label.label}</Badge>}
-          <span className="max-w-[500px] truncate font-medium">{row.getValue("jumlahTagihan")}</span>
+          <span className="max-w-[500px] truncate font-medium">Rp {idr(parseInt(row.getValue("jumlahTagihan")))}</span>
         </div>
       );
     },

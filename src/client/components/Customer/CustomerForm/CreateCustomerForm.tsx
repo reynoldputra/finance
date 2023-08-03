@@ -6,17 +6,22 @@ import InputForm from "../../form/InputForm/InputForm";
 import {
   TCreateCustomerInput,
   createCustomerInput,
-} from "../../../../server/collections/customer/customerSchema";
+} from "@server/collections/customer/customerSchema";
 import { trpc } from "@client/lib/trpc";
 import cuid from "cuid";
 import { useToast } from "@client/components/ui/use-toast";
+import Modal from "@client/components/modal/Modal";
 
 interface Option {
   title: string;
   value: string;
 }
 
-export function CreateCustomerForm() {
+interface CreateCustomerFormProps {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function CreateCustomerForm({ setOpen }: CreateCustomerFormProps) {
   const { toast } = useToast();
 
   const form = useForm<TCreateCustomerInput>({
@@ -47,8 +52,9 @@ export function CreateCustomerForm() {
       if (!values.id) {
         values.id = cuid();
       }
-      const { data } = await createCustomerMutation.mutateAsync(values);
-      if (data) {
+      const { data, status } = await createCustomerMutation.mutateAsync(values);
+      if (status && data) {
+        setOpen(false);
         toast({
           description: `Customer ${data.nama} successfully created`,
         });

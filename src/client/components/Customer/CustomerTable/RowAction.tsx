@@ -5,7 +5,7 @@ import {
 } from "@client/components/ui/dropdown-menu";
 import { Row } from "@tanstack/react-table";
 import { DataTableRowActions } from "@client/components/table/DataTableRowActions";
-import { ICustomerTable } from "../../../../server/types/customer";
+import { ICustomerTable } from "@server/types/customer";
 import { trpc } from "@client/lib/trpc";
 import { useToast } from "@client/components/ui/use-toast";
 import ModalDropdownItem from "@client/components/modal/ModalDropdownItem";

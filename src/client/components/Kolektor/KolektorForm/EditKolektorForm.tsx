@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form } from "@client/components/ui/form";
 import { Button } from "@client/components/ui/button";
-import InputForm from "../../form/InputForm/InputForm";
+import InputForm from "@client/components/form/InputForm/InputForm";
 import { trpc } from "@client/lib/trpc";
 import {
   TUpdateKolektorInput,

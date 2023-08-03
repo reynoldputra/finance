@@ -27,7 +27,7 @@ export default function DataTableFilter({
 
   const comboboxItems : ComboboxItem[] = sortedUniqueValues.map((s) => {
     return {
-      label : s,
+      title : s,
       value : s
     }
   })

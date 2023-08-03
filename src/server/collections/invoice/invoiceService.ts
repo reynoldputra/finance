@@ -39,7 +39,7 @@ export class InvoiceService {
       }, 0);
 
       parsed.push({
-        totalPembayaran,
+        sisa : inv.total - totalPembayaran,
         id : inv.id,
         tanggalTransaksi : new Date(inv.tanggalTransaksi),
         namaSales : inv.namaSales,
@@ -48,6 +48,7 @@ export class InvoiceService {
         total : inv.total
       });
     }
+
     return parsed;
   }
 
@@ -76,7 +77,7 @@ export class InvoiceService {
     return {
       ...res,
       namaCustomer : res.customer.nama,
-      totalPembayaran
+      sisa : res.total - totalPembayaran
     };
   }
 

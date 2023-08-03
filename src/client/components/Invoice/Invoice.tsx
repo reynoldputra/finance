@@ -1,26 +1,17 @@
-import useDataTable from "@client/hook/useDataTable"
-import { trpc } from "@client/lib/trpc"
-import { useNavigate } from "react-router-dom"
-import DataTable from "../table/DataTable"
-import { InvoiceColumn } from "./InvoiceTable/InvoiceColumn"
+import InvoiceTable from "./InvoiceTable/InvoiceTable";
+import Sidebar from "../Sidebar";
+import CreateInvoice from "./CreateInvoice";
 
-export default function Invoice () {
-  const data = trpc.invoice.getInvoices.useQuery().data
-  const table = useDataTable({
-    columns : InvoiceColumn,
-    data : data?.data ?? []
-  })
-  
-  const navigate = useNavigate()
-
+export default function Invoice() {
   return (
     <>
-      <DataTable
-        columns={InvoiceColumn}
-        table={table}
-      />
-
-      <p onClick={() => {navigate("/customer?id=123")}}>To invoice custId = "adfasdfa"</p>
+      <div className="w-full flex justify-center items-center gap-x-4 mt-4">
+        <Sidebar />
+      </div>
+      <div className="w-full flex justify-end">
+        <CreateInvoice />
+      </div>
+      <InvoiceTable />
     </>
-  )
+  );
 }

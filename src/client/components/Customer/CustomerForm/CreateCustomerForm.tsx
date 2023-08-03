@@ -41,8 +41,9 @@ export function CreateCustomerForm() {
       if (!values.id) {
         values.id = cuid();
       }
-      const { data } = await createCustomerMutation.mutateAsync(values);
-      if (data) {
+      console.log(values)
+      const { data, status } = await createCustomerMutation.mutateAsync(values);
+      if (status && data) {
         toast({
           description: `Customer ${data.nama} successfully created`,
         });

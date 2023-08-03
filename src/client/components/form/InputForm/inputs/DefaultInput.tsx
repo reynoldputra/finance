@@ -35,7 +35,7 @@ const DefaultInput: React.FC<DefaultInputProps> = ({
           <FormControl>
             <Input
               type={type}
-              value={String(field.value) ?? ""}
+              value={field.value ?? ""}
               onChange={(e) => field.onChange(e.target.value)}
               onBlur={field.onBlur}
             />

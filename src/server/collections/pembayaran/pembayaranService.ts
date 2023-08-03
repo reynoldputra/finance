@@ -48,7 +48,7 @@ export class PembayaranService {
 
       let statusPenagihan = "";
 
-      if (invoice.total - invoice.totalPembayaran > totalPembayaranPenagihan) {
+      if (invoice.sisa > totalPembayaranPenagihan) {
         statusPenagihan = "CICILAN";
       } else if (totalPembayaranPenagihan > 0) {
         statusPenagihan = "LUNAS";
@@ -110,7 +110,7 @@ export class PembayaranService {
 
       let statusPenagihan = "";
 
-      if (invoice.total - invoice.totalPembayaran > totalPembayaranPenagihan) {
+      if (invoice.sisa > totalPembayaranPenagihan) {
         statusPenagihan = "CICILAN";
       } else if (totalPembayaranPenagihan > 0) {
         statusPenagihan = "LUNAS";

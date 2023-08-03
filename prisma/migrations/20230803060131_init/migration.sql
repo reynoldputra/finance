@@ -41,6 +41,7 @@ CREATE TABLE "Penagihan" (
 -- CreateTable
 CREATE TABLE "Invoice" (
     "id" TEXT NOT NULL PRIMARY KEY,
+    "transaksiId" TEXT NOT NULL,
     "total" INTEGER NOT NULL,
     "tanggal_transaksi" DATETIME NOT NULL,
     "nama_sales" TEXT NOT NULL,
@@ -100,6 +101,9 @@ CREATE UNIQUE INDEX "Customer_nama_customer_key" ON "Customer"("nama_customer");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Kolektor_nama_kolektor_key" ON "Kolektor"("nama_kolektor");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Invoice_transaksiId_key" ON "Invoice"("transaksiId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "metode_pembayaran_jenis_key" ON "metode_pembayaran"("jenis");

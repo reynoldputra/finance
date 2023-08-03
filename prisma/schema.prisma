@@ -62,6 +62,7 @@ model Penagihan {
 
 model Invoice {
   id               String      @id @default(cuid())
+  transaksiId      String      @unique @default(cuid())
   total            Int
   tanggalTransaksi DateTime    @map("tanggal_transaksi")
   namaSales        String      @map("nama_sales")

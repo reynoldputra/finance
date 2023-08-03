@@ -1,15 +1,11 @@
-import { Home, LucideIcon, UserCog2, Users2 } from "lucide-react";
-
-export interface ISidebarItem {
-  title: string;
-  route: string;
-  icon: LucideIcon;
-}
+import { ISidebarItem } from "@client/types/SidebarItem";
+import { Home, UserCog2, Users2 } from "lucide-react";
 
 const SidebarItems: ISidebarItem[] = [
   { title: "Home", route: "/", icon: Home },
   { title: "Customer", route: "/customer", icon: Users2 },
   { title: "Kolektor", route: "/kolektor", icon: UserCog2 },
+  { title: "Invoice", route: "/invoice", icon: UserCog2 },
 ];
 
 export default SidebarItems;

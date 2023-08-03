@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const createInvoiceInput = z.object({
   id: z.string(),
+  transaksiId: z.string(),
   namaSales: z.string(),
   tanggalTransaksi: z.date(),
   customerId: z.string(),
@@ -10,10 +11,11 @@ export const createInvoiceInput = z.object({
 
 export const updateInvoiceInput = z.object({
   id: z.string(),
-  namaSales: z.string().optional(),
-  tanggalTransaksi: z.date().optional(),
-  customerId: z.string().optional(),
-  total: z.number().optional(),
+  transaksiId: z.string(),
+  namaSales: z.string(),
+  tanggalTransaksi: z.date(),
+  customerId: z.string(),
+  total: z.number(),
 });
 
 export type TCreateInvoiceInput = z.infer<typeof createInvoiceInput>;

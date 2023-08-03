@@ -5,23 +5,18 @@ import { Button } from "@client/components/ui/button";
 import InputForm from "../../form/InputForm/InputForm";
 import { trpc } from "@client/lib/trpc";
 import { useToast } from "@client/components/ui/use-toast";
-import { createInvoiceInput, TCreateInvoiceInput } from "@server/collections/invoice/invoiceSchema";
+import { createInvoiceInput, TCreateInvoiceInput, TUpdateInvoiceInput, updateInvoiceInput } from "@server/collections/invoice/invoiceSchema";
 import { ComboboxItem } from "@client/types/form/ComboboxItem";
-import cuid from "cuid";
+import { TInvoiceSchema } from "../InvoiceTable/data/schema";
+import { Row } from "@tanstack/react-table";
 
-interface CreateInvoiceFormProps {
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+interface UpdateInvoiceFormProps {
+  setOpen : React.Dispatch<React.SetStateAction<boolean>>;
+  row : Row<TInvoiceSchema>
 }
 
-export function CreateInvoiceForm({ setOpen }: CreateInvoiceFormProps) {
+export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
   const { toast } = useToast();
-
-  const form = useForm<TCreateInvoiceInput>({
-    resolver: zodResolver(createInvoiceInput),
-    defaultValues: {
-      id: cuid(),
-    },
-  });
 
   const res = trpc.customer.customerOption.useQuery();
   const result = res.data ?? [];
@@ -30,17 +25,29 @@ export function CreateInvoiceForm({ setOpen }: CreateInvoiceFormProps) {
     value: item.id,
   }));
 
-  const createInvoiceMutation = trpc.invoice.createInvoice.useMutation();
+  const form = useForm<TUpdateInvoiceInput>({
+    resolver: zodResolver(updateInvoiceInput),
+    defaultValues: {
+      id : row.original.id,
+      transaksiId : row.original.transaksiId,
+      customerId : custemers.find((c) => c.title == row.original.namaCustomer)?.value,
+      total : row.original.total,
+      tanggalTransaksi : row.original.tanggalTransaksi,
+      namaSales : row.original.namaSales,
+    }
+  });
+
+  const updateInvoiceMutation = trpc.invoice.updateInvoice.useMutation();
   const utils = trpc.useContext()
 
   async function onSubmit(values: TCreateInvoiceInput) {
     try {
-      const { data } = await createInvoiceMutation.mutateAsync(values);
+      const { data } = await updateInvoiceMutation.mutateAsync(values);
       if (data) {
-        toast({
-          description: `Invoice ${data.id} successfully created`,
-        });
         setOpen(false);
+        toast({
+          description: `Invoice ${data.transaksiId} successfully updated`,
+        });
         utils.invoice.invalidate()
       }
     } catch (err) {

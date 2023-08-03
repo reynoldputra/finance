@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 export const createInvoiceInput = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   namaSales: z.string(),
   tanggalTransaksi: z.date(),
   customerId: z.string(),
-  total: z.number(),
+  total: z.coerce.number(),
 });
 
 export const updateInvoiceInput = z.object({

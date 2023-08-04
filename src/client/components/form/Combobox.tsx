@@ -14,9 +14,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@client/components/ui/p
 import { ComboboxItem } from "@client/types/form/ComboboxItem";
 
 interface ComboboxProps {
-  items: ComboboxItem[]
-  placeholder : string
-  onChange : (value : string) => void
+  items: ComboboxItem[];
+  placeholder?: string;
+  onChange?: (value: string) => void;
 }
 
 export function Combobox({ items, placeholder, onChange }: ComboboxProps) {
@@ -33,7 +33,11 @@ export function Combobox({ items, placeholder, onChange }: ComboboxProps) {
           className="w-[200px] justify-between truncate"
         >
           {value
-            ? items.find((item) => item.value.toLowerCase() === value)?.title
+            ? items.find((item) => {
+                const str =
+                  typeof item.value == "string" ? item.value.toLowerCase() : item.value.toString();
+                return str == value;
+              })?.title
             : "Search..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -47,17 +51,13 @@ export function Combobox({ items, placeholder, onChange }: ComboboxProps) {
               <CommandItem
                 key={item.value}
                 onSelect={(currentValue) => {
-                  console.log(currentValue, value)
-                  setValue(currentValue === value ? "" : currentValue);
+                  setValue(currentValue);
                   setOpen(false);
-                  onChange(currentValue)
+                  if (onChange) onChange(currentValue);
                 }}
               >
                 <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === item.value ? "opacity-100" : "opacity-0"
-                  )}
+                  className={cn("mr-2 h-4 w-4", value === item.value ? "opacity-100" : "opacity-0")}
                 />
                 {item.title}
               </CommandItem>

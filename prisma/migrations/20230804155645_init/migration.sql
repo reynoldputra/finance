@@ -91,6 +91,7 @@ CREATE TABLE "Giro" (
 -- CreateTable
 CREATE TABLE "Transfer" (
     "id" TEXT NOT NULL PRIMARY KEY,
+    "bank" TEXT NOT NULL,
     "tanggal" DATETIME NOT NULL,
     "caraBayarId" TEXT NOT NULL,
     CONSTRAINT "Transfer_caraBayarId_fkey" FOREIGN KEY ("caraBayarId") REFERENCES "cara_bayar" ("id") ON DELETE CASCADE ON UPDATE CASCADE

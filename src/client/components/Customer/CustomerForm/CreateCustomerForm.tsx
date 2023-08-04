@@ -10,7 +10,6 @@ import {
 import { trpc } from "@client/lib/trpc";
 import cuid from "cuid";
 import { useToast } from "@client/components/ui/use-toast";
-import Modal from "@client/components/modal/Modal";
 
 interface Option {
   title: string;

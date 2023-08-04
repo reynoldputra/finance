@@ -21,7 +21,7 @@ interface CreateCustomerFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function CreateCustomerForm({ setOpen }: CreateCustomerFormProps) {
+export default function CreateCustomerForm({ setOpen }: CreateCustomerFormProps) {
   const { toast } = useToast();
 
   const form = useForm<TCreateCustomerInput>({

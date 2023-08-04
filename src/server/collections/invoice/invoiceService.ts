@@ -7,6 +7,7 @@ export class InvoiceService {
     const res = await prisma.invoice.create({
       data: {
         id: invoice.id,
+        transaksiId : invoice.transaksiId,
         customerId: invoice.customerId,
         tanggalTransaksi: invoice.tanggalTransaksi,
         namaSales: invoice.namaSales,
@@ -39,8 +40,9 @@ export class InvoiceService {
       }, 0);
 
       parsed.push({
-        totalPembayaran,
+        sisa : inv.total - totalPembayaran,
         id : inv.id,
+        transaksiId : inv.transaksiId,
         tanggalTransaksi : new Date(inv.tanggalTransaksi),
         namaSales : inv.namaSales,
         status : (inv.total - totalPembayaran > 0 ) ? "BELUM" : "LUNAS",
@@ -48,6 +50,7 @@ export class InvoiceService {
         total : inv.total
       });
     }
+
     return parsed;
   }
 
@@ -76,26 +79,34 @@ export class InvoiceService {
     return {
       ...res,
       namaCustomer : res.customer.nama,
-      totalPembayaran
+      sisa : res.total - totalPembayaran
     };
   }
 
   public static async updateInvoice(invoice: TUpdateInvoiceInput) {
-    let updateData: Prisma.InvoiceUncheckedUpdateInput = {};
-    if (invoice.customerId) updateData.customerId = invoice.customerId;
-    if (invoice.namaSales) updateData.namaSales = invoice.namaSales;
-    if (invoice.total) updateData.total = invoice.total;
-    if (invoice.tanggalTransaksi) updateData.tanggalTransaksi = invoice.tanggalTransaksi;
 
     const res = await prisma.invoice.update({
       where: { id: invoice.id },
-      data: updateData,
+      data: invoice,
     });
 
     return res;
   }
 
   public static async deleteInvoice(id: string) {
+    const cek = await prisma.invoice.findFirst({
+      where : {
+        id
+      },
+      include : {
+        penagihan : true
+      }
+    })
+
+    if(cek?.penagihan.length) {
+      throw new Error("Terdapat pembayaran yang terhubung ke invoice ini")
+    }
+
     const res = await prisma.invoice.delete({
       where: {
         id,

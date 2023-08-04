@@ -41,6 +41,22 @@ export const PenagihanRouter = penagihanTrpc.router({
       }
     }),
 
+  createManyPenagihan: penagihanTrpc.publicProcedure
+    .input(z.array(createPenagihanInput))
+    .mutation(async ({ input }: { input: TCreatePenagihanInput[] }) => {
+      try {
+        const res = await PenagihanService.createManyPenagihan(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
+
   updatePenagihan: penagihanTrpc.publicProcedure
     .input(updatePenagihanInput)
     .mutation(async ({ input }: { input: TUpdatePenagihanInput }) => {

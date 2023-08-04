@@ -11,7 +11,8 @@ describe("Create invoice", () => {
   beforeAll(async () => {
     customer = (await CustomerService.getCustomerTable())[0];
     newInvoice = {
-      id: "oihokijoijjfogjdfokw",
+      id: "adafsdfasdfasdf",
+      transaksiId: "oihokijoijjfogjdfokw",
       customerId: customer.id,
       namaSales: "sales name new",
       tanggalTransaksi: new Date(),
@@ -46,7 +47,8 @@ describe("Delete invoice", () => {
   beforeAll(async () => {
     customer = (await CustomerService.getCustomerTable())[0];
     newInvoice = {
-      id: "asdfasdfasad",
+      id: "adafsdfasdfasdf",
+      transaksiId: "oihokijoijjfogjdfokw",
       customerId: customer.id,
       namaSales: "sales name new",
       tanggalTransaksi: new Date(),
@@ -77,7 +79,8 @@ describe("Update invoice", () => {
     customer = cust[0];
     otherCustomer = cust[1];
     newInvoice = {
-      id: "jnvnkcxnvkjckvjx",
+      id: "adafsdfasdfasdf",
+      transaksiId: "oihokijoijjfogjdfokw",
       customerId: customer.id,
       namaSales: "sales name new",
       tanggalTransaksi: new Date(),
@@ -96,6 +99,7 @@ describe("Update invoice", () => {
     if (otherCustomer && newInvoice.id) {
       let updateInvoice: TUpdateInvoiceInput = {
         id: newInvoice.id,
+        transaksiId: newInvoice.transaksiId,
         customerId: otherCustomer.id,
         namaSales: "sales updated",
         tanggalTransaksi: new Date(new Date().getTime() + 100 * 100),

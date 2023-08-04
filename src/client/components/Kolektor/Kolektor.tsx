@@ -15,7 +15,6 @@ export default function Kolektor() {
       <div onClick={() => navigate("/")}>Go to home page</div>
       <KolektorTable />
       <CreateKolektor />
-      <Toaster />
     </div>
   );
 }

@@ -15,7 +15,6 @@ export default function Customer() {
       <div onClick={() => navigate("/")}>Go to home page</div>
       <CustomerTable />
       <CreateCustomer />
-      <Toaster />
     </div>
   );
 }

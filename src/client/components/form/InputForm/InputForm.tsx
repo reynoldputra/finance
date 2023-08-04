@@ -1,11 +1,7 @@
 import DefaultInput from "./inputs/DefaultInput";
 import DateInput from "./inputs/DateInput";
 import ComboboxInput from "./inputs/ComboboxInput";
-
-interface Option {
-  title: string;
-  value: string;
-}
+import { ComboboxItem } from "@client/types/form/ComboboxItem";
 
 interface CustomFormFieldProps {
   name: string;
@@ -13,7 +9,7 @@ interface CustomFormFieldProps {
   description?: string;
   errorMessage?: string;
   type: "text" | "number" | "combobox" | "datepicker";
-  options?: readonly Option[];
+  options?: readonly ComboboxItem[];
 }
 
 const InputForm: React.FC<CustomFormFieldProps> = ({

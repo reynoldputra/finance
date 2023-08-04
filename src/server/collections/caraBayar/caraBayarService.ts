@@ -11,7 +11,27 @@ import {
 
 export class CaraBayarService {
   static async getCaraBayar() {
-    const result = await prisma.caraBayar.findMany();
+    const result = await prisma.caraBayar.findMany({
+      include : {
+        metode : true,
+        giro : true,
+        transfer : true
+      }
+    });
+    return result;
+  }
+
+  static async getTransfer() {
+    const result = await prisma.transfer.findMany({
+      include : {
+        caraBayar : {
+          include : {
+            distribusiPembayaran : true
+          }
+        }
+      }
+    });
+
     return result;
   }
 
@@ -22,14 +42,14 @@ export class CaraBayarService {
       metodePembayaranId: 1,
     };
 
-    if (createGiroInput.safeParse(input.pembayaran).success) {
+    if (input.pembayaran.giro) {
       newCaraBayar.giro = {
-        create: input.pembayaran as TCreateGiroInput,
+        create: input.pembayaran.giro,
       };
       newCaraBayar.metodePembayaranId = 2;
-    } else if (createTransferInput.safeParse(input.pembayaran).success) {
+    } else if (input.pembayaran.transfer) {
       newCaraBayar.transfer = {
-        create: input.pembayaran as TCreateTransferInput,
+        create: input.pembayaran.transfer,
       };
       newCaraBayar.metodePembayaranId = 3;
     }
@@ -62,14 +82,14 @@ export class CaraBayarService {
     }
 
     if (input.pembayaran) {
-      if (createGiroInput.safeParse(input.pembayaran).success) {
+      if (input.pembayaran.giro) {
         updateCaraBayar.giro = {
-          create: input.pembayaran as TCreateGiroInput,
+          create: input.pembayaran.giro,
         };
         updateCaraBayar.metodePembayaranId = 2;
-      } else if (createTransferInput.safeParse(input.pembayaran).success) {
+      } else if (input.pembayaran.transfer) {
         updateCaraBayar.transfer = {
-          create: input.pembayaran as TCreateTransferInput,
+          create: input.pembayaran.transfer,
         };
         updateCaraBayar.metodePembayaranId = 3;
       }

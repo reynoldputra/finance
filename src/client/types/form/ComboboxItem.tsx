@@ -1,4 +1,4 @@
 export interface ComboboxItem {
-  value : string
-  title : string
+  value : string | number
+  title : string | number
 }

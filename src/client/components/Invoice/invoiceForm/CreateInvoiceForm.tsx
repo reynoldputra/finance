@@ -17,10 +17,7 @@ export function CreateInvoiceForm({ setOpen }: CreateInvoiceFormProps) {
   const { toast } = useToast();
 
   const form = useForm<TCreateInvoiceInput>({
-    resolver: zodResolver(createInvoiceInput),
-    defaultValues: {
-      id: cuid(),
-    },
+    resolver: zodResolver(createInvoiceInput)
   });
 
   const res = trpc.customer.customerOption.useQuery();

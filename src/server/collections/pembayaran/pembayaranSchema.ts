@@ -16,7 +16,6 @@ export const createPembayaranInput = z.object({
     )
     .optional(),
   caraBayarLama: z.array(caraBayarLama).optional(),
-  jumlah: z.number(),
 });
 
 export const updatePemabayaranInput = z.object({

@@ -53,7 +53,7 @@ async function main() {
           if (data.nama_sales) salesName = data.nama_sales;
           if (data.nama_kolektor) colectorName = data.nama_kolektor;
           let totalPembayaran = 0;
-          let invoiceId = "";
+          let invoiceId = 0;
           let penagihanId = "";
 
           await prisma.$transaction(async (ctx) => {
@@ -268,6 +268,7 @@ async function main() {
                 | Prisma.TransferCreateWithoutCaraBayarInput = {
                 id: data.transfer_id,
                 tanggal: new Date(2023, parseInt(m) - 1, parseInt(d)),
+                bank : "BCA"
               };
 
               const findTransfer = await prisma.transfer.findFirst({

@@ -18,18 +18,14 @@ import { Button } from "@client/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import { cn } from "@client/lib/cn";
 import { Check, ChevronsUpDown } from "lucide-react";
-
-interface Option {
-  title: string;
-  value: string;
-}
+import { ComboboxItem } from "@client/types/form/ComboboxItem";
 
 interface ComboboxInputProps {
   name: string;
   title: string;
   description?: string;
   errorMessage?: string;
-  options?: readonly Option[];
+  options?: readonly ComboboxItem[];
 }
 
 const ComboboxInput: React.FC<ComboboxInputProps> = ({
@@ -73,7 +69,7 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                   <CommandGroup>
                     {options?.map((language) => (
                       <CommandItem
-                        value={language.value}
+                        value={language.value.toString()}
                         key={language.value}
                         onSelect={(value) => {
                           form.setValue(name, value);

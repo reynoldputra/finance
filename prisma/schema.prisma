@@ -122,6 +122,7 @@ model Giro {
 
 model Transfer {
   id          String    @id @default(cuid())
+  bank        String
   tanggal     DateTime
   caraBayarId String    @unique
   caraBayar   CaraBayar @relation(fields: [caraBayarId], references: [id], onDelete: Cascade)

@@ -11,7 +11,7 @@ import { useToast } from "@client/components/ui/use-toast";
 import ModalDropdownItem from "@client/components/modal/ModalDropdownItem";
 import { Button } from "@client/components/ui/button";
 import * as Dialog from "@radix-ui/react-dialog";
-import EditCustomerForm from "../customerForm/EditCustomerForm";
+import EditCustomerForm from "../CustomerForm/EditCustomerForm";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;

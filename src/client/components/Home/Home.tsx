@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { ExampleForm } from "./ExampleForm";
-import { Modal } from "../Modal";
 import Sidebar from "../Sidebar";
 import { useNavigate } from "react-router-dom";
 import {
@@ -32,12 +31,6 @@ export const Home: React.FC<HomeProps> = (props) => {
         <div className="mx-auto">{info}</div>
       </div>
       <div className="w-full flex justify-center items-center gap-x-4 mt-4">
-        <Modal
-          buttonTitle="Ini Modal"
-          modalTitle="Submitted"
-          description="You submit the form"
-          buttonVariant="outline"
-        />
         <Sidebar />
       </div>
       <div className="px-64 mt-2">
@@ -60,6 +53,7 @@ export const Home: React.FC<HomeProps> = (props) => {
         </Dialog>
       </div>
       <div onClick={() => navigate("/customer")}>Go to customer</div>
+      <div onClick={() => navigate("/invoice")}>Go to invoice</div>
     </div>
   );
 };

@@ -66,22 +66,24 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                     ? options?.find(
                         (language) => language.value === field.value
                       )?.title
-                    : "Select language"}
+                    : `Select ${title.toLowerCase()}`}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-0">
               <Command>
-                <CommandInput placeholder="Search framework..." />
-                <CommandEmpty>No framework found.</CommandEmpty>
+                <CommandInput
+                  placeholder={`Search ${title.toLowerCase()}...`}
+                />
+                <CommandEmpty>{`No ${title.toLowerCase()} found.`}</CommandEmpty>
                 <CommandGroup>
                   {options?.map((language) => (
                     <CommandItem
                       value={language.value}
                       key={language.value}
                       onSelect={(value) => {
-                        form.setValue("Language", value);
+                        form.setValue(name, value);
                       }}
                     >
                       <Check

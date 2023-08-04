@@ -14,6 +14,9 @@ export const CustomerRouter = customerTrpc.router({
   customerTable: customerTrpc.publicProcedure.query(() => {
     return CustomerService.getCustomerTable();
   }),
+  customerOption : customerTrpc.publicProcedure.query(() => {
+    return CustomerService.getAllCustomer()
+  }),
   createCustomer: customerTrpc.publicProcedure
     .input(createCustomerInput)
     .mutation(async ({ input }: { input: TCreateCustomerInput }) => {

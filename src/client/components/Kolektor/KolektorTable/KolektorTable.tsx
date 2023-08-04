@@ -9,7 +9,6 @@ export default function KolektorTable() {
     columns: KolektorColumn,
     data: data.data?.data ?? [],
   });
-  console.log(data);
   return (
     <>
       <DataTable 

@@ -1,4 +1,4 @@
-import { Penagihan, Prisma } from "@server/../generated/client";
+import { Prisma } from "@server/../generated/client";
 import { prisma } from "../../prisma";
 import { TCreatePenagihanInput, TUpdatePenagihanInput } from "./penagihanSchema";
 
@@ -76,6 +76,14 @@ export class PenagihanService {
         status: "WAITING",
       },
     });
+
+    return result;
+  }
+
+  static async createManyPenagihan(input: TCreatePenagihanInput[]) {
+    const result = input.map((i) => {
+      return this.createPenagihan(i)
+    })
 
     return result;
   }

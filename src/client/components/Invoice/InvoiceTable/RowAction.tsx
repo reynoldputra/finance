@@ -21,16 +21,16 @@ export function RowAction({ row }: RowActionsProps<TInvoiceSchema>) {
   const utils = trpc.useContext();
 
   const handleDelete = async (id: string) => {
-    const { status } = await deleteInvoiceMutation.mutateAsync(id);
+    const res = await deleteInvoiceMutation.mutateAsync(id);
 
-    if (status) {
+    if (res.status) {
       toast({
         description: "Success delete item",
       });
       utils.invoice.invalidate();
     } else {
       toast({
-        description: "Failed delete item",
+        description: res.message ?? "Failed delete message",
       });
     }
   };

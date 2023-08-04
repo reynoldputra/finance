@@ -50,6 +50,7 @@ export const InvoiceRouter = invoiceTrpc.router({
       } catch (err) {
         return {
           status: false,
+          message : (err as Error).message ?? ""
         };
       }
     }),

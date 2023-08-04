@@ -6,11 +6,7 @@ import {
   FormDescription,
   FormMessage,
 } from "@client/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@client/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@client/components/ui/popover";
 import {
   Command,
   CommandEmpty,
@@ -51,58 +47,54 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
       render={({ field }) => (
         <FormItem>
           <FormLabel>{title}</FormLabel>
-          <Popover>
-            <PopoverTrigger asChild>
-              <FormControl>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  className={cn(
-                    "w-[200px] justify-between",
-                    !field.value && "text-muted-foreground"
-                  )}
-                >
-                  {field.value
-                    ? options?.find(
-                        (language) => language.value === field.value
-                      )?.title
-                    : `Select ${title.toLowerCase()}`}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </FormControl>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandInput
-                  placeholder={`Search ${title.toLowerCase()}...`}
-                />
-                <CommandEmpty>{`No ${title.toLowerCase()} found.`}</CommandEmpty>
-                <CommandGroup>
-                  {options?.map((language) => (
-                    <CommandItem
-                      value={language.value}
-                      key={language.value}
-                      onSelect={(value) => {
-                        form.setValue(name, value);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          language.value === field.value
-                            ? "opacity-100"
-                            : "opacity-0"
-                        )}
-                      />
-                      {language.title}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          <div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      "w-[200px] justify-between",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    {field.value
+                      ? options?.find((language) => language.value === field.value)?.title
+                      : `Select ${title.toLowerCase()}`}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px] p-0">
+                <Command>
+                  <CommandInput placeholder={`Search ${title.toLowerCase()}...`} />
+                  <CommandEmpty>{`No ${title.toLowerCase()} found.`}</CommandEmpty>
+                  <CommandGroup>
+                    {options?.map((language) => (
+                      <CommandItem
+                        value={language.value}
+                        key={language.value}
+                        onSelect={(value) => {
+                          form.setValue(name, value);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            language.value === field.value ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {language.title}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
           {description && <FormDescription>{description}</FormDescription>}
           {errorMessage && <FormMessage>{errorMessage}</FormMessage>}
+          </div>
         </FormItem>
       )}
     />

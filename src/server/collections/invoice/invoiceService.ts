@@ -94,6 +94,19 @@ export class InvoiceService {
   }
 
   public static async deleteInvoice(id: string) {
+    const cek = await prisma.invoice.findFirst({
+      where : {
+        id
+      },
+      include : {
+        penagihan : true
+      }
+    })
+
+    if(cek?.penagihan.length) {
+      throw new Error("Terdapat pembayaran yang terhubung ke invoice ini")
+    }
+
     const res = await prisma.invoice.delete({
       where: {
         id,

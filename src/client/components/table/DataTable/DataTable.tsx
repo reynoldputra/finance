@@ -12,18 +12,20 @@ import {
 import { DataTablePagination } from "./DataTablePagination";
 import { ReactTableProvider } from "@client/provider/ReactTableProvider";
 import { DataTableToolbar } from "./DataTableToolbar";
+import { ReactNode } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   table: TableType<TData>;
+  toolbar ?: ReactNode
 }
 
-export function DataTable<TData, TValue>({ columns, table }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, table, toolbar }: DataTableProps<TData, TValue>) {
   return (
     <ReactTableProvider table={table}>
       <div className="space-y-4 p-8">
         <div className="rounded-md border">
-          <DataTableToolbar table={table} />
+          <DataTableToolbar table={table} toolbar={toolbar} />
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

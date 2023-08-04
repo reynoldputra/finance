@@ -1,8 +1,11 @@
 import useDataTable from "@client/hook/useDataTable";
 import { trpc } from "@client/lib/trpc";
-import { useNavigate } from "react-router-dom";
 import DataTable from "@client/components/table/DataTable";
 import { InvoiceColumn } from "./InvoiceColumn";
+import SelectedAction from "./SelectedAction";
+import { Table } from "@tanstack/react-table";
+import { TInvoiceSchema } from "./data/schema";
+import CreateInvoice from "../CreateInvoice";
 
 export default function InvoiceTable() {
   const data = trpc.invoice.getInvoices.useQuery().data;
@@ -13,7 +16,16 @@ export default function InvoiceTable() {
 
   return (
     <>
-      <DataTable columns={InvoiceColumn} table={table} />
+      <DataTable columns={InvoiceColumn} table={table} toolbar={<ToolbarInvoice table={table} />} />
     </>
   );
 }
+
+const ToolbarInvoice = ({table} : {table : Table<TInvoiceSchema>}) => {
+  return (
+    <>
+      <SelectedAction table={table} />
+      <CreateInvoice />
+    </>
+  )
+} 

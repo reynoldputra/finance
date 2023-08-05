@@ -47,6 +47,7 @@ export class InvoiceService {
         namaSales : inv.namaSales,
         status : (inv.total - totalPembayaran > 0 ) ? "BELUM" : "LUNAS",
         namaCustomer : inv.customer.nama,
+        customerId : inv.customer.id,
         total : inv.total
       });
     }

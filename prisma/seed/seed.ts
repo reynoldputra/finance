@@ -53,7 +53,7 @@ async function main() {
           if (data.nama_sales) salesName = data.nama_sales;
           if (data.nama_kolektor) colectorName = data.nama_kolektor;
           let totalPembayaran = 0;
-          let invoiceId = 0;
+          let invoiceId = "";
           let penagihanId = "";
 
           await prisma.$transaction(async (ctx) => {

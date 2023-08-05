@@ -9,25 +9,36 @@ import { ComboboxItem } from "@client/types/form/ComboboxItem";
 import {
   createPenagihanInput,
   TCreatePenagihanInput,
+  TUpdatePenagihanInput,
+  updatePenagihanInput,
 } from "@client/../server/collections/penagihan/penagihanSchema";
+import { TPenagihanTable } from "../PenagihanTable/data/schema";
+import { Row } from "@tanstack/react-table";
 
 interface UpdatePenagihanFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  row : Row<TPenagihanTable>
 }
 
-export function UpdatePenagihanForm({ setOpen }: UpdatePenagihanFormProps) {
+export function UpdatePenagihanForm({ setOpen, row }: UpdatePenagihanFormProps) {
   const { toast } = useToast();
-
-  const form = useForm<TCreatePenagihanInput>({
-    resolver: zodResolver(createPenagihanInput),
-  });
 
   const res = trpc.invoice.getInvoices.useQuery();
   const result = res.data?.data ?? [];
   const invoices: ComboboxItem[] = result.map((item) => ({
-    title: item.id,
+    title: item.transaksiId,
     value: item.id,
   }));
+
+  const form = useForm<TUpdatePenagihanInput>({
+    resolver: zodResolver(updatePenagihanInput),
+    defaultValues : {
+      penagihanId : row.original.id,
+      invoiceId : invoices.find((i) => i.title == row.original.transaksiId)?.value.toString() ?? "",
+      tanggalTagihan : row.original.tanggalTagihan,
+      kolektorId : row.original.kolektorId,
+    }
+  });
 
   const kolektor = trpc.kolektor.getAllKolektor.useQuery();
   const kolektorData = kolektor.data?.data ?? [];
@@ -36,15 +47,16 @@ export function UpdatePenagihanForm({ setOpen }: UpdatePenagihanFormProps) {
     value: k.id,
   }));
 
-  const createPenagihanMutation = trpc.penagihan.createPenagihan.useMutation();
+  const updatePenagihanMutation = trpc.penagihan.updatePenagihan.useMutation();
   const utils = trpc.useContext();
 
-  async function onSubmit(values: TCreatePenagihanInput) {
+  async function onSubmit(values: TUpdatePenagihanInput) {
+    console.log(values)
     try {
-      const { data } = await createPenagihanMutation.mutateAsync(values);
+      const { data } = await updatePenagihanMutation.mutateAsync(values);
       if (data) {
         toast({
-          description: `Penagihan successfully created`,
+          description: `Penagihan successfully updated`,
         });
         setOpen(false);
         utils.penagihan.invalidate();

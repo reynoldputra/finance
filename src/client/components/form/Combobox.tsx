@@ -49,11 +49,12 @@ export function Combobox({ items, placeholder, onChange }: ComboboxProps) {
           <CommandGroup>
             {items.map((item) => (
               <CommandItem
+                value={item.value.toString()}
                 key={item.value}
                 onSelect={(currentValue) => {
                   setValue(currentValue);
                   setOpen(false);
-                  if (onChange) onChange(currentValue);
+                  if (onChange) onChange(item.value.toString());
                 }}
               >
                 <Check

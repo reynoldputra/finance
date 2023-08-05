@@ -8,6 +8,7 @@ import { toast } from "@client/components/ui/use-toast";
 import { trpc } from "@client/lib/trpc";
 import { TPenagihanTable } from "./data/schema";
 import { CreatePembayaran } from "../pembayaranForm/CreatePembayaranForm";
+import { UpdatePenagihanForm } from "../penagihanForm/UpdatePenagihanForm";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
@@ -16,21 +17,20 @@ interface RowActionsProps<TData> {
 export function RowAction({ row }: RowActionsProps<TPenagihanTable>) {
   const [openEdit, setOpenEdit] = useState(false);
 
-  const deleteInvoiceMutation = trpc.invoice.deleteInvoice.useMutation();
-
+  const deletePenagihanMutation = trpc.penagihan.deletePenagihan.useMutation();
   const utils = trpc.useContext();
 
   const handleDelete = async (id: string) => {
-    const res = await deleteInvoiceMutation.mutateAsync(id);
+    const res = await deletePenagihanMutation.mutateAsync(id);
 
     if (res.status) {
       toast({
         description: "Success delete item",
       });
-      utils.invoice.invalidate();
+      utils.penagihan.invalidate();
     } else {
       toast({
-        description: res.message ?? "Failed delete message",
+        description: "Failed delete message",
       });
     }
   };
@@ -38,9 +38,8 @@ export function RowAction({ row }: RowActionsProps<TPenagihanTable>) {
   return (
     <>
       <DataTableRowActions>
-        <ModalDropdownItem triggerChildren="Input Pembayaran" open={openEdit} onOpenChange={setOpenEdit}>
-          <CreatePembayaran setOpen={setOpenEdit} row={row} />
-          {/* <UpdateInvoiceForm setOpen={setOpenEdit} row={row} /> */}
+        <ModalDropdownItem triggerChildren="Edit" open={openEdit} onOpenChange={setOpenEdit}>
+          <UpdatePenagihanForm setOpen={setOpenEdit} row={row} />
         </ModalDropdownItem>
         <ModalDropdownItem triggerChildren="Delete">
           <p>Are you sure want to delete this item ?</p>
@@ -48,9 +47,9 @@ export function RowAction({ row }: RowActionsProps<TPenagihanTable>) {
             <DialogClose>
               <Button>No</Button>
             </DialogClose>
-            {/* <DialogClose onClick={() => handleDelete(row.original.id)}> */}
-            {/*   <Button>Yes</Button> */}
-            {/* </DialogClose> */}
+            <DialogClose onClick={() => handleDelete(row.original.id)}>
+              <Button>Yes</Button>
+            </DialogClose>
           </div>
         </ModalDropdownItem>
       </DataTableRowActions>

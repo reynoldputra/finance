@@ -26,10 +26,12 @@ interface ComboboxInputProps {
   description?: string;
   errorMessage?: string;
   options?: readonly ComboboxItem[];
+  disabled ?: boolean
 }
 
 const ComboboxInput: React.FC<ComboboxInputProps> = ({
   name,
+  disabled = false,
   title,
   description,
   errorMessage,
@@ -50,6 +52,7 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                   <Button
                     variant="outline"
                     role="combobox"
+                    disabled={disabled}
                     className={cn(
                       "w-[200px] justify-between",
                       !field.value && "text-muted-foreground"

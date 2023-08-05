@@ -79,6 +79,18 @@ export class CustomerService {
     return res;
   }
 
+  public static async getDetailCustomer(id : string) {
+    const res = await prisma.customer.findFirst( {
+      where : {
+        id
+      },
+      include : {
+        currentKolektor : true 
+      }
+    });
+    return res;
+  }
+
   public static async createCustomer(customer: TCreateCustomerInput) {
     const res = await prisma.customer.create({
       data: customer,

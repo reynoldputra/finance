@@ -7,10 +7,10 @@ export const createPenagihanInput = z.object({
 })
 
 export const updatePenagihanInput = z.object({
-  distribusiPembayaranId : z.string(),
-  invoiceId : z.string().optional(),
-  tanggalTagihan : z.date().optional(),
-  kolektorId : z.string().optional()
+  penagihanId : z.string(),
+  invoiceId : z.string(),
+  tanggalTagihan : z.date(),
+  kolektorId : z.string()
 })
 
 export type TCreatePenagihanInput = z.infer<typeof createPenagihanInput>;

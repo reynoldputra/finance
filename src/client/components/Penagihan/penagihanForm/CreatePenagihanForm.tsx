@@ -10,6 +10,8 @@ import {
   createPenagihanInput,
   TCreatePenagihanInput,
 } from "@client/../server/collections/penagihan/penagihanSchema";
+import { useEffect, useState } from "react";
+import { Combobox } from "@client/components/form/Combobox";
 
 interface CreatePenagihanFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,9 +26,16 @@ export function CreatePenagihanForm({ setOpen }: CreatePenagihanFormProps) {
 
   const res = trpc.invoice.getInvoices.useQuery();
   const result = res.data?.data ?? [];
-  const invoices: ComboboxItem[] = result.map((item) => ({
-    title: item.id,
+  let invoices: ComboboxItem[] = result.map((item) => ({
+    title: item.transaksiId,
     value: item.id,
+  }));
+
+  const customer = trpc.customer.customerOption.useQuery();
+  const custData = customer.data ?? [];
+  const custOption: ComboboxItem[] = custData.map((c) => ({
+    title: c.nama,
+    value: c.id,
   }));
 
   const kolektor = trpc.kolektor.getAllKolektor.useQuery();
@@ -56,17 +65,45 @@ export function CreatePenagihanForm({ setOpen }: CreatePenagihanFormProps) {
 
   const register = form.register;
 
+  const [cust, setCust] = useState<string>("");
+  
+  const custDetail = trpc.customer.customerDetail.useQuery(cust)
+
+  useEffect(() => {
+    let newInvoice = result.filter((c) => c.customerId == cust);
+
+    invoices = newInvoice.map((inv) => ({
+      title: inv.transaksiId,
+      value: inv.id,
+    }));
+
+  }, [cust]);
+
+
+  useEffect(() => {
+    if(custDetail.data) {
+      form.setValue("kolektorId", custDetail.data.kolektorId)
+    } else {
+      form.resetField("kolektorId")
+    }
+  }, [custDetail.data])
+
   return (
     <Form {...form}>
+      <h1 className="font-bold">Add penagihan</h1>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <p className="text-sm">Customer</p>
+        <Combobox items={custOption} onChange={(e) => setCust(e)} />
         <InputForm
           {...register("invoiceId")}
           type="combobox"
           title="Invoice Id"
+          disabled={cust.length ? false : true}
           options={invoices}
         />
         <InputForm
           {...register("kolektorId")}
+          disabled={cust.length ? false : true}
           type="combobox"
           title="Kolektor"
           options={kolektorOptions}

@@ -14,9 +14,14 @@ export const CustomerRouter = customerTrpc.router({
   customerTable: customerTrpc.publicProcedure.query(() => {
     return CustomerService.getCustomerTable();
   }),
-  customerOption : customerTrpc.publicProcedure.query(() => {
-    return CustomerService.getAllCustomer()
+  customerOption: customerTrpc.publicProcedure.query(() => {
+    return CustomerService.getAllCustomer();
   }),
+  customerDetail: customerTrpc.publicProcedure
+    .input(z.string())
+    .query(({ input }: { input: string }) => {
+      return CustomerService.getDetailCustomer(input);
+    }),
   createCustomer: customerTrpc.publicProcedure
     .input(createCustomerInput)
     .mutation(async ({ input }: { input: TCreateCustomerInput }) => {

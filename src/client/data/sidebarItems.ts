@@ -7,8 +7,6 @@ const SidebarItems: ISidebarItem[] = [
   { title: "Kolektor", route: "/kolektor", icon: UserCog2 },
   { title: "Invoice", route: "/invoice", icon: UserCog2 },
   { title: "Penagihan", route: "/penagihan", icon: UserCog2 },
-  { title: "Transfer", route: "/transfer", icon: UserCog2 },
-  { title: "Giro", route: "/transfer", icon: UserCog2 },
 ];
 
 export default SidebarItems;

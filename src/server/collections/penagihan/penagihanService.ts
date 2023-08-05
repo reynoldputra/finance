@@ -120,9 +120,9 @@ export class PenagihanService {
     if (input.invoiceId) updateData.invoiceId = input.invoiceId;
     if (input.kolektorId) updateData.kolektorId = input.kolektorId;
     if (input.tanggalTagihan) updateData.tanggalTagihan = input.tanggalTagihan;
-    const result = await prisma.distribusiPembayaran.update({
+    const result = await prisma.penagihan.update({
       where: {
-        id: input.distribusiPembayaranId,
+        id: input.penagihanId
       },
       data: updateData,
     });

@@ -36,8 +36,10 @@ export default function ConfirmDeleteForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <InputForm name="confirm" type="text" title=" " />
-        <p className="text-red-500">{form.formState.errors.confirm?.message}</p>
-        <div className="flex gap-x-3 mt-2">
+        <span className="text-red-500 text-base">
+          {form.formState.errors.confirm?.message}
+        </span>
+        <div className="flex gap-x-3 mt-1">
           <Dialog.Close>
             <Button className="text-base" variant={"outline"}>
               Cancel

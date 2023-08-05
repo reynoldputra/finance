@@ -46,7 +46,7 @@ export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
             <span className="font-bold text-xl">Are you sure ?</span>
             <span className=" text-base mt-3">
               This action
-              <span className="text-base font-semibold">CANNOT</span> be undone.
+              <span className="text-base font-semibold"> CANNOT</span> be undone.
               This will permanently delete the
               <span className="font-semibold">"{row.original.nama}"</span>
               customer.

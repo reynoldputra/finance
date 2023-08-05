@@ -1,24 +1,58 @@
-import { useNavigate } from "react-router-dom";
-import { SheetTrigger } from "../ui/sheet";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ISidebarItem } from "@client/types/SidebarItem";
 import SidebarItems from "../../data/sidebarItems";
 
-const SidebarMenus: React.FC = () => {
+interface sidebarMenusProps {
+  open: boolean;
+}
+
+const SidebarMenus: React.FC<sidebarMenusProps> = ({ open }) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const isOnThisPath = (route: string, currRoute: string) => {
+    if (route === currRoute) {
+      return "bg-opacity-100 shadow-lg shadow-normalBlue/70";
+    } else {
+      return " bg-opacity-[0.15] hover:bg-opacity-100 hover:shadow-lg hover:shadow-normalBlue/70";
+    }
+  };
+  const isOnThisPathIcon = (route: string, currRoute: string) => {
+    if (route === currRoute) {
+      return "text-white";
+    } else {
+      return "text-darkBlue group-hover:text-white";
+    }
+  };
   return (
-    <div className="h-full flex flex-col justify-start mt-4 gap-y-6">
-      {SidebarItems.map((menu: ISidebarItem) => (
-        <SheetTrigger asChild key={menu.route}>
+    <>
+      {SidebarItems.map((item: ISidebarItem, index) => (
+        <li
+          key={item.title}
+          className={`flex rounded-md p-2 cursor-pointer text-gray-800 font-semibold text-lg items-center gap-x-4 ${
+            item.gap ? "mt-9" : "mt-2"
+          } ${index === 0 && "bg-light-white"} ${!open && "justify-center"} `}
+          onClick={() => navigate(item.route)}
+        >
           <div
-            onClick={() => navigate(menu.route)}
-            className="w-full flex items-center gap-x-4 cursor-pointer"
+            className={`group bg-normalBlue p-[0.6rem] duration-500 rounded-lg  ${isOnThisPath(
+              item.route,
+              pathname
+            )}`}
           >
-            <menu.icon />
-            <p className="text-xl font-semibold">{menu.title}</p>
+            <item.icon
+              className={`cursor-pointer  w-6 h-6 ${isOnThisPathIcon(
+                item.route,
+                pathname
+              )}`}
+            />
           </div>
-        </SheetTrigger>
+          <span className={`${!open && "hidden"} origin-left duration-200`}>
+            {item.title}
+          </span>
+        </li>
       ))}
-    </div>
+    </>
   );
 };
 

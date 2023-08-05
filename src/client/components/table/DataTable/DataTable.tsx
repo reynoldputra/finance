@@ -23,9 +23,9 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({ columns, table, toolbar }: DataTableProps<TData, TValue>) {
   return (
     <ReactTableProvider table={table}>
-      <div className="space-y-4 p-8">
+      <div className="p-6 space-y-4">
+      <DataTableToolbar table={table} toolbar={toolbar} />
         <div className="rounded-md border">
-          <DataTableToolbar table={table} toolbar={toolbar} />
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

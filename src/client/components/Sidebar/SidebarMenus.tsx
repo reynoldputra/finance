@@ -35,13 +35,13 @@ const SidebarMenus: React.FC<sidebarMenusProps> = ({ open }) => {
           onClick={() => navigate(item.route)}
         >
           <div
-            className={`group bg-normalBlue p-[0.6rem] duration-500 rounded-lg  ${isOnThisPath(
+            className={`group bg-normalBlue p-[0.65rem] duration-500 rounded-lg  ${isOnThisPath(
               item.route,
               pathname
             )}`}
           >
             <item.icon
-              className={`cursor-pointer  w-6 h-6 ${isOnThisPathIcon(
+              className={`cursor-pointer  w-7 h-7 ${isOnThisPathIcon(
                 item.route,
                 pathname
               )}`}

@@ -46,7 +46,7 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{title}</FormLabel>
+          <FormLabel className="text-base">{title}</FormLabel>
           <div>
             <Popover>
               <PopoverTrigger asChild>
@@ -92,8 +92,8 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                 </Command>
               </PopoverContent>
             </Popover>
-          {description && <FormDescription>{description}</FormDescription>}
-          {errorMessage && <FormMessage>{errorMessage}</FormMessage>}
+            {description && <FormDescription className="text-base">{description}</FormDescription>}
+          {errorMessage && <FormMessage className="text-base">{errorMessage}</FormMessage>}
           </div>
         </FormItem>
       )}

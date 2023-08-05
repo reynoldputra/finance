@@ -18,10 +18,10 @@ const Sidebar = () => {
           onClick={() => setOpen(!open)}
         />
         <div
-          className={`flex gap-x-4 ${!open && "justify-center pl-0"} pl-1 items-center`}
+          className={`flex gap-x-4 ${open ? "pl-1" : "justify-center pl-0"} items-center`}
         >
           <CircleDollarSign
-            className={`cursor-pointer duration-500 text-darkBlue w-8 h-8 ${
+            className={`cursor-pointer duration-500 text-darkBlue w-9 h-9 ${
               open && "rotate-[360deg]"
             }`}
           />

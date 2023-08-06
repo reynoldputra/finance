@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { MainTrpc } from "../../trpc";
 import {
-  createPembayaranInput,
   TCreatePembayaranInput,
   updatePemabayaranInput,
   TUpdatePembayaranInput,
+  createPembayaranWithCarabayarInput,
 } from "./pembayaranSchema";
 import { PembayaranService } from "./pembayaranService";
 
@@ -28,7 +28,7 @@ export const pembayaranRouter = pembayaranTrpc.router({
     }),
 
   createPembayaran: pembayaranTrpc.publicProcedure
-    .input(createPembayaranInput)
+    .input(createPembayaranWithCarabayarInput)
     .mutation(async ({ input }: { input: TCreatePembayaranInput }) => {
       try {
         const res = await PembayaranService.createPembayaran(input);

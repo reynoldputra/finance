@@ -50,6 +50,7 @@ export default function Modal({
               <DialogDescription>{description}</DialogDescription>
             )}
           </DialogHeader>
+          <hr />
           {children}
         </DialogContent>
       </Dialog>

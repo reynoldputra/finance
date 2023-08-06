@@ -42,10 +42,17 @@ export function CreateKolektorForm({ setOpen }: CreateKolektorFormProps) {
         setOpen(false);
         toast({
           description: `Kolektor ${data.nama} successfully created`,
+          variant: "success",
+          className: "text-white text-base font-semibold",
         });
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
+      toast({
+        description: `Failed to create kolektor, please try again`,
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
     }
   }
 

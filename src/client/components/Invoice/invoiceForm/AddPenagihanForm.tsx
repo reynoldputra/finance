@@ -74,12 +74,19 @@ export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvo
       if (data) {
         toast({
           description: `${data.length} penagihan successfully created`,
+          variant: "success",
+          className: "text-white text-base font-semibold"
         });
         utils.invoice.invalidate();
         setOpen(false)
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
+      toast({
+        description: `Failed to create penagihan, please try again`,
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
     }
   }
 

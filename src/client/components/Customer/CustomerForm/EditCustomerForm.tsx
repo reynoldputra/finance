@@ -57,10 +57,17 @@ export default function EditCustomerForm({ customerData }: EditCustomerProps) {
       if (data) {
         toast({
           description: `Customer ${data.nama} successfully edited`,
+          variant: "success",
+          className: "text-white text-base font-semibold",
         });
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
+      toast({
+        description: `Failed to update customer, please try again`,
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
     }
   }
 

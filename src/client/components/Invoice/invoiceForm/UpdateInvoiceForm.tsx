@@ -47,11 +47,18 @@ export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
         setOpen(false);
         toast({
           description: `Invoice ${data.transaksiId} successfully updated`,
+          variant: "success",
+          className: "text-white text-base font-semibold"
         });
         utils.invoice.invalidate()
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
+      toast({
+        description: `Failed to update invoice, please try again`,
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
     }
   }
 

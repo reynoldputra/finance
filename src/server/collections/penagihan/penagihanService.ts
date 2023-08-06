@@ -1,5 +1,6 @@
 import { Prisma } from "@server/../generated/client";
 import { prisma } from "../../prisma";
+import { distribusiPembayaran } from "../pembayaran/pembayaranSchema";
 import { TCreatePenagihanInput, TUpdatePenagihanInput } from "./penagihanSchema";
 
 export class PenagihanService {
@@ -92,6 +93,31 @@ export class PenagihanService {
       ...result,
       totalPembayaran: total,
     };
+  }
+
+  static async getPenagihanByCarabayar(id: string) {
+    const result = await prisma.penagihan.findMany({
+      where: {
+        distribusiPembayaran : {
+          some : {
+            caraBayarId : id
+          }
+        }
+      },
+      include: {
+        invoice : true,
+        distribusiPembayaran : true
+      },
+    });
+
+    const parsed = result.map((r) => {
+      return {
+        ...r,
+        distribusi : r.distribusiPembayaran.find(d => d.caraBayarId == id)
+      }
+    })
+
+    return parsed
   }
 
   static async createPenagihan(input: TCreatePenagihanInput) {

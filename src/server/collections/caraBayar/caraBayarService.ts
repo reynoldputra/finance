@@ -55,20 +55,6 @@ export class CaraBayarService {
     })
     return resultParse;
   }
- 
-  static async getTransfer() {
-    const result = await prisma.transfer.findMany({
-      include : {
-        caraBayar : {
-          include : {
-            distribusiPembayaran : true
-          }
-        }
-      }
-    });
-
-    return result;
-  }
 
   static async createCaraBayar(input: TCreateCaraBayarInput) {
     let newCaraBayar: Prisma.CaraBayarUncheckedCreateInput = {

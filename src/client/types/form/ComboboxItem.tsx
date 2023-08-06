@@ -1,4 +1,5 @@
 export interface ComboboxItem {
-  value : string | number
-  title : string | number
+  value : string 
+  title : string
+  disabled ?: boolean
 }

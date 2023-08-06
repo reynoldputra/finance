@@ -7,7 +7,6 @@ import { TPembayaranSchema } from "./data/schema";
 export default function DetailDistribusi({ row }: { row: Row<TPembayaranSchema> }) {
   const result = trpc.penagihan.getPenagihanByCarabayar.useQuery(row.original.id).data;
   const data = result?.data;
-  console.log(data)
 
   return (
     <>

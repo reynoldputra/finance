@@ -1,6 +1,6 @@
 import PenagihanTable from "./PenagihanTable";
 
-export default function Penagihan () {
+export default function Penagihan() {
   return (
     <div className="w-full min-h-screen flex-col flex justify-center items-center gap-y-4 py-5">
       <h1 className="font-bold text-2xl text-darkBlue font mx-auto">

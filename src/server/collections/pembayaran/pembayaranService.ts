@@ -1,3 +1,4 @@
+import { DistribusiPembayaran } from "@server/../generated/client";
 import { prisma } from "@server/prisma";
 import { CaraBayarService } from "../caraBayar/caraBayarService";
 import { InvoiceService } from "../invoice/invoiceService";
@@ -29,6 +30,8 @@ export class PembayaranService {
       const carabayar = await CaraBayarService.createCaraBayar(input.carabayar)
 
 
+      let distribusiHasil : DistribusiPembayaran[] = []
+
       for(let idx in input.distribusi) {
         const distribusi = input.distribusi[idx]
         const detailPenagihan = await PenagihanService.getPenagihan(distribusi.penagihanId);
@@ -42,6 +45,8 @@ export class PembayaranService {
           }
         })
 
+        distribusiHasil.push(distribusiPembayaran)
+
         await ctx.penagihan.update({
           where : {
             id : distribusiPembayaran.penagihanId,
@@ -52,11 +57,11 @@ export class PembayaranService {
         })
       }
 
-      return input.distribusi.length;
+      return distribusiHasil;
     });
 
     return {
-      terbayar : result
+      distribusiHasil : result
     };
   }
 

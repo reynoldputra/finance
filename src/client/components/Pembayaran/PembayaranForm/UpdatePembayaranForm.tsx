@@ -18,12 +18,15 @@ import { RadioGroup, RadioGroupItem } from "@client/components/ui/radio-group";
 import { Label } from "@client/components/ui/label";
 import { PlusIcon, Trash } from "lucide-react";
 import { idr } from "@client/lib/idr";
+import { Row } from "@tanstack/react-table";
+import { TPembayaranSchema } from "../PembayaranTable/data/schema";
 
 interface ModalFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  row : Row<TPembayaranSchema>
 }
 
-export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
+export function UpdatePembayaran({ setOpen, row }: ModalFormProps) {
   const { toast } = useToast();
   const [penagihanOption, setPenagihanOption] = useState<ComboboxItem[]>();
   const [currCust, setCurrentCust] = useState("");
@@ -233,19 +236,5 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
         </Button>
       </form>
     </Form>
-  );
-}
-
-export function CreatePembayaranModal() {
-  const [open, setOpen] = useState(false);
-  return (
-    <Modal
-      modalTitle="Create Pembayaran"
-      open={open}
-      onOpenChange={setOpen}
-      buttonTitle="Create Pembayaran"
-    >
-      <CreatePembayaranForm setOpen={setOpen} />
-    </Modal>
   );
 }

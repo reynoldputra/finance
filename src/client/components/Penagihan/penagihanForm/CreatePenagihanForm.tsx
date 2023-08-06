@@ -19,6 +19,7 @@ interface CreatePenagihanFormProps {
 
 export function CreatePenagihanForm({ setOpen }: CreatePenagihanFormProps) {
   const { toast } = useToast();
+  const [invoiceOption, setInvoiceOption] = useState<ComboboxItem[]>()
 
   const form = useForm<TCreatePenagihanInput>({
     resolver: zodResolver(createPenagihanInput),
@@ -30,6 +31,10 @@ export function CreatePenagihanForm({ setOpen }: CreatePenagihanFormProps) {
     title: item.transaksiId,
     value: item.id,
   }));
+
+  useEffect(() => {
+    setInvoiceOption(invoices)
+  }, [])
 
   const customer = trpc.customer.customerOption.useQuery();
   const custData = customer.data ?? [];
@@ -72,10 +77,12 @@ export function CreatePenagihanForm({ setOpen }: CreatePenagihanFormProps) {
   useEffect(() => {
     let newInvoice = result.filter((c) => c.customerId == cust);
 
-    invoices = newInvoice.map((inv) => ({
+    const invoices = newInvoice.map((inv) => ({
       title: inv.transaksiId,
       value: inv.id,
     }));
+
+    setInvoiceOption(invoices)
 
   }, [cust]);
 
@@ -99,7 +106,7 @@ export function CreatePenagihanForm({ setOpen }: CreatePenagihanFormProps) {
           type="combobox"
           title="Invoice Id"
           disabled={cust.length ? false : true}
-          options={invoices}
+          options={invoiceOption}
         />
         <InputForm
           {...register("kolektorId")}

@@ -26,57 +26,38 @@ export class PembayaranService {
 
   static async createPembayaran(input: TCreatePembayaranInput) {
     const result = await prisma.$transaction(async (ctx) => {
-      let carabayarBaru: TCaraBayarLama[] = [];
-      if (input.caraBayarBaru) {
-        for (let idx in input.caraBayarBaru) {
-          let inputCaraBayar = input.caraBayarBaru[idx];
-          const carabayar = await CaraBayarService.createCaraBayar(inputCaraBayar);
-          carabayarBaru.push({
-            id: carabayar.id,
-            totalDistribusi: inputCaraBayar.totalDistribusi,
-          });
-        }
-      }
-      if (input.caraBayarLama) carabayarBaru.concat(input.caraBayarLama);
+      const carabayar = await CaraBayarService.createCaraBayar(input.carabayar)
 
-      const totalPembayaranPenagihan = carabayarBaru.reduce((tot, cur) => {
-        return (tot += cur.totalDistribusi);
-      }, 0);
 
-      const detailPenagihan = await PenagihanService.getPenagihan(input.penagihanId);
-      const invoice = await InvoiceService.getInvoice(detailPenagihan.invoiceId);
+      for(let idx in input.distribusi) {
+        const distribusi = input.distribusi[idx]
+        const detailPenagihan = await PenagihanService.getPenagihan(distribusi.penagihanId);
+        const invoice = await InvoiceService.getInvoice(detailPenagihan.invoiceId);
 
-      let statusPenagihan = "";
+        const distribusiPembayaran = await ctx.distribusiPembayaran.create({
+          data : {
+            caraBayarId : carabayar.id,
+            penagihanId : distribusi.penagihanId,
+            jumlah : distribusi.total
+          }
+        })
 
-      if (invoice.sisa > totalPembayaranPenagihan) {
-        statusPenagihan = "CICILAN";
-      } else if (totalPembayaranPenagihan > 0) {
-        statusPenagihan = "LUNAS";
-      } else {
-        statusPenagihan = "NIHIL";
-      }
-
-      const distribusiPembayaran = await ctx.penagihan.update({
-        where: {
-          id: input.penagihanId,
-        },
-        data: {
-          distribusiPembayaran: {
-            create: carabayarBaru.map((c) => {
-              return {
-                jumlah: c.totalDistribusi,
-                caraBayarId: c.id,
-              };
-            }),
+        await ctx.penagihan.update({
+          where : {
+            id : distribusiPembayaran.penagihanId,
           },
-          status: statusPenagihan,
-        },
-      });
+          data : {
+            status : distribusiPembayaran.jumlah <= invoice.sisa ? "CICILAN" : "LUNAS"
+          }
+        })
+      }
 
-      return distribusiPembayaran;
+      return input.distribusi.length;
     });
 
-    return result;
+    return {
+      terbayar : result
+    };
   }
 
   static async updatePembayaran(input: TUpdatePembayaranInput) {

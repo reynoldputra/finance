@@ -6,27 +6,27 @@ import { Button } from "@client/components/ui/button";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { toast } from "@client/components/ui/use-toast";
 import { trpc } from "@client/lib/trpc";
-import { TPenagihanTable } from "./data/schema";
-import { UpdatePenagihanForm } from "../penagihanForm/UpdatePenagihanForm";
+import { TPembayaranSchema } from "./data/schema";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
 }
 
-export function RowAction({ row }: RowActionsProps<TPenagihanTable>) {
+export function RowAction({ row }: RowActionsProps<TPembayaranSchema>) {
   const [openEdit, setOpenEdit] = useState(false);
 
-  const deletePenagihanMutation = trpc.penagihan.deletePenagihan.useMutation();
+  const deleteCarabayarMutation = trpc.carabayar.deleteCarabayar.useMutation();
+
   const utils = trpc.useContext();
 
   const handleDelete = async (id: string) => {
-    const res = await deletePenagihanMutation.mutateAsync(id);
+    const res = await deleteCarabayarMutation.mutateAsync(id);
 
     if (res.status) {
       toast({
         description: "Success delete item",
       });
-      utils.penagihan.invalidate();
+      utils.carabayar.invalidate();
     } else {
       toast({
         description: "Failed delete message",
@@ -38,7 +38,7 @@ export function RowAction({ row }: RowActionsProps<TPenagihanTable>) {
     <>
       <DataTableRowActions>
         <ModalDropdownItem triggerChildren="Edit" open={openEdit} onOpenChange={setOpenEdit}>
-          <UpdatePenagihanForm setOpen={setOpenEdit} row={row} />
+          {/* <UpdateInvoiceForm setOpen={setOpenEdit} row={row} /> */}
         </ModalDropdownItem>
         <ModalDropdownItem triggerChildren="Delete">
           <p>Are you sure want to delete this item ?</p>

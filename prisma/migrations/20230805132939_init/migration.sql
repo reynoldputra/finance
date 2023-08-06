@@ -67,6 +67,7 @@ CREATE TABLE "cara_bayar" (
     "total" INTEGER NOT NULL,
     "tanda_terima" BOOLEAN NOT NULL,
     "metodePembayaranId" INTEGER NOT NULL,
+    "tanggal" DATETIME NOT NULL,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL,
     CONSTRAINT "cara_bayar_metodePembayaranId_fkey" FOREIGN KEY ("metodePembayaranId") REFERENCES "metode_pembayaran" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
@@ -92,7 +93,6 @@ CREATE TABLE "Giro" (
 CREATE TABLE "Transfer" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "bank" TEXT NOT NULL,
-    "tanggal" DATETIME NOT NULL,
     "caraBayarId" TEXT NOT NULL,
     CONSTRAINT "Transfer_caraBayarId_fkey" FOREIGN KEY ("caraBayarId") REFERENCES "cara_bayar" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );

@@ -56,18 +56,18 @@ export function RowAction({ row }: RowActionsProps<TInvoiceSchema>) {
                 This action
                 <span className="text-base font-semibold"> CANNOT</span> be
                 undone. This will permanently delete the
-                <span className="font-semibold"> "{row.original.id}" </span>
+                <span className="font-semibold"> "{row.original.transaksiId}" </span>
                 Invoice.
               </span>
             </div>
             <div className="flex flex-col text-lg mt-2">
               <span className=" text-base font-semibold">
-                Please type Invoice's id "{row.original.id}" to confirm the
+                Please type Invoice's id "{row.original.transaksiId}" to confirm the
                 delete.
               </span>
               <ConfirmDeleteForm
                 handleDelete={handleDelete}
-                currName={row.original.id}
+                currName={row.original.transaksiId}
               />
             </div>
           </div>

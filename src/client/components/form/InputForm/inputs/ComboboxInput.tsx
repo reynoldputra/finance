@@ -60,7 +60,7 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                   >
                     {field.value
                       ? options?.find((language) => language.value === field.value)?.title
-                      : `Select ${title.toLowerCase()}`}
+                      : `Select ...`}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </FormControl>
@@ -72,10 +72,11 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                   <CommandGroup>
                     {options?.map((language) => (
                       <CommandItem
+                        disabled={language.disabled}
                         value={language.value.toString()}
                         key={language.value}
                         onSelect={(value) => {
-                          form.setValue(name, value);
+                          form.setValue(name, (form.getValues(name) == value ? "" : value));
                         }}
                       >
                         <Check
@@ -92,7 +93,7 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
               </PopoverContent>
             </Popover>
             {description && <FormDescription className="text-base">{description}</FormDescription>}
-          {errorMessage && <FormMessage className="text-base">{errorMessage}</FormMessage>}
+            {errorMessage && <FormMessage className="text-base">{errorMessage}</FormMessage>}
           </div>
         </FormItem>
       )}

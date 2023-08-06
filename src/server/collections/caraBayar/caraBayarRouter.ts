@@ -19,19 +19,6 @@ export const CarabayarRouter = carabayarTrpc.router({
       };
     }
   }),
-  getTransfers: carabayarTrpc.publicProcedure.query(async () => {
-    try {
-      const res = await CaraBayarService.getTransfer();
-      return {
-        status: true,
-        data: res,
-      };
-    } catch (err) {
-      return {
-        status: false,
-      };
-    }
-  }),
   createCarabayar: carabayarTrpc.publicProcedure
     .input(createCaraBayarInput)
     .mutation(async ({ input }: { input: TCreateCaraBayarInput }) => {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Modal from "../modal/Modal";
-import { CreateCustomerForm } from "./customerForm/CreateCustomerForm";
+import CreateCustomerForm from "./CustomerForm/CreateCustomerForm";
 
 export default function CreateCustomer() {
   const [open, setOpen] = useState(false);

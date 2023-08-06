@@ -14,7 +14,7 @@ export function DataTableToolbar<TData>({ table, toolbar }: DataTableToolbarProp
   const isSorted = table.getState().sorting.length > 0;
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 hover:bg-slate-50">
+    <div className="flex h-full items-center justify-between">
       <div className="flex justify-end gap-4">
         {isSorted && (
           <Button
@@ -37,7 +37,7 @@ export function DataTableToolbar<TData>({ table, toolbar }: DataTableToolbarProp
           </Button>
         )}
       </div>
-      <div className="flex gap-4">
+      <div className="flex items-center gap-4">
         {toolbar}
         <DataTableViewOptions table={table} />
       </div>

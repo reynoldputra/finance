@@ -1,20 +1,14 @@
-import { useNavigate } from "react-router-dom";
 import CustomerTable from "./CustomerTable";
-import { Toaster } from "../ui/toaster";
-import Sidebar from "../Sidebar";
-import CreateCustomer from "./CreateCustomer";
 
 export default function Customer() {
-  const navigate = useNavigate();
   return (
-    <div>
-      <div className="w-full flex justify-center items-center gap-x-4 mt-4">
-        <Sidebar />
+    <div className="w-full min-h-screen flex flex-col justify-center items-center gap-y-4 py-5">
+      <h1 className="font-bold text-2xl text-darkBlue font mx-auto">
+        Customer Table
+      </h1>
+      <div className="bg-white rounded-xl xl:w-10/12 w-8/12 sm:w-9/12 border-2 drop-shadow-2xl">
+        <CustomerTable />
       </div>
-      <p>Customer page</p>
-      <div onClick={() => navigate("/")}>Go to home page</div>
-      <CustomerTable />
-      <CreateCustomer />
     </div>
   );
 }

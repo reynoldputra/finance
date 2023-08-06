@@ -1,20 +1,14 @@
-import { useNavigate } from "react-router-dom";
 import KolektorTable from "./KolektorTable";
-import { Toaster } from "../ui/toaster";
-import Sidebar from "../Sidebar";
-import CreateKolektor from "./CreateKolektor";
 
 export default function Kolektor() {
-  const navigate = useNavigate();
   return (
-    <div>
-      <div className="w-full flex justify-center items-center gap-x-4 mt-4">
-        <Sidebar />
+    <div className="w-full min-h-screen flex-col flex justify-center items-center gap-y-4 py-5">
+      <h1 className="font-bold text-2xl text-darkBlue font mx-auto">
+        Kolektor Table
+      </h1>
+      <div className="bg-white rounded-xl xl:w-10/12 w-8/12 sm:w-9/12 border-2 drop-shadow-2xl">
+        <KolektorTable />
       </div>
-      <p>Kolektor Page</p>
-      <div onClick={() => navigate("/")}>Go to home page</div>
-      <KolektorTable />
-      <CreateKolektor />
     </div>
   );
 }

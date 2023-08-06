@@ -38,7 +38,7 @@ const DateInput: React.FC<DateInputProps> = ({
       name={name}
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel>{title}</FormLabel>
+          <FormLabel className="text-base">{title}</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>
@@ -68,8 +68,8 @@ const DateInput: React.FC<DateInputProps> = ({
               />
             </PopoverContent>
           </Popover>
-          {description && <FormDescription>{description}</FormDescription>}
-          {errorMessage && <FormMessage>{errorMessage}</FormMessage>}
+          {description && <FormDescription className="text-base">{description}</FormDescription>}
+          {errorMessage && <FormMessage className="text-base">{errorMessage}</FormMessage>}
         </FormItem>
       )}
     />

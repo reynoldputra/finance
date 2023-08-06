@@ -3,10 +3,7 @@ const plugin = require("tailwindcss/plugin");
 
 module.exports = {
   darkMode: ["class"],
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-    "./index.html"
-  ],
+  content: ["./src/**/*.{js,jsx,ts,tsx}", "./index.html"],
   theme: {
     container: {
       center: true,
@@ -50,6 +47,8 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        darkBlue: "#193B68",
+        normalBlue: "#1479FF",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -80,7 +79,7 @@ module.exports = {
     {
       pattern: /grid-(rows|cols)-(.+)/,
       variants: ["sm", "md", "lg", "xl"],
-    }
+    },
   ],
   plugins: [
     plugin(({ addComponents }) => {
@@ -103,6 +102,6 @@ module.exports = {
 
       addComponents(gridRowCol);
     }),
-    require("tailwindcss-animate")
-  ]
-}
+    require("tailwindcss-animate"),
+  ],
+};

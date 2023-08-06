@@ -38,8 +38,8 @@ export function DataTableColumnHeader<TData, TValue>({
     <div className="py-2">
       <div className={cn("flex items-center text-black", className)}>
         <DropdownMenu> <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-accent">
-              <span className="font-bold">{title}</span>
+            <Button variant="ghost" size="sm" className="-ml-1 mb-1 h-8 data-[state=open]:bg-accent">
+              <span className="font-bold text-base">{title}</span>
               {column.getIsSorted() === "desc" ? (
                 <ArrowDownIcon className="ml-2 h-4 w-4" />
               ) : column.getIsSorted() === "asc" ? (

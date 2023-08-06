@@ -31,7 +31,7 @@ const DefaultInput: React.FC<DefaultInputProps> = ({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{title}</FormLabel>
+          <FormLabel className="text-base">{title}</FormLabel>
           <FormControl>
             <Input
               type={type}
@@ -40,8 +40,8 @@ const DefaultInput: React.FC<DefaultInputProps> = ({
               onBlur={field.onBlur}
             />
           </FormControl>
-          {description && <FormDescription>{description}</FormDescription>}
-          {errorMessage && <FormMessage>{errorMessage}</FormMessage>}
+          {description && <FormDescription className="text-base">{description}</FormDescription>}
+          {errorMessage && <FormMessage className="text-base">{errorMessage}</FormMessage>}
         </FormItem>
       )}
     />

@@ -14,9 +14,24 @@ export const CustomerRouter = customerTrpc.router({
   customerTable: customerTrpc.publicProcedure.query(() => {
     return CustomerService.getCustomerTable();
   }),
-  customerOption : customerTrpc.publicProcedure.query(() => {
-    return CustomerService.getAllCustomer()
+  customerOption: customerTrpc.publicProcedure.query(() => {
+    return CustomerService.getAllCustomer();
   }),
+  getCustomerById: customerTrpc.publicProcedure
+    .input(z.string())
+    .mutation(async ({ input }: { input: string }) => {
+      try {
+        const res = await CustomerService.getCustomerById(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
   createCustomer: customerTrpc.publicProcedure
     .input(createCustomerInput)
     .mutation(async ({ input }: { input: TCreateCustomerInput }) => {

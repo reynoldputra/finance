@@ -1,17 +1,11 @@
-import {
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-} from "@client/components/ui/dropdown-menu";
-import * as Dialog from "@radix-ui/react-dialog";
 import { Row } from "@tanstack/react-table";
 import { DataTableRowActions } from "@client/components/table/DataTableRowActions";
 import { TKolektorTable } from "@server/collections/kolektor/kolektorSchema";
 import { trpc } from "@client/lib/trpc";
 import { useToast } from "@client/components/ui/use-toast";
 import ModalDropdownItem from "@client/components/modal/ModalDropdownItem";
-import { Button } from "@client/components/ui/button";
 import EditKolektorForm from "../KolektorForm/EditKolektorForm";
+import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
@@ -47,24 +41,25 @@ export function RowAction({ row }: RowActionsProps<TKolektorTable>) {
         <EditKolektorForm kolektorData={row.original} />
       </ModalDropdownItem>
       <ModalDropdownItem triggerChildren="Delete">
-        <Dialog.Close>
-          <Button>Cancel</Button>
-        </Dialog.Close>
-        <Dialog.Close>
-          <Button onClick={handleDelete}>Delete</Button>
-        </Dialog.Close>
+        <div className="flex flex-col w-full h-full">
+          <div className="flex flex-col">
+            <span className="font-bold text-xl">Are you sure ?</span>
+            <span className=" text-base mt-3">
+              This action
+              <span className="text-base font-semibold">CANNOT</span> be undone.
+              This will permanently delete the
+              <span className="font-semibold">"{row.original.nama}"</span>
+              customer.
+            </span>
+          </div>
+          <div className="flex flex-col text-lg mt-2">
+            <span className=" text-base font-semibold">
+              Please type "CONFIRM DELETE" to confirm the delete.
+            </span>
+            <ConfirmDeleteForm handleDelete={handleDelete} />
+          </div>
+        </div>
       </ModalDropdownItem>
-      {/* <DropdownMenuItem>Edit</DropdownMenuItem>
-      <DropdownMenuItem
-        onClick={() => navigator.clipboard.writeText(row.original.id)}
-      >
-        Copy Kolektor ID
-      </DropdownMenuItem>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={handleDelete}>
-        Delete
-        <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-      </DropdownMenuItem> */}
     </DataTableRowActions>
   );
 }

@@ -102,12 +102,21 @@ export class CustomerService {
     if (nama) updateCustomerData.nama = nama;
     if (kolektorId) updateCustomerData.kolektorId = kolektorId;
 
+    const existingCustomer = await prisma.customer.findUnique({
+      where: { id },
+      select: { kolektorId: true },
+    });
+    
     const updatedCustomer = await prisma.$transaction(async (prisma) => {
       const updateCostumer = await prisma.customer.update({
         where: { id: id },
         data: updateCustomerData,
       });
-      if (kolektorId) {
+      if (
+        kolektorId &&
+        existingCustomer &&
+        existingCustomer.kolektorId !== kolektorId
+      ) {
         const createHistory = await prisma.kolektorHistory.create({
           data: {
             customerId: id,
@@ -118,5 +127,14 @@ export class CustomerService {
       return updateCostumer;
     });
     return updatedCustomer;
+  }
+
+  public static async getCustomerById(id: string) {
+    const customer = await prisma.customer.findFirst({
+      where: {
+        id: id,
+      },
+    });
+    return customer;
   }
 }

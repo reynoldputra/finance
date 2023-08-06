@@ -28,10 +28,15 @@ export const KolektorColumn: ColumnDef<TKolektorTable>[] = [
   },
   {
     accessorKey: "nama",
+    id: "Nama Kolektor",
     header: ({ column, table }) => (
       <DataTableColumnHeader table={table} column={column} title="Nama" />
     ),
-    cell: ({ row }) => <div className="w-[180px]">{row.getValue("nama")}</div>,
+    cell: ({ row }) => <div className="w-[180px]">{row.getValue("Nama Kolektor")}</div>,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+
   },
   {
     accessorKey: "penagihanWaiting",

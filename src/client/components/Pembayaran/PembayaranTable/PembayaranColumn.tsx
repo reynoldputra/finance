@@ -10,18 +10,27 @@ export const pembayaranColumn : ColumnDef<TPembayaranSchema>[] = [
     id : "Kode Pembayaran",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Kode Pembayaran" />,
     cell: ({ row }) => <div className="w-[180px]">{row.getValue("Kode Pembayaran")}</div>,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "namaCustomer",
-    id : "Customer",
+    id : "Nama Customer",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Customer" />,
-    cell: ({ row }) => <div className="w-[180px]">{row.getValue("Customer")}</div>,
+    cell: ({ row }) => <div className="w-[180px]">{row.getValue("Nama Customer")}</div>,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "metodePembayaran",
     id : "Metode",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Metode" />,
     cell: ({ row }) => <div className="w-[180px]">{row.getValue("Metode")}</div>,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "tanggalPembayaran",

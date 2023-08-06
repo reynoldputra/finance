@@ -33,13 +33,21 @@ export const CustomerColumn: ColumnDef<ICustomerTable>[] = [
   },
   {
     accessorKey: "nama",
+    id: "Nama Customer",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Nama" />,
-    cell: ({ row }) => <div className="w-[180px]">{row.getValue("nama")}</div>,
+    cell: ({ row }) => <div className="w-[180px]">{row.getValue("Nama Customer")}</div>,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "kolektorNama",
+    id: "Nama Kolektor",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Nama Kolektor" />,
-    cell: ({ row }) => <div className="w-[180px]">{row.getValue("kolektorNama")}</div>,
+    cell: ({ row }) => <div className="w-[180px]">{row.getValue("Nama Kolektor")}</div>,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
     enableSorting: true,
     enableHiding: true,
   },

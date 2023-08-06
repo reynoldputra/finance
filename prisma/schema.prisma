@@ -92,6 +92,7 @@ model CaraBayar {
   tandaTerima          Boolean                @map("tanda_terima")
   distribusiPembayaran DistribusiPembayaran[]
   metodePembayaranId   Int
+  tanggal              DateTime
 
   transfer  Transfer?
   giro      Giro?
@@ -122,7 +123,7 @@ model Giro {
 
 model Transfer {
   id          String    @id @default(cuid())
-  tanggal     DateTime
+  bank        String
   caraBayarId String    @unique
   caraBayar   CaraBayar @relation(fields: [caraBayarId], references: [id], onDelete: Cascade)
 }

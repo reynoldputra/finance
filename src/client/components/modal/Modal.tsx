@@ -25,6 +25,7 @@ interface IModalsProps extends DialogProps {
   modalTitle?: string;
   description?: string;
   children: ReactNode;
+  buttonProps ?: React.ButtonHTMLAttributes<HTMLButtonElement>
 }
 
 export default function Modal({
@@ -33,13 +34,14 @@ export default function Modal({
   modalTitle,
   description,
   children,
+  buttonProps,
   ...rest
 }: IModalsProps) {
   return (
     <>
       <Dialog {...rest}>
         <DialogTrigger asChild>
-          <Button variant={buttonVariant}>{buttonTitle}</Button>
+          <Button {...buttonProps} variant={buttonVariant}>{buttonTitle}</Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
@@ -48,6 +50,7 @@ export default function Modal({
               <DialogDescription>{description}</DialogDescription>
             )}
           </DialogHeader>
+          <hr />
           {children}
         </DialogContent>
       </Dialog>

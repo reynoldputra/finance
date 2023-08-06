@@ -30,7 +30,7 @@ export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
     defaultValues: {
       id : row.original.id,
       transaksiId : row.original.transaksiId,
-      customerId : custemers.find((c) => c.title == row.original.namaCustomer)?.value,
+      customerId : custemers.find((c) => c.title == row.original.namaCustomer)?.value.toString(),
       total : row.original.total,
       tanggalTransaksi : row.original.tanggalTransaksi,
       namaSales : row.original.namaSales,

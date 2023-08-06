@@ -1,11 +1,7 @@
 import DefaultInput from "./inputs/DefaultInput";
 import DateInput from "./inputs/DateInput";
 import ComboboxInput from "./inputs/ComboboxInput";
-
-interface Option {
-  title: string;
-  value: string;
-}
+import { ComboboxItem } from "@client/types/form/ComboboxItem";
 
 interface CustomFormFieldProps {
   name: string;
@@ -13,7 +9,8 @@ interface CustomFormFieldProps {
   description?: string;
   errorMessage?: string;
   type: "text" | "number" | "combobox" | "datepicker";
-  options?: readonly Option[];
+  disabled?: boolean;
+  options?: readonly ComboboxItem[];
 }
 
 const InputForm: React.FC<CustomFormFieldProps> = ({
@@ -21,6 +18,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
   title,
   description,
   errorMessage,
+  disabled = false,
   type,
   options,
 }) => {
@@ -39,6 +37,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
       <ComboboxInput
         name={name}
         title={title}
+        disabled={disabled}
         description={description}
         errorMessage={errorMessage}
         options={options}
@@ -46,12 +45,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
     );
   } else if (type === "datepicker") {
     return (
-      <DateInput
-        name={name}
-        title={title}
-        description={description}
-        errorMessage={errorMessage}
-      />
+      <DateInput name={name} title={title} description={description} errorMessage={errorMessage} />
     );
   } else {
     return null;

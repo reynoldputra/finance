@@ -6,6 +6,12 @@ export class PenagihanService {
   static async getAllPenagihan() {
     const result = await prisma.penagihan.findMany({
       include: {
+        invoice: {
+          include : {
+            customer : true
+          }
+        },
+        kolektor: true,
         distribusiPembayaran: {
           include: {
             caraBayar: {
@@ -28,9 +34,30 @@ export class PenagihanService {
         return (tot += cur.jumlah);
       }, 0);
 
+      let cash = 0;
+      let transfer = 0;
+      let giro = 0;
+
+      d.distribusiPembayaran.forEach((d) => {
+        if (d.caraBayar.metodePembayaranId == 1) cash++;
+        if (d.caraBayar.metodePembayaranId == 2) giro++;
+        if (d.caraBayar.metodePembayaranId == 3) transfer++;
+      });
+
       parsed.push({
-        ...d,
+        id : d.id,
+        transaksiId: d.invoice.transaksiId,
+        tanggalTagihan: d.tanggalTagihan,
+        status: d.status,
+        namaKolektor: d.kolektor.nama,
+        kolektorId: d.kolektor.id,
+        namaCustomer : d.invoice.customer.nama,
+        customerId : d.invoice.customer.id,
+        sisa : d.invoice.total - total,
         totalPembayaran: total,
+        cash,
+        transfer,
+        giro,
       });
     }
 
@@ -82,8 +109,8 @@ export class PenagihanService {
 
   static async createManyPenagihan(input: TCreatePenagihanInput[]) {
     const result = input.map((i) => {
-      return this.createPenagihan(i)
-    })
+      return this.createPenagihan(i);
+    });
 
     return result;
   }
@@ -93,9 +120,9 @@ export class PenagihanService {
     if (input.invoiceId) updateData.invoiceId = input.invoiceId;
     if (input.kolektorId) updateData.kolektorId = input.kolektorId;
     if (input.tanggalTagihan) updateData.tanggalTagihan = input.tanggalTagihan;
-    const result = await prisma.distribusiPembayaran.update({
+    const result = await prisma.penagihan.update({
       where: {
-        id: input.distribusiPembayaranId,
+        id: input.penagihanId
       },
       data: updateData,
     });

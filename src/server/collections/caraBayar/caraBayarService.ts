@@ -1,17 +1,72 @@
 import { Prisma } from "@server/../generated/client";
 import { prisma } from "@server/prisma";
 import {
-  createGiroInput,
-  createTransferInput,
   TCreateCaraBayarInput,
-  TCreateGiroInput,
-  TCreateTransferInput,
   TUpdateCaraBayarInput,
 } from "./caraBayarSchema";
 
 export class CaraBayarService {
   static async getCaraBayar() {
-    const result = await prisma.caraBayar.findMany();
+    const result = await prisma.caraBayar.findMany({
+      include : {
+        metode : true,
+        giro : true,
+        transfer : true,
+        distribusiPembayaran : {
+          include : {
+            penagihan : {
+              include : {
+                invoice : {
+                  include : {
+                  customer : true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const resultParse = result.map(r => {
+      let detail
+
+      if(r.giro) detail = {
+        bank: r.giro.bank,
+        nomor: r.giro.nomor,
+        jatuhTempo: r.giro.jatuhTempo
+      }
+
+      if(r.transfer) detail = {
+        bank: r.transfer.bank
+      }
+
+      return {
+        id: r.id,
+        metodePembayaran: r.metode.jenis,
+        total: r.total,
+        tandaTerima: r.tandaTerima,
+        namaCustomer : r.distribusiPembayaran[0].penagihan.invoice.customer.nama,
+        customerId : r.distribusiPembayaran[0].penagihan.invoice.customer.id,
+        tanggalPembayaran : r.tanggal,
+        detailPembayaran: detail,
+        jumlahDistribusi: r.distribusiPembayaran.length
+      }
+    })
+    return resultParse;
+  }
+ 
+  static async getTransfer() {
+    const result = await prisma.transfer.findMany({
+      include : {
+        caraBayar : {
+          include : {
+            distribusiPembayaran : true
+          }
+        }
+      }
+    });
+
     return result;
   }
 
@@ -19,17 +74,18 @@ export class CaraBayarService {
     let newCaraBayar: Prisma.CaraBayarUncheckedCreateInput = {
       total: input.total,
       tandaTerima: input.tandaTerima,
+      tanggal : input.tanggal,
       metodePembayaranId: 1,
     };
 
-    if (createGiroInput.safeParse(input.pembayaran).success) {
+    if (input.pembayaran.giro) {
       newCaraBayar.giro = {
-        create: input.pembayaran as TCreateGiroInput,
+        create: input.pembayaran.giro,
       };
       newCaraBayar.metodePembayaranId = 2;
-    } else if (createTransferInput.safeParse(input.pembayaran).success) {
+    } else if (input.pembayaran.transfer) {
       newCaraBayar.transfer = {
-        create: input.pembayaran as TCreateTransferInput,
+        create: input.pembayaran.transfer,
       };
       newCaraBayar.metodePembayaranId = 3;
     }
@@ -42,13 +98,26 @@ export class CaraBayarService {
   }
 
   static async deleteCaraBayar(id: string) {
-    const result = await prisma.caraBayar.delete({
-      where: {
-        id,
-      },
-    });
+    const result = await prisma.$transaction(async (ctx) => {
+      const result = await ctx.distribusiPembayaran.deleteMany({
+        where : {
+          caraBayarId : id
+        }
+      })
 
-    return result;
+      await ctx.caraBayar.delete({
+        where : {
+          id : id
+        }
+      })
+
+
+      return result
+    })
+
+    return {
+      distribusi : result
+    };
   }
 
   static async updateCaraBayar(input: TUpdateCaraBayarInput) {
@@ -62,14 +131,14 @@ export class CaraBayarService {
     }
 
     if (input.pembayaran) {
-      if (createGiroInput.safeParse(input.pembayaran).success) {
+      if (input.pembayaran.giro) {
         updateCaraBayar.giro = {
-          create: input.pembayaran as TCreateGiroInput,
+          create: input.pembayaran.giro,
         };
         updateCaraBayar.metodePembayaranId = 2;
-      } else if (createTransferInput.safeParse(input.pembayaran).success) {
+      } else if (input.pembayaran.transfer) {
         updateCaraBayar.transfer = {
-          create: input.pembayaran as TCreateTransferInput,
+          create: input.pembayaran.transfer,
         };
         updateCaraBayar.metodePembayaranId = 3;
       }

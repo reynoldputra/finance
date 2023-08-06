@@ -8,6 +8,7 @@ export const invoiceSchema = z.object({
     tanggalTransaksi: z.date(),
     namaSales: z.string(),
     namaCustomer: z.string(),
+    customerId : z.string(),
     status: z.string()
 })
 

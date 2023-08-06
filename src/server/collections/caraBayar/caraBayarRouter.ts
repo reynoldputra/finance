@@ -14,6 +14,7 @@ export const CarabayarRouter = carabayarTrpc.router({
         data: res,
       };
     } catch (err) {
+      console.log(err)
       return {
         status: false,
       };

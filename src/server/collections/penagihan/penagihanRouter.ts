@@ -24,10 +24,9 @@ export const PenagihanRouter = penagihanTrpc.router({
       };
     }
   }),
-  
-  getPenagihanByCarabayar: penagihanTrpc.publicProcedure.input(z.string()).query(async ({input}) => {
+  getPenagihanById: penagihanTrpc.publicProcedure.input(z.string()).query(async ({ input }) => {
     try {
-      const res = await PenagihanService.getPenagihanByCarabayar(input);
+      const res = await PenagihanService.getPenagihan(input);
       return {
         status: true,
         data: res,
@@ -38,6 +37,34 @@ export const PenagihanRouter = penagihanTrpc.router({
       };
     }
   }),
+  getPenagihanSisa: penagihanTrpc.publicProcedure.query(async () => {
+    try {
+      const res = await PenagihanService.getPenagihanSisa();
+      return {
+        status: true,
+        data: res,
+      };
+    } catch (err) {
+      return {
+        status: false,
+      };
+    }
+  }),
+  getPenagihanByCarabayar: penagihanTrpc.publicProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      try {
+        const res = await PenagihanService.getPenagihanByCarabayar(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
 
   createPenagihan: penagihanTrpc.publicProcedure
     .input(createPenagihanInput)

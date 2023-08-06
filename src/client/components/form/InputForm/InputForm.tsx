@@ -7,6 +7,7 @@ interface CustomFormFieldProps {
   name: string;
   title: string;
   description?: string;
+  placeholder?: string;
   errorMessage?: string;
   type: "text" | "number" | "combobox" | "datepicker";
   disabled?: boolean;
@@ -21,14 +22,17 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
   disabled = false,
   type,
   options,
+  placeholder
 }) => {
   if (type === "number" || type === "text") {
     return (
       <DefaultInput
+        placeholder={placeholder}
         name={name}
         title={title}
         description={description}
         errorMessage={errorMessage}
+        disabled={disabled}
         type={type}
       />
     );

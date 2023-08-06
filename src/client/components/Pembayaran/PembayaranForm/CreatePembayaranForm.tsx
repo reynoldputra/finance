@@ -18,9 +18,21 @@ import { RadioGroup, RadioGroupItem } from "@client/components/ui/radio-group";
 import { Label } from "@client/components/ui/label";
 import { PlusIcon, Trash } from "lucide-react";
 import { idr } from "@client/lib/idr";
+import DefaultInput from "@client/components/form/InputForm/inputs/DefaultInput";
 
 interface ModalFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+interface ISisaPenagihan {
+  sisa: number;
+  penagihanId: string;
+}
+
+interface IDistribusi {
+  penagihanId: string;
+  total: number;
+  sisa: number;
 }
 
 export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
@@ -30,6 +42,8 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
   const [metode, setMetode] = useState(1);
   const [totalCarabayar, setTotalcarabayar] = useState(0);
   const [totalDistribusi, setTotalDistirbusi] = useState(0);
+  const [sisa, setSisa] = useState<ISisaPenagihan[]>([]);
+  const [distribusi, setDistribusi] = useState<IDistribusi[]>([]);
 
   const penagihan = trpc.penagihan.getAllPenagihan.useQuery();
   const penagihanData = penagihan.data?.data ?? [];
@@ -41,8 +55,12 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
     };
   });
 
+  const sisaQuery = trpc.penagihan.getPenagihanSisa.useQuery();
+  const sisaData = sisaQuery.data?.data ?? [];
+
   useEffect(() => {
     setPenagihanOption(penagihanItems);
+    setSisa(sisaData);
   }, []);
 
   const form = useForm<TCreatePembayaranInput>({
@@ -51,6 +69,7 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
       distribusi: [{ penagihanId: "", total: 0 }],
       carabayar: {
         pembayaran: {},
+        tanggal : new Date()
       },
     },
   });
@@ -84,12 +103,13 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
     try {
       console.log(values);
       const { data } = await createPembayaranMutation.mutateAsync(values);
-      if (data) {
+      if (data?.distribusiHasil && data?.distribusiHasil.length > 0) {
         toast({
-          description: `${data.terbayar} invoice terbayar`,
+          description: `${data.distribusiHasil.length} invoice terbayar`,
         });
         setOpen(false);
         utils.carabayar.invalidate();
+        utils.penagihan.invalidate();
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
@@ -117,15 +137,29 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
     const subscription = form.watch((value) => {
       if (value.carabayar?.total) setTotalcarabayar(value.carabayar?.total);
       if (value.distribusi) {
+        const dist = value.distribusi.map((d) => {
+          const penagihan = penagihanData.find((p) => p.id == d?.penagihanId)
+          const sisa = penagihan ? penagihan.sisa : 0
+          return {
+            penagihanId: d?.penagihanId ?? "",
+            total: d?.total ?? 0,
+            sisa : sisa ?? 0
+          };
+        });
+        console.log(dist)
+        if (dist) setDistribusi(dist);
         let totaldist = 0;
         for (let idx in value.distribusi) {
           let valnumber = value.distribusi[idx]?.total ?? 0;
           let valstr = valnumber.toString();
           totaldist += parseInt(valstr);
         }
-        setTotalDistirbusi(totaldist);
+        console.log(distribusi);
+        setTotalDistirbusi(totaldist)
       }
     });
+
+
 
     return () => subscription.unsubscribe();
   }, [watchFIelds]);
@@ -185,35 +219,48 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
         <div>
           <p className="text-sm font-bold">Distribusi</p>
           {distribusiFields.map((field, idx) => (
-            <div className="flex gap-4 border-t-2 mt-2 items-end">
-              <InputForm
-                {...register(`distribusi.${idx}.penagihanId`)}
-                type="combobox"
-                title="Penagihan"
-                options={(() => {
-                  if (penagihanOption) {
-                    const result = penagihanOption.filter((p) => {
-                      return (
-                        !form.getValues("distribusi").find((d) => d.penagihanId == p.value) ||
-                        p.value == form.getValues(`distribusi.${idx}.penagihanId`)
-                      );
-                    });
-                    return result;
-                  } else {
-                    return [];
-                  }
-                })()}
-              />
-              <InputForm {...register(`distribusi.${idx}.total`)} type="number" title="Jumlah" />
-              <Button
-                className={idx == 0 ? "invisible" : ""}
-                variant="outline"
-                onClick={() => {
-                  if (idx) remove(idx);
-                }}
-              >
-                <Trash />
-              </Button>
+            <div>
+              <div className="flex gap-4 border-t-2 mt-2 pt-2 items-end">
+                <InputForm
+                  {...register(`distribusi.${idx}.penagihanId`)}
+                  type="combobox"
+                  title="Penagihan"
+                  options={(() => {
+                    if (penagihanOption) {
+                      const result = penagihanOption.filter((p) => {
+                        return (
+                          !form.getValues("distribusi").find((d) => d.penagihanId == p.value) ||
+                          p.value == form.getValues(`distribusi.${idx}.penagihanId`)
+                        );
+                      });
+                      return result;
+                    } else {
+                      return [];
+                    }
+                  })()}
+                />
+                <DefaultInput
+                  {...register(`distribusi.${idx}.total`)}
+                  type="number"
+                  title={"Jumlah" + ((distribusi[idx] && distribusi[idx].sisa) ? ` (max ${idr(distribusi[idx].sisa)})` : "")}
+                />
+                <Button
+                  className={idx == 0 ? "invisible" : ""}
+                  variant="outline"
+                  onClick={() => {
+                    if (idx) remove(idx);
+                  }}
+                >
+                  <Trash />
+                </Button>
+              </div>
+              {distribusi[idx]?.penagihanId &&
+                distribusi[idx].total > distribusi[idx].sisa && (
+                  <p className="text-sm text-red-400 mt-1">
+                    Error : total distribusi melebihi sisa pembayaran{" "}
+                    {idr(distribusi[idx].sisa)}
+                  </p>
+                )}
             </div>
           ))}
           <Button className="mt-2" variant="outline" onClick={() => addDistribusiField()}>

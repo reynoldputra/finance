@@ -29,10 +29,17 @@ export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
       if (data) {
         toast({
           description: `Customer ${data.nama} successfully deleted`,
+          variant: "success",
+          className: "text-white text-base font-semibold"
         });
       }
     } catch (error) {
       console.log(error);
+      toast({
+        description: `Failed to delete customer, please try again`,
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
     }
   }
   return (
@@ -46,17 +53,21 @@ export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
             <span className="font-bold text-xl">Are you sure ?</span>
             <span className=" text-base mt-3">
               This action
-              <span className="text-base font-semibold"> CANNOT</span> be undone.
-              This will permanently delete the
-              <span className="font-semibold">"{row.original.nama}"</span>
+              <span className="text-base font-semibold"> CANNOT</span> be
+              undone. This will permanently delete the
+              <span className="font-semibold"> "{row.original.nama}" </span>
               customer.
             </span>
           </div>
           <div className="flex flex-col text-lg mt-2">
             <span className=" text-base font-semibold">
-              Please type "CONFIRM DELETE" to confirm the delete.
+              Please type Customer's name "{row.original.nama}" to confirm the
+              delete.
             </span>
-            <ConfirmDeleteForm handleDelete={handleDelete} />
+            <ConfirmDeleteForm
+              handleDelete={handleDelete}
+              currName={row.original.nama}
+            />
           </div>
         </div>
       </ModalDropdownItem>

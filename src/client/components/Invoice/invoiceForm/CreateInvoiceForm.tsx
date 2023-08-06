@@ -36,12 +36,19 @@ export function CreateInvoiceForm({ setOpen }: CreateInvoiceFormProps) {
       if (data) {
         toast({
           description: `Invoice ${data.id} successfully created`,
+          variant: "success",
+          className: "text-white text-base font-semibold"
         });
         setOpen(false);
         utils.invoice.invalidate()
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
+      toast({
+        description: `Failed to create invoice, please try again`,
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
     }
   }
 

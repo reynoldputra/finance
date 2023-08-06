@@ -7,7 +7,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <div className="flex flex-row min-h-screen w-full max-h-full bg-normalBlue bg-opacity-10">
       <Sidebar />
       <Toaster />
-      <main className="w-11/12 h-full">{children}</main>
+      <main className="w-[93.4%] h-ful overflow-hidden">{children}</main>
     </div>
   );
 }

@@ -20,7 +20,9 @@ interface CreateCustomerFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function CreateCustomerForm({ setOpen }: CreateCustomerFormProps) {
+export default function CreateCustomerForm({
+  setOpen,
+}: CreateCustomerFormProps) {
   const { toast } = useToast();
 
   const form = useForm<TCreateCustomerInput>({
@@ -56,10 +58,17 @@ export default function CreateCustomerForm({ setOpen }: CreateCustomerFormProps)
         setOpen(false);
         toast({
           description: `Customer ${data.nama} successfully created`,
+          variant: "success",
+          className: "text-white text-base font-semibold"
         });
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
+      toast({
+        description: `Failed to create customer, please try again`,
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
     }
   }
 

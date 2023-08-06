@@ -6,19 +6,21 @@ const Sidebar = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex">
+    <div className="flex relative">
+      <ChevronLeft
+        className={`absolute cursor-pointer -right-4 top-16 w-7 h-7 z-50
+           border-2 rounded-full bg-white ${!open && "rotate-180"}`}
+        onClick={() => setOpen(!open)}
+      />
       <div
         className={` ${
           open ? "w-64" : "w-28 "
-        } bg-white min-h-screen max-h-full p-5 z-50 pt-8 relative duration-300 border-r-2`}
+        } bg-white min-h-screen max-h-full p-5 z-40 pt-8 relative duration-500 overflow-hidden border-r-2`}
       >
-        <ChevronLeft
-          className={`absolute cursor-pointer -right-4 top-16 w-7 h-7
-           border-2 rounded-full bg-white ${!open && "rotate-180"}`}
-          onClick={() => setOpen(!open)}
-        />
         <div
-          className={`flex gap-x-4 ${open ? "pl-1" : "justify-center pl-0"} items-center`}
+          className={`flex gap-x-4 ${
+            open ? "pl-1" : "justify-center pl-0"
+          } items-center`}
         >
           <CircleDollarSign
             className={`cursor-pointer duration-500 text-darkBlue w-9 h-9 ${

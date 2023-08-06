@@ -44,10 +44,17 @@ export default function EditKolektorForm({ kolektorData }: EditKolektorProps) {
       if (data) {
         toast({
           description: `Kolektor ${data.nama} successfully edited`,
+          variant: "success",
+          className: "text-white text-base font-semibold"
         });
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
+      toast({
+        description: `Failed to update kolektor, please try again`,
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
     }
   }
 

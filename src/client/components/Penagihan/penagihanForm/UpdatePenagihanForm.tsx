@@ -57,6 +57,8 @@ export function UpdatePenagihanForm({ setOpen, row }: UpdatePenagihanFormProps) 
       if (data) {
         toast({
           description: `Penagihan successfully updated`,
+          variant: "success",
+          className: "text-white text-base font-semibold"
         });
         setOpen(false);
         utils.penagihan.invalidate();

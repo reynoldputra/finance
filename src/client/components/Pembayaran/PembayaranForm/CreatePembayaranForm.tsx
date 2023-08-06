@@ -86,12 +86,19 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
       if (data) {
         toast({
           description: `${data.terbayar} invoice terbayar`,
+          variant: "success",
+          className: "text-white text-base font-semibold"
         });
         setOpen(false);
         utils.carabayar.invalidate();
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
+      toast({
+        description: `Failed to create pembayaran, please try again`,
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
     }
   }
 

@@ -59,12 +59,19 @@ export function CreatePenagihanForm({ setOpen }: CreatePenagihanFormProps) {
       if (data) {
         toast({
           description: `Penagihan successfully created`,
+          variant: "success",
+          className: "text-white text-base font-semibold"
         });
         setOpen(false);
         utils.penagihan.invalidate();
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
+      toast({
+        description: `Failed to create penagihan, please try again`,
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
     }
   }
 

@@ -32,12 +32,20 @@ export const PenagihanColumn : ColumnDef<TPenagihanTable>[] = [
     id : "Id Transaksi",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Id Transaksi" />,
     cell: ({ row }) => <div className="w-[180px]">{row.getValue("Id Transaksi")}</div>,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+
   },
   {
     accessorKey: "namaKolektor",
     id : "Nama Kolektor",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Nama Kolektor" />,
     cell: ({ row }) => <div className="w-[180px]">{row.getValue("Nama Kolektor")}</div>,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+
   },
   {
     accessorKey: "tanggalTagihan",
@@ -50,12 +58,19 @@ export const PenagihanColumn : ColumnDef<TPenagihanTable>[] = [
     id : "Nama Customer",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Nama Customer" />,
     cell: ({ row }) => <div className="w-[180px]">{row.getValue("Nama Customer")}</div>,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+
   },
   {
     accessorKey: "status",
-    id : "status",
+    id : "Status",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Status" />,
-    cell: ({ row }) => <div className="w-[180px]">{row.getValue("status")}</div>,
+    cell: ({ row }) => <div className="w-[180px]">{row.getValue("Status")}</div>,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "sisa",

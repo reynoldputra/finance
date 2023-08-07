@@ -1,92 +1,89 @@
-import { Column, Table } from "@tanstack/react-table"
-import * as React from "react"
-import { Input } from "@client/components/ui/input"
-import { Combobox } from "../form/Combobox"
-import { ComboboxItem } from "@client/types/form/ComboboxItem"
+import { Column, Table } from "@tanstack/react-table";
+import * as React from "react";
+import { Input } from "@client/components/ui/input";
+import DataTableMultiFilter from "./DataTableMultiFilter";
 
 export default function DataTableFilter({
   column,
   table,
 }: {
-  column: Column<any, unknown>
-  table: Table<any>
+  column: Column<any, unknown>;
+  table: Table<any>;
 }) {
   const firstValue = table
     .getPreFilteredRowModel()
-    .flatRows[0]?.getValue(column.id)
+    .flatRows[0]?.getValue(column.id);
 
-  const columnFilterValue = column.getFilterValue()
+  const columnFilterValue = column.getFilterValue();
 
   const sortedUniqueValues = React.useMemo(
     () =>
-      typeof firstValue === 'number'
+      typeof firstValue === "number"
         ? []
         : Array.from(column.getFacetedUniqueValues().keys()).sort(),
     [column.getFacetedUniqueValues()]
-  )
+  );
 
-  const comboboxItems : ComboboxItem[] = sortedUniqueValues.map((s) => {
+  interface optionsMultiFilter {
+    label: string;
+    value: string;
+  }
+
+  const items: optionsMultiFilter[] = sortedUniqueValues.map((s) => {
     return {
-      title : s,
-      value : s
-    }
-  })
+      label: s,
+      value: s,
+    };
+  });
 
-  return typeof firstValue === 'number' ? (
-    <div>
+  return typeof firstValue === "number" ? (
+    <>
       <div className="flex space-x-2">
         <DebouncedInput
           type="number"
-          min={Number(column.getFacetedMinMaxValues()?.[0] ?? '')}
-          max={Number(column.getFacetedMinMaxValues()?.[1] ?? '')}
-          value={(columnFilterValue as [number, number])?.[0] ?? ''}
-          onChange={value =>
+          min={Number(column.getFacetedMinMaxValues()?.[0] ?? "")}
+          max={Number(column.getFacetedMinMaxValues()?.[1] ?? "")}
+          value={(columnFilterValue as [number, number])?.[0] ?? ""}
+          onChange={(value) =>
             column.setFilterValue((old: [number, number]) => [value, old?.[1]])
           }
           placeholder={`Min ${
             column.getFacetedMinMaxValues()?.[0]
               ? `(${column.getFacetedMinMaxValues()?.[0]})`
-              : ''
+              : ""
           }`}
           className="w-24 border shadow rounded"
         />
         <DebouncedInput
           type="number"
-          min={Number(column.getFacetedMinMaxValues()?.[0] ?? '')}
-          max={Number(column.getFacetedMinMaxValues()?.[1] ?? '')}
-          value={(columnFilterValue as [number, number])?.[1] ?? ''}
-          onChange={value =>
+          min={Number(column.getFacetedMinMaxValues()?.[0] ?? "")}
+          max={Number(column.getFacetedMinMaxValues()?.[1] ?? "")}
+          value={(columnFilterValue as [number, number])?.[1] ?? ""}
+          onChange={(value) =>
             column.setFilterValue((old: [number, number]) => [old?.[0], value])
           }
           placeholder={`Max ${
             column.getFacetedMinMaxValues()?.[1]
               ? `(${column.getFacetedMinMaxValues()?.[1]})`
-              : ''
+              : ""
           }`}
           className="w-24 border shadow rounded"
         />
       </div>
       <div className="h-1" />
-    </div>
-  ) : (
-    <>
-      {/* <datalist className="max-h-48 overflow-hidden" id={column.id + 'list'}> */}
-      {/*   {sortedUniqueValues.slice(0, 5000).map((value: any) => ( */}
-      {/*     <option value={value} key={value} /> */}
-      {/*   ))} */}
-      {/* </datalist> */}
-      {/* <DebouncedInput */}
-      {/*   type="text" */}
-      {/*   value={(columnFilterValue ?? '') as string} */}
-      {/*   onChange={value => column.setFilterValue(value)} */}
-      {/*   placeholder={`Search... (${column.getFacetedUniqueValues().size})`} */}
-      {/*   className="w-full border shadow rounded" */}
-      {/*   list={column.id + 'list'} */}
-      {/* /> */}
-      {/* <div className="h-1" /> */}
-      <Combobox items={comboboxItems} placeholder={`Search... (${column.getFacetedUniqueValues().size})`} onChange={value => column.setFilterValue(value)}  />
     </>
-  )
+  ) : typeof firstValue === "string" ? (
+    <>
+      <DataTableMultiFilter
+        columnId={column.id}
+        table={table}
+        options={items}
+      />
+    </>
+  ) : (
+    // date
+    <div></div>
+  );
 }
 
 // A debounced input react component
@@ -96,25 +93,29 @@ function DebouncedInput({
   debounce = 500,
   ...props
 }: {
-  value: string | number
-  onChange: (value: string | number) => void
-  debounce?: number
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>) {
-  const [value, setValue] = React.useState(initialValue)
+  value: string | number;
+  onChange: (value: string | number) => void;
+  debounce?: number;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">) {
+  const [value, setValue] = React.useState(initialValue);
 
   React.useEffect(() => {
-    setValue(initialValue)
-  }, [initialValue])
+    setValue(initialValue);
+  }, [initialValue]);
 
   React.useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(value)
-    }, debounce)
+      onChange(value);
+    }, debounce);
 
-    return () => clearTimeout(timeout)
-  }, [value])
+    return () => clearTimeout(timeout);
+  }, [value]);
 
   return (
-    <Input {...props} value={value} onChange={e => setValue(e.target.value)} />
-  )
+    <Input
+      {...props}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+    />
+  );
 }

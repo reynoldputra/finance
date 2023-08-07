@@ -8,6 +8,7 @@ import { toast } from "@client/components/ui/use-toast";
 import { trpc } from "@client/lib/trpc";
 import { TPenagihanTable } from "./data/schema";
 import { UpdatePenagihanForm } from "../penagihanForm/UpdatePenagihanForm";
+import DetailPenagihan from "./DetailPenagihan";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
@@ -39,6 +40,9 @@ export function RowAction({ row }: RowActionsProps<TPenagihanTable>) {
       <DataTableRowActions>
         <ModalDropdownItem triggerChildren="Edit" open={openEdit} onOpenChange={setOpenEdit}>
           <UpdatePenagihanForm setOpen={setOpenEdit} row={row} />
+        </ModalDropdownItem>
+        <ModalDropdownItem triggerChildren="Detail Pembayaran" modalTitle="Detail Pembayaran">
+          <DetailPenagihan penagihanId={row.original.id} />
         </ModalDropdownItem>
         <ModalDropdownItem triggerChildren="Delete">
           <p>Are you sure want to delete this item ?</p>

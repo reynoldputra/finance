@@ -25,10 +25,22 @@ export class PembayaranService {
     return result;
   }
 
+  static async getPembayaranLama(carabayarId: string) {
+    const result = await prisma.caraBayar.findFirst({
+      where: {
+        id: carabayarId,
+      },
+      include: {
+        distribusiPembayaran : true
+      },
+    });
+
+    return result;
+  }
+
   static async createPembayaran(input: TCreatePembayaranInput) {
     const result = await prisma.$transaction(async (ctx) => {
       const carabayar = await CaraBayarService.createCaraBayar(input.carabayar)
-
 
       let distribusiHasil : DistribusiPembayaran[] = []
 
@@ -67,61 +79,36 @@ export class PembayaranService {
 
   static async updatePembayaran(input: TUpdatePembayaranInput) {
     const result = await prisma.$transaction(async (ctx) => {
-      let carabayarBaru: TCaraBayarLama[] = [];
-      if (input.caraBayarBaru) {
-        for (let idx in input.caraBayarBaru) {
-          let inputCaraBayar = input.caraBayarBaru[idx];
-          const carabayar = await CaraBayarService.createCaraBayar(inputCaraBayar);
-          carabayarBaru.push({
-            id: carabayar.id,
-            totalDistribusi: inputCaraBayar.totalDistribusi,
-          });
-        }
-      }
+      await CaraBayarService.deleteCaraBayar(input.carabayar.id)
+      const carabayar = await CaraBayarService.createCaraBayar(input.carabayar)
+      let distribusiHasil : DistribusiPembayaran[] = []
 
-      await ctx.distribusiPembayaran.deleteMany({
-        where: {
-          penagihanId: input.penagihanId,
-        },
-      });
+      for(let idx in input.distribusi) {
+        const distribusi = input.distribusi[idx]
+        const detailPenagihan = await PenagihanService.getPenagihan(distribusi.penagihanId);
+        const invoice = await InvoiceService.getInvoice(detailPenagihan.invoiceId);
 
-      if (input.caraBayarLama) carabayarBaru.concat(input.caraBayarLama);
+        const distribusiPembayaran = await ctx.distribusiPembayaran.create({
+          data : {
+            caraBayarId : carabayar.id,
+            penagihanId : distribusi.penagihanId,
+            jumlah : distribusi.total
+          }
+        })
 
-      const totalPembayaranPenagihan = carabayarBaru.reduce((tot, cur) => {
-        return (tot += cur.totalDistribusi);
-      }, 0);
+        distribusiHasil.push(distribusiPembayaran)
 
-      const detailPenagihan = await PenagihanService.getPenagihan(input.penagihanId);
-      const invoice = await InvoiceService.getInvoice(detailPenagihan.invoiceId);
-
-      let statusPenagihan = "";
-
-      if (invoice.sisa > totalPembayaranPenagihan) {
-        statusPenagihan = "CICILAN";
-      } else if (totalPembayaranPenagihan > 0) {
-        statusPenagihan = "LUNAS";
-      } else {
-        statusPenagihan = "NIHIL";
-      }
-
-      const distribusiPembayaran = await ctx.penagihan.update({
-        where: {
-          id: input.penagihanId,
-        },
-        data: {
-          distribusiPembayaran: {
-            create: carabayarBaru.map((c) => {
-              return {
-                jumlah: c.totalDistribusi,
-                caraBayarId: c.id,
-              };
-            }),
+        await ctx.penagihan.update({
+          where : {
+            id : distribusiPembayaran.penagihanId,
           },
-          status: statusPenagihan,
-        },
-      });
+          data : {
+            status : distribusiPembayaran.jumlah <= invoice.sisa ? "CICILAN" : "LUNAS"
+          }
+        })
+      }
 
-      return distribusiPembayaran;
+      return distribusiHasil;
     });
 
     return result;

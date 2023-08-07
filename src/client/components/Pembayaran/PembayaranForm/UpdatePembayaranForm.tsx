@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { FieldValue, useFieldArray, useForm } from "react-hook-form";
 import { Form } from "@client/components/ui/form";
 import { Button } from "@client/components/ui/button";
 import InputForm from "../../form/InputForm/InputForm";
@@ -10,6 +10,8 @@ import { ComboboxItem } from "@client/types/form/ComboboxItem";
 import {
   createPembayaranWithCarabayarInput,
   TCreatePembayaranInput,
+  TUpdatePembayaranInput,
+  updatePemabayaranWithCarabayarInput,
 } from "@client/../server/collections/pembayaran/pembayaranSchema";
 import { useEffect, useState } from "react";
 import { dmyDate } from "@client/lib/dmyDate";
@@ -44,12 +46,21 @@ export function UpdatePembayaran({ setOpen, row }: ModalFormProps) {
     };
   });
 
+
+  let initVal : FieldValue<TUpdatePembayaranInput> = {
+  }
+
+  const pembayaranLama = trpc.pembayaran.getPembayaranLama.useQuery(row.original.id)
+  if(pembayaranLama.data?.data) {
+    const dataPembayaraLama = pembayaranLama.data.data
+  }
+
   useEffect(() => {
     setPenagihanOption(penagihanItems);
   }, []);
 
-  const form = useForm<TCreatePembayaranInput>({
-    resolver: zodResolver(createPembayaranWithCarabayarInput),
+  const form = useForm<TUpdatePembayaranInput>({
+    resolver: zodResolver(updatePemabayaranWithCarabayarInput),
     defaultValues: {
       distribusi: [{ penagihanId: "", total: 0 }],
       carabayar: {
@@ -87,9 +98,9 @@ export function UpdatePembayaran({ setOpen, row }: ModalFormProps) {
     try {
       console.log(values);
       const { data } = await createPembayaranMutation.mutateAsync(values);
-      if (data) {
+      if (data?.distribusiHasil.length) {
         toast({
-          description: `${data.terbayar} invoice terbayar`,
+          description: `${data.distribusiHasil.length} invoice terbayar`,
         });
         setOpen(false);
         utils.carabayar.invalidate();

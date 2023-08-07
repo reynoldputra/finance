@@ -22,8 +22,9 @@ export const createCaraBayarInput = z.object({
 
 export const updateCaraBayarInput = z.object({
   id: z.string(),
-  total: z.number().optional(),
-  tandaTerima: z.boolean().optional(),
+  total: z.number(),
+  tandaTerima: z.boolean(),
+  tanggal : z.date(),
   pembayaran: z.object({
     giro: createGiroInput.optional(),
     transfer: createTransferInput.optional(),

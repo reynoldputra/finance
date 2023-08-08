@@ -9,24 +9,22 @@ import {
 import { useFormContext } from "react-hook-form";
 import { Input } from "@client/components/ui/input";
 
-interface DefaultInputProps {
-  name: string;
+interface DefaultInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   title: string;
   description?: string;
-  placeholder?: string;
-  disabled?: boolean
   errorMessage?: string;
-  type: "text" | "number" | "combobox" | "datepicker";
+  name : string
 }
 
-const DefaultInput: React.FC<DefaultInputProps> = ({
-  name,
+const GeneralInput: React.FC<DefaultInputProps> = ({
   title,
   description,
   errorMessage,
+  name,
   disabled,
   type,
-  placeholder
+  placeholder,
+  ...rest
 }) => {
   const form = useFormContext();
   return (
@@ -41,9 +39,10 @@ const DefaultInput: React.FC<DefaultInputProps> = ({
               disabled={disabled}
               type={type}
               placeholder={placeholder}
-              value={field.value ?? ""}
               onChange={(e) => field.onChange(e.target.value)}
               onBlur={field.onBlur}
+              value={field.value ?? ""}
+              {...rest}
             />
           </FormControl>
           {description && <FormDescription className="text-base">{description}</FormDescription>}
@@ -54,4 +53,4 @@ const DefaultInput: React.FC<DefaultInputProps> = ({
   );
 };
 
-export default DefaultInput;
+export default GeneralInput;

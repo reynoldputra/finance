@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createCaraBayarInput } from "../caraBayar/caraBayarSchema";
+import { createCaraBayarInput, updateCaraBayarInput } from "../caraBayar/caraBayarSchema";
 
 export const caraBayarLama = z.object({
   id: z.string(),
@@ -16,18 +16,11 @@ export const createPembayaranWithCarabayarInput = z.object({
   distribusi : z.array(distribusiPembayaran)
 });
 
-export const updatePemabayaranInput = z.object({
-  penagihanId: z.string(),
-  caraBayarBaru: z
-    .array(
-      createCaraBayarInput.extend({
-        totalDistribusi: z.number(),
-      })
-    )
-    .optional(),
-  caraBayarLama: z.array(caraBayarLama).optional()
+export const updatePemabayaranWithCarabayarInput = z.object({
+  carabayar : updateCaraBayarInput,
+  distribusi : z.array(distribusiPembayaran)
 });
 
 export type TCreatePembayaranInput = z.infer<typeof createPembayaranWithCarabayarInput>;
 export type TCaraBayarLama = z.infer<typeof caraBayarLama>;
-export type TUpdatePembayaranInput = z.infer<typeof updatePemabayaranInput>;
+export type TUpdatePembayaranInput = z.infer<typeof updatePemabayaranWithCarabayarInput>;

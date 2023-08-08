@@ -7,6 +7,7 @@ import { trpc } from "@client/lib/trpc";
 import { TPenagihanTable } from "./data/schema";
 import { UpdatePenagihanForm } from "../penagihanForm/UpdatePenagihanForm";
 import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
+import DetailPenagihan from "./DetailPenagihan";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
@@ -42,6 +43,9 @@ export function RowAction({ row }: RowActionsProps<TPenagihanTable>) {
       <DataTableRowActions>
         <ModalDropdownItem triggerChildren="Edit" open={openEdit} onOpenChange={setOpenEdit}>
           <UpdatePenagihanForm setOpen={setOpenEdit} row={row} />
+        </ModalDropdownItem>
+        <ModalDropdownItem triggerChildren="Detail Pembayaran" modalTitle="Detail Pembayaran">
+          <DetailPenagihan penagihanId={row.original.id} />
         </ModalDropdownItem>
         <ModalDropdownItem triggerChildren="Delete">
         <div className="flex flex-col w-full h-full">

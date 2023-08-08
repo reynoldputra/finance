@@ -14,19 +14,7 @@ export const CarabayarRouter = carabayarTrpc.router({
         data: res,
       };
     } catch (err) {
-      return {
-        status: false,
-      };
-    }
-  }),
-  getTransfers: carabayarTrpc.publicProcedure.query(async () => {
-    try {
-      const res = await CaraBayarService.getTransfer();
-      return {
-        status: true,
-        data: res,
-      };
-    } catch (err) {
+      console.log(err)
       return {
         status: false,
       };

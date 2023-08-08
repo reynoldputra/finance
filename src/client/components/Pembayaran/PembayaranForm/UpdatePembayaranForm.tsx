@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { FieldValue, useFieldArray, useForm } from "react-hook-form";
 import { Form } from "@client/components/ui/form";
 import { Button } from "@client/components/ui/button";
 import InputForm from "../../form/InputForm/InputForm";
@@ -10,6 +10,8 @@ import { ComboboxItem } from "@client/types/form/ComboboxItem";
 import {
   createPembayaranWithCarabayarInput,
   TCreatePembayaranInput,
+  TUpdatePembayaranInput,
+  updatePemabayaranWithCarabayarInput,
 } from "@client/../server/collections/pembayaran/pembayaranSchema";
 import { useEffect, useState } from "react";
 import { dmyDate } from "@client/lib/dmyDate";
@@ -18,31 +20,21 @@ import { RadioGroup, RadioGroupItem } from "@client/components/ui/radio-group";
 import { Label } from "@client/components/ui/label";
 import { PlusIcon, Trash } from "lucide-react";
 import { idr } from "@client/lib/idr";
-import DefaultInput from "@client/components/form/InputForm/inputs/DefaultInput";
+import { Row } from "@tanstack/react-table";
+import { TPembayaranSchema } from "../PembayaranTable/data/schema";
 
 interface ModalFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  row : Row<TPembayaranSchema>
 }
 
-interface ISisaPenagihan {
-  sisa: number;
-  penagihanId: string;
-}
-
-interface IDistribusi {
-  penagihanId: string;
-  total: number;
-  sisa: number;
-}
-
-export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
+export function UpdatePembayaran({ setOpen, row }: ModalFormProps) {
   const { toast } = useToast();
   const [penagihanOption, setPenagihanOption] = useState<ComboboxItem[]>();
   const [currCust, setCurrentCust] = useState("");
   const [metode, setMetode] = useState(1);
   const [totalCarabayar, setTotalcarabayar] = useState(0);
   const [totalDistribusi, setTotalDistirbusi] = useState(0);
-  const [distribusi, setDistribusi] = useState<IDistribusi[]>([]);
 
   const penagihan = trpc.penagihan.getAllPenagihan.useQuery();
   const penagihanData = penagihan.data?.data ?? [];
@@ -54,20 +46,25 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
     };
   });
 
-  const sisaQuery = trpc.penagihan.getPenagihanSisa.useQuery();
-  const sisaData = sisaQuery.data?.data ?? [];
+
+  let initVal : FieldValue<TUpdatePembayaranInput> = {
+  }
+
+  const pembayaranLama = trpc.pembayaran.getPembayaranLama.useQuery(row.original.id)
+  if(pembayaranLama.data?.data) {
+    const dataPembayaraLama = pembayaranLama.data.data
+  }
 
   useEffect(() => {
     setPenagihanOption(penagihanItems);
   }, []);
 
-  const form = useForm<TCreatePembayaranInput>({
-    resolver: zodResolver(createPembayaranWithCarabayarInput),
+  const form = useForm<TUpdatePembayaranInput>({
+    resolver: zodResolver(updatePemabayaranWithCarabayarInput),
     defaultValues: {
       distribusi: [{ penagihanId: "", total: 0 }],
       carabayar: {
         pembayaran: {},
-        tanggal : new Date()
       },
     },
   });
@@ -101,23 +98,15 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
     try {
       console.log(values);
       const { data } = await createPembayaranMutation.mutateAsync(values);
-      if (data?.distribusiHasil && data?.distribusiHasil.length > 0) {
+      if (data?.distribusiHasil.length) {
         toast({
-          variant: "success",
-          className: "text-white text-base font-semibold",
           description: `${data.distribusiHasil.length} invoice terbayar`,
         });
         setOpen(false);
         utils.carabayar.invalidate();
-        utils.penagihan.invalidate();
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
-      toast({
-        description: `Failed to create pembayaran, please try again`,
-        variant: "destructive",
-        className: "text-white text-base font-semibold",
-      });
     }
   }
 
@@ -142,29 +131,15 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
     const subscription = form.watch((value) => {
       if (value.carabayar?.total) setTotalcarabayar(value.carabayar?.total);
       if (value.distribusi) {
-        const dist = value.distribusi.map((d) => {
-          const penagihan = penagihanData.find((p) => p.id == d?.penagihanId)
-          const sisa = penagihan ? penagihan.sisa : 0
-          return {
-            penagihanId: d?.penagihanId ?? "",
-            total: d?.total ?? 0,
-            sisa : sisa ?? 0
-          };
-        });
-        console.log(dist)
-        if (dist) setDistribusi(dist);
         let totaldist = 0;
         for (let idx in value.distribusi) {
           let valnumber = value.distribusi[idx]?.total ?? 0;
           let valstr = valnumber.toString();
           totaldist += parseInt(valstr);
         }
-        console.log(distribusi);
-        setTotalDistirbusi(totaldist)
+        setTotalDistirbusi(totaldist);
       }
     });
-
-
 
     return () => subscription.unsubscribe();
   }, [watchFIelds]);
@@ -224,48 +199,35 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
         <div>
           <p className="text-sm font-bold">Distribusi</p>
           {distribusiFields.map((field, idx) => (
-            <div>
-              <div className="flex gap-4 border-t-2 mt-2 pt-2 items-end">
-                <InputForm
-                  {...register(`distribusi.${idx}.penagihanId`)}
-                  type="combobox"
-                  title="Penagihan"
-                  options={(() => {
-                    if (penagihanOption) {
-                      const result = penagihanOption.filter((p) => {
-                        return (
-                          !form.getValues("distribusi").find((d) => d.penagihanId == p.value) ||
-                          p.value == form.getValues(`distribusi.${idx}.penagihanId`)
-                        );
-                      });
-                      return result;
-                    } else {
-                      return [];
-                    }
-                  })()}
-                />
-                <DefaultInput
-                  {...register(`distribusi.${idx}.total`)}
-                  type="number"
-                  title={"Jumlah" + ((distribusi[idx] && distribusi[idx].sisa) ? ` (max ${idr(distribusi[idx].sisa)})` : "")}
-                />
-                <Button
-                  className={idx == 0 ? "invisible" : ""}
-                  variant="outline"
-                  onClick={() => {
-                    if (idx) remove(idx);
-                  }}
-                >
-                  <Trash />
-                </Button>
-              </div>
-              {distribusi[idx]?.penagihanId &&
-                distribusi[idx].total > distribusi[idx].sisa && (
-                  <p className="text-sm text-red-400 mt-1">
-                    Error : total distribusi melebihi sisa pembayaran{" "}
-                    {idr(distribusi[idx].sisa)}
-                  </p>
-                )}
+            <div className="flex gap-4 border-t-2 mt-2 items-end">
+              <InputForm
+                {...register(`distribusi.${idx}.penagihanId`)}
+                type="combobox"
+                title="Penagihan"
+                options={(() => {
+                  if (penagihanOption) {
+                    const result = penagihanOption.filter((p) => {
+                      return (
+                        !form.getValues("distribusi").find((d) => d.penagihanId == p.value) ||
+                        p.value == form.getValues(`distribusi.${idx}.penagihanId`)
+                      );
+                    });
+                    return result;
+                  } else {
+                    return [];
+                  }
+                })()}
+              />
+              <InputForm {...register(`distribusi.${idx}.total`)} type="number" title="Jumlah" />
+              <Button
+                className={idx == 0 ? "invisible" : ""}
+                variant="outline"
+                onClick={() => {
+                  if (idx) remove(idx);
+                }}
+              >
+                <Trash />
+              </Button>
             </div>
           ))}
           <Button className="mt-2" variant="outline" onClick={() => addDistribusiField()}>
@@ -285,19 +247,5 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
         </Button>
       </form>
     </Form>
-  );
-}
-
-export function CreatePembayaranModal() {
-  const [open, setOpen] = useState(false);
-  return (
-    <Modal
-      modalTitle="Create Pembayaran"
-      open={open}
-      onOpenChange={setOpen}
-      buttonTitle="Create Pembayaran"
-    >
-      <CreatePembayaranForm setOpen={setOpen} />
-    </Modal>
   );
 }

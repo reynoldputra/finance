@@ -6,6 +6,7 @@ import { toast } from "@client/components/ui/use-toast";
 import { trpc } from "@client/lib/trpc";
 import { TPembayaranSchema } from "./data/schema";
 import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
+import DetailDistribusi from "./DetailDistribusi";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
@@ -40,11 +41,12 @@ export function RowAction({ row }: RowActionsProps<TPembayaranSchema>) {
   return (
     <>
       <DataTableRowActions>
-        <ModalDropdownItem
-          triggerChildren="Edit"
-          open={openEdit}
-          onOpenChange={setOpenEdit}
-        >
+        <ModalDropdownItem triggerChildren="Detail Distribusi" modalTitle="Detail Distribusi">
+          <div>
+            <DetailDistribusi row={row} />
+          </div>
+        </ModalDropdownItem>
+        <ModalDropdownItem triggerChildren="Edit" open={openEdit} onOpenChange={setOpenEdit}>
           {/* <UpdateInvoiceForm setOpen={setOpenEdit} row={row} /> */}
         </ModalDropdownItem>
         <ModalDropdownItem triggerChildren="Delete">

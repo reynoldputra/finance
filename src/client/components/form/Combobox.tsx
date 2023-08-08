@@ -36,13 +36,7 @@ export function Combobox({ items, placeholder, onChange, title }: ComboboxProps)
             className="w-[200px] justify-between truncate"
           >
             {value
-              ? items.find((item) => {
-                  const str =
-                    typeof item.value == "string"
-                      ? item.value
-                      : item.value.toString();
-                  return str == value;
-                })?.title
+              ? items.find((item) => item.value == value)?.title
               : "Search..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -54,12 +48,16 @@ export function Combobox({ items, placeholder, onChange, title }: ComboboxProps)
             <CommandGroup>
               {items.map((item) => (
                 <CommandItem
-                  value={item.value.toString()}
-                  key={item.value}
+                  value={item.title}
+                  key={item.title}
                   onSelect={(currentValue) => {
-                    setValue(currentValue);
+                    const item = items.find((i) => i.title.toLowerCase() == currentValue)
                     setOpen(false);
-                    if (onChange) onChange(item.value.toString());
+                    if(item) {
+                      console.log(item.value, value)
+                      setValue(item.value == value ? "" : item.value)
+                      if (onChange) onChange(item.value == value ? "" : item.value);
+                    } 
                   }}
                 >
                   <Check

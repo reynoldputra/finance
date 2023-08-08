@@ -7,9 +7,9 @@ export class PenagihanService {
     const result = await prisma.penagihan.findMany({
       include: {
         invoice: {
-          include : {
-            customer : true
-          }
+          include: {
+            customer: true,
+          },
         },
         kolektor: true,
         distribusiPembayaran: {
@@ -45,15 +45,15 @@ export class PenagihanService {
       });
 
       parsed.push({
-        id : d.id,
+        id: d.id,
         transaksiId: d.invoice.transaksiId,
         tanggalTagihan: d.tanggalTagihan,
         status: d.status,
         namaKolektor: d.kolektor.nama,
         kolektorId: d.kolektor.id,
-        namaCustomer : d.invoice.customer.nama,
-        customerId : d.invoice.customer.id,
-        sisa : d.invoice.total - total,
+        namaCustomer: d.invoice.customer.nama,
+        customerId: d.invoice.customer.id,
+        sisa: d.invoice.total - total,
         totalPembayaran: total,
         cash,
         transfer,
@@ -64,12 +64,43 @@ export class PenagihanService {
     return parsed;
   }
 
+  static async getPenagihanSisa() {
+    const result = await prisma.penagihan.findMany({
+      include: {
+        invoice: true,
+        distribusiPembayaran: {
+          include: {
+            caraBayar: {
+              include: {
+                giro: true,
+                transfer: true,
+                metode: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    const parse = result.map((r) => {
+      const total = r.distribusiPembayaran.reduce((tot, cur) => {
+        return (tot += cur.jumlah);
+      }, 0);
+      return {
+        penagihanId: r.id,
+        sisa: r.invoice.total - total,
+      };
+    });
+
+    return parse
+  }
+
   static async getPenagihan(id: string) {
     const result = await prisma.penagihan.findFirstOrThrow({
       where: {
         id,
       },
       include: {
+        invoice: true,
         distribusiPembayaran: {
           include: {
             caraBayar: {
@@ -91,7 +122,33 @@ export class PenagihanService {
     return {
       ...result,
       totalPembayaran: total,
+      sisa: result.invoice.total - total,
     };
+  }
+
+  static async getPenagihanByCarabayar(id: string) {
+    const result = await prisma.penagihan.findMany({
+      where: {
+        distribusiPembayaran: {
+          some: {
+            caraBayarId: id,
+          },
+        },
+      },
+      include: {
+        invoice: true,
+        distribusiPembayaran: true,
+      },
+    });
+
+    const parsed = result.map((r) => {
+      return {
+        ...r,
+        distribusi: r.distribusiPembayaran.find((d) => d.caraBayarId == id),
+      };
+    });
+
+    return parsed;
   }
 
   static async createPenagihan(input: TCreatePenagihanInput) {
@@ -122,7 +179,7 @@ export class PenagihanService {
     if (input.tanggalTagihan) updateData.tanggalTagihan = input.tanggalTagihan;
     const result = await prisma.penagihan.update({
       where: {
-        id: input.penagihanId
+        id: input.penagihanId,
       },
       data: updateData,
     });

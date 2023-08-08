@@ -2,9 +2,9 @@ import { z } from "zod";
 import { MainTrpc } from "../../trpc";
 import {
   TCreatePembayaranInput,
-  updatePemabayaranInput,
   TUpdatePembayaranInput,
   createPembayaranWithCarabayarInput,
+  updatePemabayaranWithCarabayarInput,
 } from "./pembayaranSchema";
 import { PembayaranService } from "./pembayaranService";
 
@@ -16,6 +16,22 @@ export const pembayaranRouter = pembayaranTrpc.router({
     .query(async ({ input: id }) => {
       try {
         const res = await PembayaranService.getPembayaranByPenagihan(id);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
+
+  getPembayaranLama: pembayaranTrpc.publicProcedure
+    .input(z.string())
+    .query(async ({ input: id }) => {
+      try {
+        const res = await PembayaranService.getPembayaranLama(id);
         return {
           status: true,
           data: res,
@@ -44,7 +60,7 @@ export const pembayaranRouter = pembayaranTrpc.router({
     }),
 
   updatePembayaran: pembayaranTrpc.publicProcedure
-    .input(updatePemabayaranInput)
+    .input(updatePemabayaranWithCarabayarInput)
     .mutation(async ({ input }: { input: TUpdatePembayaranInput }) => {
       try {
         const res = await PembayaranService.updatePembayaran(input);

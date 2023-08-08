@@ -4,6 +4,7 @@ import { InvoiceRouter } from "./collections/invoice/invoiceRouter";
 import { KolektorRouter } from "./collections/kolektor/kolektorRouter";
 import { pembayaranRouter } from "./collections/pembayaran/pembayaranRouter";
 import { PenagihanRouter } from "./collections/penagihan/penagihanRouter";
+import { TandaterimaRouter } from "./collections/tandaTerima/tandaTerimaRouter";
 import { MainTrpc } from "./trpc";
 
 const mainTrpc = new MainTrpc()
@@ -14,7 +15,8 @@ export const appRouter = mainTrpc.router({
   kolektor : KolektorRouter,
   penagihan : PenagihanRouter,
   carabayar : CarabayarRouter,
-  pembayaran : pembayaranRouter
+  pembayaran : pembayaranRouter,
+  tandaTerima : TandaterimaRouter
 })
 
 export type AppRouter = typeof appRouter;

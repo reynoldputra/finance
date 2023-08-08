@@ -60,14 +60,29 @@ model Penagihan {
   kolektor Kolektor @relation(fields: [kolektorId], references: [id])
 }
 
+model TandaTerima {
+  id                 String               @id @default(cuid())
+  tandaTerimaInvoice TandaTerimaInvoice[]
+}
+
+model TandaTerimaInvoice {
+  id            String @id @default(cuid())
+  tandaTerimaId String
+  invoiceId     String
+
+  tandaTerima TandaTerima @relation(fields: [tandaTerimaId], references: [id])
+  invoice     Invoice     @relation(fields: [invoiceId], references: [id])
+}
+
 model Invoice {
-  id               String      @id @default(cuid())
-  transaksiId      String      @unique @default(cuid())
-  total            Int
-  tanggalTransaksi DateTime    @map("tanggal_transaksi")
-  namaSales        String      @map("nama_sales")
-  penagihan        Penagihan[]
-  customerId       String
+  id                 String               @id @default(cuid())
+  transaksiId        String               @unique @default(cuid())
+  total              Int
+  tanggalTransaksi   DateTime             @map("tanggal_transaksi")
+  namaSales          String               @map("nama_sales")
+  penagihan          Penagihan[]
+  tandaTerimaInvoice TandaTerimaInvoice[]
+  customerId         String
 
   customer  Customer @relation(fields: [customerId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")

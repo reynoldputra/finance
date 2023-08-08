@@ -19,6 +19,7 @@ interface customerData {
   id: string;
   nama: string;
   kolektorId: string;
+  alamat?: string;
 }
 
 interface EditCustomerProps {
@@ -34,6 +35,7 @@ export default function EditCustomerForm({ customerData }: EditCustomerProps) {
       nama: customerData.nama,
       id: customerData.id,
       kolektorId: customerData.kolektorId,
+      alamat: customerData.alamat ? customerData.alamat : "",
     },
   });
 
@@ -85,6 +87,12 @@ export default function EditCustomerForm({ customerData }: EditCustomerProps) {
           type="text"
           title="Nama Customer"
           description="Edit Nama Customer Here"
+        />
+        <InputForm
+          name="alamat"
+          type="text"
+          title="Alamat Customer"
+          description="Edit Alamat Customer Here"
         />
         <InputForm
           name="kolektorId"

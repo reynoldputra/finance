@@ -15,6 +15,7 @@ datasource db {
 model Customer {
   id              String            @id @default(cuid())
   nama            String            @unique @map("nama_customer")
+  alamat          String?
   invoices        Invoice[]
   kolektorHistory KolektorHistory[]
   kolektorId      String
@@ -62,7 +63,11 @@ model Penagihan {
 
 model TandaTerima {
   id                 String               @id @default(cuid())
+  tanggalTT          DateTime             @default(now())
   tandaTerimaInvoice TandaTerimaInvoice[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 }
 
 model TandaTerimaInvoice {

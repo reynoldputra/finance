@@ -2,6 +2,7 @@
 CREATE TABLE "Customer" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "nama_customer" TEXT NOT NULL,
+    "alamat" TEXT,
     "kolektorId" TEXT NOT NULL,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL,
@@ -36,6 +37,23 @@ CREATE TABLE "Penagihan" (
     "keterangan" TEXT,
     CONSTRAINT "Penagihan_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "Penagihan_kolektorId_fkey" FOREIGN KEY ("kolektorId") REFERENCES "Kolektor" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "TandaTerima" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "tanggalTT" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "TandaTerimaInvoice" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "tandaTerimaId" TEXT NOT NULL,
+    "invoiceId" TEXT NOT NULL,
+    CONSTRAINT "TandaTerimaInvoice_tandaTerimaId_fkey" FOREIGN KEY ("tandaTerimaId") REFERENCES "TandaTerima" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "TandaTerimaInvoice_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable

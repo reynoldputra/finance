@@ -14,6 +14,7 @@ export const TandaterimaRouter = tandaTerimaTrpc.router({
     } catch (err) {
       return {
         status: false,
+        err: err
       };
     }
   }),

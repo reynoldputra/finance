@@ -108,11 +108,12 @@ export class CustomerService {
   }
 
   public static async updateCostumer(customer: TUpdateCustomerInput) {
-    const { id, nama, kolektorId } = customer;
+    const { id, nama, kolektorId, alamat } = customer;
 
     const updateCustomerData: Prisma.CustomerUncheckedUpdateInput = {};
     if (nama) updateCustomerData.nama = nama;
     if (kolektorId) updateCustomerData.kolektorId = kolektorId;
+    if (alamat) updateCustomerData.alamat = alamat;
 
     const existingCustomer = await prisma.customer.findUnique({
       where: { id },

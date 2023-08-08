@@ -1,11 +1,25 @@
+import DataTable from '@client/components/table/DataTable';
 import useDataTable from '@client/hook/useDataTable';
 import { trpc } from '@client/lib/trpc'
 
 export default function TandaTerimaTable() {
     const data = trpc.tandaTerima.getTandaTerimaTable.useQuery().data;
     console.log(data?.data)
-    // const table = useDataTable()
+    // const table = useDataTable({
+    //   columns: TandaTerimaColumn,
+    //   data: data?.data ?? [],
+    // })
   return (
-    <div>TandaTerimaTable</div>
+    <>
+      {/* <DataTable table={table} columns={TandaTerimaColumn} toolbar={<Toolbar />}/> */}
+    </>
+  )
+}
+
+const Toolbar = () => {
+  return (
+    <>
+      
+    </>
   )
 }

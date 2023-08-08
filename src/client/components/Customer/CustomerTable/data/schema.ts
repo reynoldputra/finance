@@ -5,6 +5,7 @@ import { z } from "zod"
 export const customerSchema = z.object({
   id: z.string(),
   nama: z.string(),
+  alamat: z.string().optional(),
   kolektorNama: z.string(),
   invoiceAktif: z.string(),
   jumlahTagihan: z.string(),

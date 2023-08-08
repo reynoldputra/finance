@@ -40,7 +40,7 @@ export class PembayaranService {
 
   static async createPembayaran(input: TCreatePembayaranInput) {
     const result = await prisma.$transaction(async (ctx) => {
-      const carabayar = await CaraBayarService.createCaraBayar(input.carabayar)
+      const carabayar = await CaraBayarService.createCaraBayar(input.carabayar, ctx)
 
       let distribusiHasil : DistribusiPembayaran[] = []
 

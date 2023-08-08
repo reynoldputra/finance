@@ -42,7 +42,6 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
   const [metode, setMetode] = useState(1);
   const [totalCarabayar, setTotalcarabayar] = useState(0);
   const [totalDistribusi, setTotalDistirbusi] = useState(0);
-  const [sisa, setSisa] = useState<ISisaPenagihan[]>([]);
   const [distribusi, setDistribusi] = useState<IDistribusi[]>([]);
 
   const penagihan = trpc.penagihan.getAllPenagihan.useQuery();
@@ -60,7 +59,6 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
 
   useEffect(() => {
     setPenagihanOption(penagihanItems);
-    setSisa(sisaData);
   }, []);
 
   const form = useForm<TCreatePembayaranInput>({

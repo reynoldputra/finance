@@ -10,6 +10,7 @@ export class TandaTerimaService {
               select: {
                 id: true,
                 total: true,
+                tanggalTransaksi: true,
                 customer: {
                   select: {
                     nama: true,
@@ -17,6 +18,7 @@ export class TandaTerimaService {
                 },
                 penagihan: {
                   select: {
+                    status : true,
                     distribusiPembayaran: {
                       select: {
                         jumlah: true,

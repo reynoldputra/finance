@@ -1,5 +1,13 @@
 import { ISidebarItem } from "@client/types/SidebarItem";
-import { Home, UserCog2, Users2, FileText, Banknote, Receipt} from "lucide-react";
+import {
+  Home,
+  UserCog2,
+  Users2,
+  FileText,
+  Banknote,
+  Receipt,
+  File
+} from "lucide-react";
 
 const SidebarItems: ISidebarItem[] = [
   { title: "Home", route: "/", icon: Home },
@@ -8,6 +16,7 @@ const SidebarItems: ISidebarItem[] = [
   { title: "Invoices", route: "/invoice", icon: FileText, gap: true },
   { title: "Penagihan", route: "/penagihan", icon: Receipt },
   { title: "Pembayaran", route: "/pembayaran", icon: Banknote },
+  { title: "Tanda Terima", route: "/tandaterima", icon: File },
 ];
 
 export default SidebarItems;

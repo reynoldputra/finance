@@ -44,12 +44,6 @@ export function RowAction({ row }: RowActionsProps<TPembayaranSchema>) {
         <ModalDropdownItem triggerChildren="Detail Distribusi" modalTitle="Detail Distribusi">
           <div>
             <DetailDistribusi row={row} />
-<<<<<<< HEAD
-=======
-            <DialogClose>
-              <Button>Close</Button>
-            </DialogClose>
->>>>>>> c154749283a1c9315ea9e3c22d4a9d21cbd266c3
           </div>
         </ModalDropdownItem>
         <ModalDropdownItem triggerChildren="Edit" open={openEdit} onOpenChange={setOpenEdit}>

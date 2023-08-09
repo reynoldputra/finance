@@ -1,5 +1,6 @@
 import { MainTrpc } from "@server/trpc";
 import { TandaTerimaService } from "./tandaTerimaService";
+import { z } from "zod";
 
 const tandaTerimaTrpc = new MainTrpc();
 
@@ -14,8 +15,23 @@ export const TandaterimaRouter = tandaTerimaTrpc.router({
     } catch (err) {
       return {
         status: false,
-        err: err
+        err: err,
       };
     }
   }),
+  getTandaTerimaDetail: tandaTerimaTrpc.publicProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      try {
+        const res = await TandaTerimaService.getDetailTandaTerima(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
 });

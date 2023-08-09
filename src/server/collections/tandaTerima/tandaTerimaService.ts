@@ -119,16 +119,14 @@ export class TandaTerimaService {
       data: {
         id,
         tanggalTT,
+        tandaTerimaInvoice: {
+          create: manyInvoiceId.map((invoiceId) => ({
+            tandaTerimaId: id,
+            invoiceId,
+          })),
+        },
       },
     });
-    for(const invoiceId of manyInvoiceId) {
-      await prisma.tandaTerimaInvoice.create({
-        data: {
-          tandaTerimaId: id,
-          invoiceId
-        }
-      })
-    }
-    return res
+    return res;
   }
 }

@@ -6,11 +6,13 @@ export const tandaTerimaTable = z.object({
   // alamat: z.string(),
   // tanggalTT: z.date(),
   jumlahInvoice: z.number(),
-  // invoices: z.object({
-  //   transaksiId: z.string(),
-  //   total: z.number(),
-  //   tanggalTransaksi: z.date(),
-  // }),
+});
+
+export const createTandaTerimaInput = z.object({
+  id: z.string(),
+  manyInvoiceId: z.array(z.string()),
+  tanggalTT: z.date(),
 });
 
 export type TTandaTerimaTable = z.infer<typeof tandaTerimaTable>;
+export type TCreateTandaTerimaInput = z.infer<typeof createTandaTerimaInput>;

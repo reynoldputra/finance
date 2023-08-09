@@ -1,6 +1,7 @@
 import { MainTrpc } from "@server/trpc";
 import { TandaTerimaService } from "./tandaTerimaService";
 import { z } from "zod";
+import { createTandaTerimaInput, TCreateTandaTerimaInput } from "./tandaTerimaSchema";
 
 const tandaTerimaTrpc = new MainTrpc();
 
@@ -34,4 +35,19 @@ export const TandaterimaRouter = tandaTerimaTrpc.router({
         };
       }
     }),
+    createTandaTerima: tandaTerimaTrpc.publicProcedure
+      .input(createTandaTerimaInput)
+      .mutation(async ({input} : {input: TCreateTandaTerimaInput}) => {
+        try {
+          const res = await TandaTerimaService.createTandaTerima(input);
+          return {
+            status: true,
+            data: res,
+          }
+        } catch (err) {
+          return {
+            status: false
+          }
+        }
+      })
 });

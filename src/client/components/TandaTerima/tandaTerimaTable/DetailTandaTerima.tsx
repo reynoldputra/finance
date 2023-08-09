@@ -1,6 +1,7 @@
 import { trpc } from "@client/lib/trpc";
 import { dmyDate } from "@client/lib/dmyDate";
 import { idr } from "@client/lib/idr";
+import { Fragment } from "react";
 
 export default function DetailTandaTerima({ id }: { id: string }) {
   const detailTandaTerima = trpc.tandaTerima.getTandaTerimaDetail.useQuery(id);
@@ -22,11 +23,11 @@ export default function DetailTandaTerima({ id }: { id: string }) {
             <p className={cnheader}>Tanggal</p>
             <p className={cnheader}>Jumlah</p>
             {dataTandaTerima.map((data) => (
-              <>
+              <Fragment key={data.transaksiId}>
                 <p className="mx-auto">{data.transaksiId}</p>
                 <p className="mx-auto">{dmyDate(data.tanggalTransaksi)}</p>
                 <p className="mx-auto">Rp. {idr(data.total)}</p>
-              </>
+              </Fragment>
             ))}
             <p className="col-end-4 font-semibold mx-auto">Total: Rp {idr(totalAmount)}</p>
           </div>

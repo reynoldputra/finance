@@ -1,4 +1,5 @@
 import { prisma } from "@server/prisma";
+import { TCreateTandaTerimaInput } from "./tandaTerimaSchema";
 
 export class TandaTerimaService {
   public static async getTandaTerimaTable() {
@@ -28,7 +29,6 @@ export class TandaTerimaService {
         },
       },
     });
-
     const tandaTerimaTable = result.map((entry) => {
       const customer = entry.tandaTerimaInvoice[0].invoice.customer;
       const invoices = entry.tandaTerimaInvoice.map((invoiceData) => {
@@ -59,8 +59,6 @@ export class TandaTerimaService {
         // invoices: invoices,
       };
     });
-
-    console.log(tandaTerimaTable);
     return tandaTerimaTable;
   }
 
@@ -112,7 +110,25 @@ export class TandaTerimaService {
         tanggalTransaksi: new Date(invoiceData.invoice.tanggalTransaksi),
       };
     });
-
     return invoices;
+  }
+
+  public static async createTandaTerima(input: TCreateTandaTerimaInput) {
+    const { id, tanggalTT, manyInvoiceId } = input;
+    const res = await prisma.tandaTerima.create({
+      data: {
+        id,
+        tanggalTT,
+      },
+    });
+    for(const invoiceId of manyInvoiceId) {
+      await prisma.tandaTerimaInvoice.create({
+        data: {
+          tandaTerimaId: id,
+          invoiceId
+        }
+      })
+    }
+    return res
   }
 }

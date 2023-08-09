@@ -11,12 +11,14 @@ import { Input } from "@client/components/ui/input";
 
 interface DefaultInputProps {
   name: string;
-  title: string;
+  title?: string;
   description?: string;
   placeholder?: string;
-  disabled?: boolean
+  disabled?: boolean;
   errorMessage?: string;
   type: "text" | "number" | "combobox" | "datepicker";
+  className?: string;
+  onChange?: (v : string) => void
 }
 
 const DefaultInput: React.FC<DefaultInputProps> = ({
@@ -26,7 +28,9 @@ const DefaultInput: React.FC<DefaultInputProps> = ({
   errorMessage,
   disabled,
   type,
-  placeholder
+  className,
+  placeholder,
+  onChange
 }) => {
   const form = useFormContext();
   return (
@@ -34,15 +38,18 @@ const DefaultInput: React.FC<DefaultInputProps> = ({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem>
-          <FormLabel className="text-base">{title}</FormLabel>
+        <FormItem className={className ?? " "}>
+          {title && <FormLabel className="text-base">{title}</FormLabel>}
           <FormControl>
             <Input
               disabled={disabled}
               type={type}
               placeholder={placeholder}
               value={field.value ?? ""}
-              onChange={(e) => field.onChange(e.target.value)}
+              onChange={(e) => {
+                field.onChange(e.target.value)
+                if(onChange) onChange(e.target.value)
+              }}
               onBlur={field.onBlur}
             />
           </FormControl>

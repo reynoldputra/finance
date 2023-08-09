@@ -13,6 +13,9 @@ module.exports = {
       },
     },
     extend: {
+       gridTemplateColumns: {
+        '16': 'repeat(16, minmax(0, 1fr))',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -79,6 +82,10 @@ module.exports = {
     {
       pattern: /grid-(rows|cols)-(.+)/,
       variants: ["sm", "md", "lg", "xl"],
+    },
+    {
+      pattern: /(col|row)-(.+)/,
+      variants: ["1", "2", "3", "4", "5"],
     },
   ],
   plugins: [

@@ -22,10 +22,17 @@ import { PlusIcon, Trash } from "lucide-react";
 import { idr } from "@client/lib/idr";
 import { Row } from "@tanstack/react-table";
 import { TPembayaranSchema } from "../PembayaranTable/data/schema";
+import { CaraBayar, DistribusiPembayaran } from "@client/../generated/client";
 
 interface ModalFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   row : Row<TPembayaranSchema>
+}
+
+interface PembayaranLama {
+  data : CaraBayar & {
+    distribusiPembayaran : DistribusiPembayaran[]
+  }
 }
 
 export function UpdatePembayaran({ setOpen, row }: ModalFormProps) {
@@ -35,6 +42,7 @@ export function UpdatePembayaran({ setOpen, row }: ModalFormProps) {
   const [metode, setMetode] = useState(1);
   const [totalCarabayar, setTotalcarabayar] = useState(0);
   const [totalDistribusi, setTotalDistirbusi] = useState(0);
+  const [pembayaran, setPembayaran] = useState<PembayaranLama>();
 
   const penagihan = trpc.penagihan.getAllPenagihan.useQuery();
   const penagihanData = penagihan.data?.data ?? [];
@@ -46,13 +54,12 @@ export function UpdatePembayaran({ setOpen, row }: ModalFormProps) {
     };
   });
 
-
-  let initVal : FieldValue<TUpdatePembayaranInput> = {
-  }
-
   const pembayaranLama = trpc.pembayaran.getPembayaranLama.useQuery(row.original.id)
   if(pembayaranLama.data?.data) {
     const dataPembayaraLama = pembayaranLama.data.data
+    setPembayaran({
+      data : dataPembayaraLama
+    })
   }
 
   useEffect(() => {

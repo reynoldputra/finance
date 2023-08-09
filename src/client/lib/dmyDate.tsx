@@ -1,6 +1,7 @@
 export const dmyDate = (date : Date) => {
-  const d = date.getDate()
-  const m = date.getMonth() + 1
-  const y = date.getFullYear()
-  return `${d}-${m}-${y}`
+  let d = date.getDate()
+  let m = date.getMonth() + 1
+  let y = date.getFullYear().toString().slice(-2)
+
+  return `${d}/${m}/${y}`
 }

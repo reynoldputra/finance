@@ -22,11 +22,13 @@ import { ComboboxItem } from "@client/types/form/ComboboxItem";
 
 interface ComboboxInputProps {
   name: string;
-  title: string;
+  title?: string;
   description?: string;
   errorMessage?: string;
   options?: readonly ComboboxItem[];
-  disabled ?: boolean
+  disabled?: boolean;
+  width?: number;
+  onChange?: (str: string) => void;
 }
 
 const ComboboxInput: React.FC<ComboboxInputProps> = ({
@@ -35,7 +37,9 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
   title,
   description,
   errorMessage,
+  onChange,
   options,
+  width = 200,
 }) => {
   const form = useFormContext();
   return (
@@ -44,7 +48,7 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-base">{title}</FormLabel>
+          {title && <FormLabel className="text-base">{title}</FormLabel>}
           <div>
             <Popover>
               <PopoverTrigger asChild>
@@ -53,10 +57,10 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                     variant="outline"
                     role="combobox"
                     disabled={disabled}
-                    className={cn(
-                      "w-[200px] justify-between",
-                      !field.value && "text-muted-foreground"
-                    )}
+                    className={cn("justify-between", !field.value && "text-muted-foreground")}
+                    style={{
+                      width: width + "px",
+                    }}
                   >
                     {field.value
                       ? options?.find((language) => language.value === field.value)?.title || field.value
@@ -65,10 +69,15 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="w-[200px] p-0">
+              <PopoverContent
+                className="p-0"
+                style={{
+                  width: width + "px",
+                }}
+              >
                 <Command>
-                  <CommandInput placeholder={`Search ${title.toLowerCase()}...`} />
-                  <CommandEmpty>{`No ${title.toLowerCase()} found.`}</CommandEmpty>
+                  <CommandInput placeholder={`Search...`} />
+                  <CommandEmpty>{`Item not found.`}</CommandEmpty>
                   <CommandGroup>
                     {options?.map((language) => (
                       <CommandItem
@@ -77,6 +86,7 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                         key={language.value}
                         onSelect={() => {
                           form.setValue(name, (form.getValues(name) == language.value ? "" : language.value));
+                          if (onChange) onChange(language.value);
                         }}
                       >
                         <Check

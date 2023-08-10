@@ -31,11 +31,26 @@ export class PembayaranService {
         id: carabayarId,
       },
       include: {
-        distribusiPembayaran : true
+        distribusiPembayaran : {
+          include : {
+            penagihan : {
+              include : {
+                invoice : true
+              }
+            }
+          }
+        },
+        giro : true,
+        transfer : true
       },
     });
 
-    return result;
+    const cust = result?.distribusiPembayaran[0].penagihan.invoice.customerId
+
+    return {
+      result,
+      customerId : cust
+    };
   }
 
   static async createPembayaran(input: TCreatePembayaranInput) {

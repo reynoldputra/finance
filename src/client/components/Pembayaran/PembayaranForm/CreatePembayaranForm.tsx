@@ -23,9 +23,6 @@ import ComboboxInput from "@client/components/form/InputForm/inputs/ComboboxInpu
 import { Checkbox } from "@client/components/ui/checkbox";
 import { cn } from "@client/lib/cn";
 
-interface ModalFormProps {
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
 
 interface IDistribusi {
   penagihanId: string;
@@ -34,7 +31,11 @@ interface IDistribusi {
   manualInput: boolean;
 }
 
-export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
+interface ModalFormProps {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function PembayaranForm ({setOpen} : ModalFormProps) {
   const { toast } = useToast();
   const [penagihanOption, setPenagihanOption] = useState<ComboboxItem[]>();
   const [currCust, setCurrentCust] = useState("");
@@ -51,7 +52,6 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
   const form = useForm<TCreatePembayaranInput>({
     resolver: zodResolver(createPembayaranWithCarabayarInput),
     defaultValues: {
-      distribusi: [{ penagihanId: "", total: 0 }],
       carabayar: {
         pembayaran: {},
         tanggal: new Date(),
@@ -82,6 +82,8 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
     });
 
     setPenagihanOption(penagihanItems);
+    
+    form.setValue("distribusi", [])
   }, [currCust]);
 
   const createPembayaranMutation = trpc.pembayaran.createPembayaran.useMutation();
@@ -89,23 +91,17 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
 
   async function onSubmit(values: TCreatePembayaranInput) {
     try {
-      console.log("submited");
-      console.log("submited");
-      console.log("submited");
-      console.log("submited");
-      console.log("submited");
-      console.log("submited");
-      // const { data } = await createPembayaranMutation.mutateAsync(values);
-      // if (data?.distribusiHasil && data?.distribusiHasil.length > 0) {
-      //   toast({
-      //     variant: "success",
-      //     className: "text-white text-base font-semibold",
-      //     description: `${data.distribusiHasil.length} invoice terbayar`,
-      //   });
-      //   setOpen(false);
-      //   utils.carabayar.invalidate();
-      //   utils.penagihan.invalidate();
-      // }
+      const { data } = await createPembayaranMutation.mutateAsync(values);
+      if (data?.distribusiHasil && data?.distribusiHasil.length > 0) {
+        toast({
+          variant: "success",
+          className: "text-white text-base font-semibold",
+          description: `${data.distribusiHasil.length} invoice terbayar`,
+        });
+        setOpen(false);
+        utils.carabayar.invalidate();
+        utils.penagihan.invalidate();
+      }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
       toast({
@@ -121,6 +117,7 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
   const {
     fields: distribusiFields,
     append,
+    replace,
     remove,
   } = useFieldArray({
     name: "distribusi",
@@ -213,27 +210,67 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
 
   const onJumlahDistChange = () => {
     let totalPembayaran = useWatchCarabayarTotal;
-    const formdistribusi = form.getValues("distribusi")
+    const formdistribusi = form.getValues("distribusi");
     for (let idx in formdistribusi) {
       const curDist = formdistribusi[idx];
       const distState = distribusi[idx];
       if (distState.manualInput) {
-        totalPembayaran -= curDist.total
+        totalPembayaran -= curDist.total;
       } else {
         if (distState.sisa < totalPembayaran) {
           form.setValue(`distribusi.${parseInt(idx)}.total`, distState.sisa);
           totalPembayaran -= distState.sisa;
         } else {
-          form.setValue(`distribusi.${parseInt(idx)}.total`, totalPembayaran < 0 ? 0 : totalPembayaran);
+          form.setValue( `distribusi.${parseInt(idx)}.total`,
+            totalPembayaran < 0 ? 0 : totalPembayaran
+          );
           totalPembayaran = 0;
         }
       }
     }
   };
-  
-  const autoFillHandle = () => {
 
-  }
+  const autoFillHandle = () => {
+    const filteredPenagihan = penagihanData.filter(
+      (p) => p.customerId == currCust && p.status == "WAITING"
+    );
+
+    const sortedPenagihan = filteredPenagihan.sort((a, b) => b.sisa - a.sisa);
+
+    form.setValue("distribusi", [{ penagihanId: "", total: 0 }]);
+
+    const formFieldsValue: { penagihanId: string; total: number }[] = [];
+    const newDistState: IDistribusi[] = [];
+
+    let totalPembayaran = watchCarabayarTotal[0];
+
+    for (let idx in sortedPenagihan) {
+      if (totalPembayaran > 0) {
+        const penagihan = sortedPenagihan[idx];
+        let total = 0;
+        if (penagihan.sisa < totalPembayaran) total = penagihan.sisa;
+        else total = totalPembayaran;
+
+        totalPembayaran -= total;
+
+        formFieldsValue.push({
+          penagihanId: penagihan.id,
+          total,
+        });
+
+        newDistState.push({
+          penagihanId: penagihan.id ?? "",
+          total: total ?? 0,
+          sisa: penagihan.sisa ?? 0,
+          manualInput: false,
+        });
+      }
+    }
+
+    setTotalDistirbusi(watchCarabayarTotal[0])
+    replace(formFieldsValue);
+    setDistribusi(newDistState);
+  };
 
   return (
     <Form {...form}>
@@ -295,15 +332,21 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
         )}
         <div>
           <p className="text-base font-bold">Distribusi</p>
-          <Button variant="secondary" className="my-2 flex gap-2">
+          <Button
+            variant="secondary"
+            className="my-2 flex gap-2"
+            type="button"
+            disabled={!(watchCarabayarTotal[0] && currCust)}
+            onClick={() => autoFillHandle()}
+          >
             <RefreshCwIcon className="w-5 h-5" /> <p>Auto Fill</p>
           </Button>
-          <div className="grid grid-cols-12 gap-y-2 gap-x-2">
-            <p className={c[0]}>Penagihan</p>
-            <p className={c[1]}>Jumlah</p>
-            <p className={cn("text-center", c[2])}>M</p>
-            <p className={c[3]}>Sisa</p>
-            <p className={c[4]}></p>
+          <div className="grid grid-cols-12 gap-y-2 gap-x-2 mt-2">
+            <p className={cn(c[0], "py-1 px-2 border rounded-md")}>Penagihan</p>
+            <p className={cn(c[1], "py-1 px-2 border rounded-md")}>Jumlah</p>
+            <p className={cn("text-center py-1 px-2 border rounded-md", c[2])}>M</p>
+            <p className={cn(c[3], "py-1 px-2 border rounded-md")}>Sisa</p>
+            <p className={cn(c[4])}></p>
             {distribusiFields.map((field, idx) => (
               <Fragment key={idx}>
                 <div className={c[0]}>
@@ -329,7 +372,7 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
                 <div className={c[1]}>
                   <DefaultInput
                     name={`distribusi.${idx}.total`}
-                    onChange={(value) => {
+                    onChange={(_) => {
                       onJumlahDistChange();
                     }}
                     type="number"
@@ -344,8 +387,8 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
                       if (currentDist[idx]) {
                         if (v == false) {
                           currentDist[idx].manualInput = false;
-                          const dist = form.getValues('distribusi');
-                          let totalPembayaran = form.getValues('carabayar.total');
+                          const dist = form.getValues("distribusi");
+                          let totalPembayaran = form.getValues("carabayar.total");
                           for (let idx in dist) {
                             const p = dist[idx];
                             if (p.penagihanId) {
@@ -354,17 +397,17 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
                                 if (sisa < totalPembayaran) {
                                   form.setValue(`distribusi.${parseInt(idx)}.total`, sisa);
                                   totalPembayaran -= sisa;
-                                  const newDistState = [...distribusi]
-                                  newDistState[idx].total = sisa
-                                  setDistribusi(newDistState)
+                                  const newDistState = [...distribusi];
+                                  newDistState[idx].total = sisa;
+                                  setDistribusi(newDistState);
                                 } else {
                                   form.setValue(
                                     `distribusi.${parseInt(idx)}.total`,
                                     totalPembayaran
                                   );
-                                  const newDistState = [...distribusi]
-                                  newDistState[idx].total = totalPembayaran
-                                  setDistribusi(newDistState)
+                                  const newDistState = [...distribusi];
+                                  newDistState[idx].total = totalPembayaran;
+                                  setDistribusi(newDistState);
                                   totalPembayaran = 0;
                                 }
                               } else {
@@ -408,13 +451,19 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
               </Fragment>
             ))}
           </div>
-          <Button type="button" className="mt-2" variant="outline" onClick={() => addDistribusiField()}>
+          <Button
+            type="button"
+            className="mt-2"
+            variant="outline"
+            disabled={!(useWatchCarabayarTotal && currCust)}
+            onClick={() => addDistribusiField()}
+          >
             <PlusIcon />
           </Button>
         </div>
         <div className="w-full flex justify-center text-sm text-slate-600">
           <p>
-            {totalCarabayar
+            {(totalCarabayar && totalCarabayar - totalDistribusi != 0)
               ? totalDistribusi - totalCarabayar > 0
                 ? "Uang pembayaran sisa " + idr(totalDistribusi - totalCarabayar)
                 : "Uang pembayaran kurang " + idr(totalCarabayar - totalDistribusi)
@@ -427,6 +476,17 @@ export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
       </form>
     </Form>
   );
+
+}
+
+interface ModalFormProps {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function CreatePembayaranForm({ setOpen } : ModalFormProps) {
+  return (
+    <PembayaranForm setOpen={setOpen} />
+  )
 }
 
 export function CreatePembayaranModal() {

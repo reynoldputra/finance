@@ -7,6 +7,7 @@ import { trpc } from "@client/lib/trpc";
 import { TPembayaranSchema } from "./data/schema";
 import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
 import DetailDistribusi from "./DetailDistribusi";
+import { UpdatePembayaranModal } from "../PembayaranForm/UpdatePembayaranForm";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
@@ -42,12 +43,10 @@ export function RowAction({ row }: RowActionsProps<TPembayaranSchema>) {
     <>
       <DataTableRowActions>
         <ModalDropdownItem triggerChildren="Detail Distribusi" modalTitle="Detail Distribusi">
-          <div>
             <DetailDistribusi row={row} />
-          </div>
         </ModalDropdownItem>
         <ModalDropdownItem triggerChildren="Edit" open={openEdit} onOpenChange={setOpenEdit}>
-          {/* <UpdateInvoiceForm setOpen={setOpenEdit} row={row} /> */}
+          <UpdatePembayaranModal carabayarId={row.original.id} setOpen={setOpenEdit} />
         </ModalDropdownItem>
         <ModalDropdownItem triggerChildren="Delete">
           <div className="flex flex-col w-full h-full">
@@ -55,21 +54,17 @@ export function RowAction({ row }: RowActionsProps<TPembayaranSchema>) {
               <span className="font-bold text-xl">Are you sure ?</span>
               <span className=" text-base mt-3">
                 This action
-                <span className="text-base font-semibold"> CANNOT</span> be
-                undone. This will permanently delete the
+                <span className="text-base font-semibold"> CANNOT</span> be undone. This will
+                permanently delete the
                 <span className="font-semibold"> "{row.original.id}" </span>
                 pembayaran.
               </span>
             </div>
             <div className="flex flex-col text-lg mt-2">
               <span className=" text-base font-semibold">
-                Please type pembayaran's id "{row.original.id}" to confirm the
-                delete.
+                Please type pembayaran's id "{row.original.id}" to confirm the delete.
               </span>
-              <ConfirmDeleteForm
-                handleDelete={handleDelete}
-                currName={row.original.id}
-              />
+              <ConfirmDeleteForm handleDelete={handleDelete} currName={row.original.id} />
             </div>
           </div>
         </ModalDropdownItem>

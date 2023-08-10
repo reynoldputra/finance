@@ -1,4 +1,5 @@
 import { dmyDate } from "@client/lib/dmyDate";
+import { idr } from "@client/lib/idr";
 import { trpc } from "@client/lib/trpc";
 import { Row } from "@tanstack/react-table";
 import { Fragment } from "react";
@@ -18,7 +19,7 @@ export default function DetailDistribusi({ row }: { row: Row<TPembayaranSchema> 
           <Fragment key={idx}>
             <p>{d.invoice.transaksiId}</p>
             <p>{dmyDate(d.tanggalTagihan)}</p>
-            <p>{d.distribusi?.jumlah}</p>
+            <p>Rp {idr(d.distribusi?.jumlah)}</p>
           </Fragment>
         ))}
       </div>

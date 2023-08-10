@@ -24,3 +24,5 @@ export const updatePemabayaranWithCarabayarInput = z.object({
 export type TCreatePembayaranInput = z.infer<typeof createPembayaranWithCarabayarInput>;
 export type TCaraBayarLama = z.infer<typeof caraBayarLama>;
 export type TUpdatePembayaranInput = z.infer<typeof updatePemabayaranWithCarabayarInput>;
+export type TDistribusiPembayaran = z.infer<typeof distribusiPembayaran>;
+

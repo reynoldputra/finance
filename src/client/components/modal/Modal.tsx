@@ -10,14 +10,9 @@ import {
 import { Button } from "@client/components/ui/button";
 import { ReactNode } from "react";
 import { DialogProps } from "@radix-ui/react-dialog";
+import { ScrollArea } from "../ui/scroll-area";
 
-type ButtonVariant =
-  | "outline"
-  | "link"
-  | "default"
-  | "destructive"
-  | "secondary"
-  | "ghost";
+type ButtonVariant = "outline" | "link" | "default" | "destructive" | "secondary" | "ghost";
 
 interface IModalsProps extends DialogProps {
   buttonTitle: string;
@@ -25,7 +20,7 @@ interface IModalsProps extends DialogProps {
   modalTitle?: string;
   description?: string;
   children: ReactNode;
-  buttonProps ?: React.ButtonHTMLAttributes<HTMLButtonElement>
+  buttonProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
 }
 
 export default function Modal({
@@ -41,17 +36,17 @@ export default function Modal({
     <>
       <Dialog {...rest}>
         <DialogTrigger asChild>
-          <Button {...buttonProps} variant={buttonVariant}>{buttonTitle}</Button>
+          <Button {...buttonProps} variant={buttonVariant}>
+            {buttonTitle}
+          </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
             {modalTitle && <DialogTitle>{modalTitle}</DialogTitle>}
-            {description && (
-              <DialogDescription>{description}</DialogDescription>
-            )}
+            {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>
           <hr />
-          {children}
+          <ScrollArea className="max-h-[800px] pr-3">{children}</ScrollArea>
         </DialogContent>
       </Dialog>
     </>

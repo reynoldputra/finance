@@ -38,7 +38,7 @@ const DefaultInput: React.FC<DefaultInputProps> = ({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem className={className ?? " "}>
+        <FormItem className={className ?? "ml-1 "}>
           {title && <FormLabel className="text-base">{title}</FormLabel>}
           <FormControl>
             <Input

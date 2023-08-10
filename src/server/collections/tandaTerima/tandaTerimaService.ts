@@ -53,10 +53,9 @@ export class TandaTerimaService {
       return {
         id: entry.id,
         namaCustomer: customer.nama,
-        // alamat: customer.alamat,
-        // tanggalTT: entry.tanggalTT,
+        alamat: customer.alamat,
+        tanggalTT: entry.tanggalTT,
         jumlahInvoice: invoices.length,
-        // invoices: invoices,
       };
     });
     return tandaTerimaTable;
@@ -124,6 +123,20 @@ export class TandaTerimaService {
             tandaTerimaId: id,
             invoiceId,
           })),
+        },
+      },
+    });
+    return res;
+  }
+
+  public static async getInvoiceByIdWaiting(id: string) {
+    const res = await prisma.invoice.findMany({
+      where: {
+        customerId: id,
+        penagihan: {
+          some: {
+            status: "WAITING",
+          },
         },
       },
     });

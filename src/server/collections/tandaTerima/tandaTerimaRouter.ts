@@ -1,7 +1,10 @@
 import { MainTrpc } from "@server/trpc";
 import { TandaTerimaService } from "./tandaTerimaService";
 import { z } from "zod";
-import { createTandaTerimaInput, TCreateTandaTerimaInput } from "./tandaTerimaSchema";
+import {
+  createTandaTerimaInput,
+  TCreateTandaTerimaInput,
+} from "./tandaTerimaSchema";
 
 const tandaTerimaTrpc = new MainTrpc();
 
@@ -32,22 +35,40 @@ export const TandaterimaRouter = tandaTerimaTrpc.router({
       } catch (err) {
         return {
           status: false,
+          err: err,
         };
       }
     }),
-    createTandaTerima: tandaTerimaTrpc.publicProcedure
-      .input(createTandaTerimaInput)
-      .mutation(async ({input} : {input: TCreateTandaTerimaInput}) => {
-        try {
-          const res = await TandaTerimaService.createTandaTerima(input);
-          return {
-            status: true,
-            data: res,
-          }
-        } catch (err) {
-          return {
-            status: false
-          }
-        }
-      })
+  createTandaTerima: tandaTerimaTrpc.publicProcedure
+    .input(createTandaTerimaInput)
+    .mutation(async ({ input }: { input: TCreateTandaTerimaInput }) => {
+      try {
+        const res = await TandaTerimaService.createTandaTerima(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+          err: err,
+        };
+      }
+    }),
+  getInvoiceByIdFiltered: tandaTerimaTrpc.publicProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      try {
+        const res = await TandaTerimaService.getInvoiceByIdWaiting(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+          err: err,
+        };
+      }
+    }),
 });

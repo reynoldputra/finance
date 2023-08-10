@@ -44,6 +44,23 @@ export const TandaTerimaColumn: ColumnDef<TTandaTerimaTable>[] = [
     },
   },
   {
+    accessorKey: "tanggalTT",
+    id: "Tanggal Tanda Terima",
+    header: ({ column, table }) => (
+      <DataTableColumnHeader
+        table={table}
+        column={column}
+        title="Tanggal Tanda Terima"
+      />
+    ),
+    cell: ({ row }) => (
+      <div className="w-[180px]">{(new Date(row.getValue("Tanggal Tanda Terima"))).toLocaleDateString()}</div>
+    ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
     accessorKey: "jumlahInvoice",
     id: "Jumlah Invoice",
     header: ({ column, table }) => (

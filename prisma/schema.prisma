@@ -63,7 +63,7 @@ model Penagihan {
 
 model TandaTerima {
   id                 String               @id @default(cuid())
-  tanggalTT          DateTime             @default(now())
+  tanggalTT          DateTime
   tandaTerimaInvoice TandaTerimaInvoice[]
 
   createdAt DateTime @default(now()) @map("created_at")

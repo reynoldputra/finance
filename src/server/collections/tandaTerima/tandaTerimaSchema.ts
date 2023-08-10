@@ -3,13 +3,13 @@ import { z } from "zod";
 export const tandaTerimaTable = z.object({
   id: z.string(),
   namaCustomer: z.string(),
-  // alamat: z.string(),
-  // tanggalTT: z.date(),
+  alamat: z.string(),
+  tanggalTT: z.date(),
   jumlahInvoice: z.number(),
 });
 
 export const createTandaTerimaInput = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   manyInvoiceId: z.array(z.string()),
   tanggalTT: z.date(),
 });

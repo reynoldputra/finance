@@ -1,11 +1,8 @@
 interface ModalFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  carabayarId : string
+  carabayarId: string;
 }
 
-export function UpdatePembayaranModal({carabayarId, setOpen} : ModalFormProps) {
-  return (
-    <div>
-    </div>
-  );
+export function UpdatePembayaranModal({ carabayarId, setOpen }: ModalFormProps) {
+  return <div></div>;
 }

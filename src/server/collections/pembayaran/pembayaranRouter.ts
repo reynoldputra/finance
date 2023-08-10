@@ -74,4 +74,20 @@ export const pembayaranRouter = pembayaranTrpc.router({
         };
       }
     }),
+
+  getMetodePembayaran: pembayaranTrpc.publicProcedure
+    .query(async () => {
+      try {
+        const res = await PembayaranService.getMetodePembayaran();
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+  })
+
 });

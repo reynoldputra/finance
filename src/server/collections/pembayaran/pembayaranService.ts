@@ -128,4 +128,9 @@ export class PembayaranService {
 
     return result;
   }
+
+  static async getMetodePembayaran () {
+    const result = await prisma.metodePembayaran.findMany()
+    return result
+  }
 }

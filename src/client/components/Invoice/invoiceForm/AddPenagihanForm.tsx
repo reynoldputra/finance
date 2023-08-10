@@ -13,6 +13,7 @@ import {
 import { z } from "zod";
 import { Table } from "@tanstack/react-table";
 import { TInvoiceSchema } from "../InvoiceTable/data/schema";
+import { useEffect, useState } from "react";
 
 interface AddPenagihanFormProps<TData> {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,21 +22,13 @@ interface AddPenagihanFormProps<TData> {
 
 export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvoiceSchema>) {
   const { toast } = useToast();
+  const [kolektorOptions, setKolektorOptions] = useState<ComboboxItem[]>([]);
 
   const selectedRows = table.getSelectedRowModel().rows;
 
   const customers = trpc.customer.customerTable.useQuery();
   const kolektors = trpc.kolektor.getAllKolektor.useQuery();
-
-  const initValue: TCreatePenagihanInput[] = selectedRows.map((r) => {
-    const customerData = customers.data ?? [];
-    const customer = customerData.find((c) => c.nama == r.original.namaCustomer);
-    return {
-      invoiceId: r.original.id,
-      kolektorId: customer?.kolektorId ?? "",
-      tanggalTagihan: new Date(),
-    };
-  });
+  const kolektorsQuery = kolektors.data?.data ?? [];
 
   const FormSchema = z.object({
     manyPenagihan: z.array(createPenagihanInput),
@@ -49,9 +42,6 @@ export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvo
         manyPenagihan: z.array(createPenagihanInput),
       })
     ),
-    defaultValues: {
-      manyPenagihan: initValue,
-    },
   });
 
   const { fields } = useFieldArray({
@@ -59,11 +49,29 @@ export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvo
     control: form.control,
   });
 
-  const kolektorsData = kolektors.data?.data ?? [];
-  const kolektorOption: ComboboxItem[] = kolektorsData.map((item) => ({
-    title: item.nama,
-    value: item.id,
-  }));
+
+  useEffect(() => {
+    if (customers.data) {
+      const initValue: TCreatePenagihanInput[] = selectedRows.map((r) => {
+        const customerData = customers.data ?? [];
+        const customer = customerData.find((c) => c.nama == r.original.namaCustomer);
+        return {
+          invoiceId: r.original.id,
+          kolektorId: customer?.kolektorId ?? "",
+          tanggalTagihan: new Date(),
+        };
+      });
+      if (initValue) form.setValue("manyPenagihan", initValue);
+    }
+    if(kolektorsQuery){
+      const kolektorsData: ComboboxItem[] = kolektorsQuery.map((item) => ({
+        title: item.nama,
+        value: item.id,
+      }));
+      console.log(kolektorsData);
+      setKolektorOptions(kolektorsData)
+    }
+  }, [kolektors.status, customers.status]);
 
   const createManyPenagihanMutation = trpc.penagihan.createManyPenagihan.useMutation();
   const utils = trpc.useContext();
@@ -75,10 +83,10 @@ export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvo
         toast({
           description: `${data.length} penagihan successfully created`,
           variant: "success",
-          className: "text-white text-base font-semibold"
+          className: "text-white text-base font-semibold",
         });
         utils.invoice.invalidate();
-        setOpen(false)
+        setOpen(false);
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
@@ -109,7 +117,7 @@ export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvo
               <InputForm
                 {...register(`manyPenagihan.${idx}.kolektorId`)}
                 type="combobox"
-                options={kolektorOption}
+                options={kolektorOptions}
                 title="Kolektor"
               />
             </div>

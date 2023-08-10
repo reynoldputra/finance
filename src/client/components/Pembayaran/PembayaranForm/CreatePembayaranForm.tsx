@@ -22,7 +22,7 @@ import DefaultInput from "@client/components/form/InputForm/inputs/DefaultInput"
 import ComboboxInput from "@client/components/form/InputForm/inputs/ComboboxInput";
 import { Checkbox } from "@client/components/ui/checkbox";
 import { cn } from "@client/lib/cn";
-
+import { Textarea } from "@client/components/ui/textarea";
 
 interface IDistribusi {
   penagihanId: string;
@@ -31,11 +31,17 @@ interface IDistribusi {
   manualInput: boolean;
 }
 
+interface IDetailMetodePembayaran {
+  id : number,
+  batasAtas : number,
+  batasBawah : number
+}
+
 interface ModalFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function PembayaranForm ({setOpen} : ModalFormProps) {
+export function PembayaranForm({ setOpen }: ModalFormProps) {
   const { toast } = useToast();
   const [penagihanOption, setPenagihanOption] = useState<ComboboxItem[]>();
   const [currCust, setCurrentCust] = useState("");
@@ -43,11 +49,15 @@ export function PembayaranForm ({setOpen} : ModalFormProps) {
   const [totalCarabayar, setTotalcarabayar] = useState(0);
   const [totalDistribusi, setTotalDistirbusi] = useState(0);
   const [distribusi, setDistribusi] = useState<IDistribusi[]>([]);
+  const [detailMetode, setDetailMetode] = useState<IDetailMetodePembayaran[]>([]);
 
   const c = [4, 3, 1, 3, 1].map((v) => "col-span-" + v.toString()); // class for form cols
 
   const penagihan = trpc.penagihan.getAllPenagihan.useQuery();
   const penagihanData = penagihan.data?.data ?? [];
+
+  const metodePembayaranQuery = trpc.pembayaran.getMetodePembayaran.useQuery();
+  const metodePembayaranData = metodePembayaranQuery.data?.data;
 
   const form = useForm<TCreatePembayaranInput>({
     resolver: zodResolver(createPembayaranWithCarabayarInput),
@@ -67,6 +77,23 @@ export function PembayaranForm ({setOpen} : ModalFormProps) {
   }));
 
   useEffect(() => {
+    if(metodePembayaranData) {
+      const detail : IDetailMetodePembayaran[] = []
+
+      for(let idx in metodePembayaranData) {
+        const m = metodePembayaranData[idx]
+        detail[m.id] = {
+          id : m.id,
+          batasBawah : m.batasBawah,
+          batasAtas : m.batasAtas
+        }
+      }
+
+      setDetailMetode(detail)
+    }
+  }, [metodePembayaranQuery.status])
+
+  useEffect(() => {
     const filteredPenagihan = penagihanData.filter(
       (p) => p.customerId == currCust && p.status == "WAITING"
     );
@@ -82,8 +109,8 @@ export function PembayaranForm ({setOpen} : ModalFormProps) {
     });
 
     setPenagihanOption(penagihanItems);
-    
-    form.setValue("distribusi", [])
+
+    form.setValue("distribusi", []);
   }, [currCust]);
 
   const createPembayaranMutation = trpc.pembayaran.createPembayaran.useMutation();
@@ -221,7 +248,8 @@ export function PembayaranForm ({setOpen} : ModalFormProps) {
           form.setValue(`distribusi.${parseInt(idx)}.total`, distState.sisa);
           totalPembayaran -= distState.sisa;
         } else {
-          form.setValue( `distribusi.${parseInt(idx)}.total`,
+          form.setValue(
+            `distribusi.${parseInt(idx)}.total`,
             totalPembayaran < 0 ? 0 : totalPembayaran
           );
           totalPembayaran = 0;
@@ -267,7 +295,7 @@ export function PembayaranForm ({setOpen} : ModalFormProps) {
       }
     }
 
-    setTotalDistirbusi(watchCarabayarTotal[0])
+    setTotalDistirbusi(watchCarabayarTotal[0]);
     replace(formFieldsValue);
     setDistribusi(newDistState);
   };
@@ -307,7 +335,7 @@ export function PembayaranForm ({setOpen} : ModalFormProps) {
           <InputForm title="Total" type="number" {...register("carabayar.total")} />
         </div>
         {metode == 2 && (
-          <div className="space-y-4">
+          <div className="space-y-4 w-60">
             <InputForm type="text" title="Bank" {...register("carabayar.pembayaran.giro.bank")} />
             <InputForm
               type="text"
@@ -322,7 +350,7 @@ export function PembayaranForm ({setOpen} : ModalFormProps) {
           </div>
         )}
         {metode == 3 && (
-          <div>
+          <div className="w-60">
             <InputForm
               type="text"
               title="Bank"
@@ -330,6 +358,12 @@ export function PembayaranForm ({setOpen} : ModalFormProps) {
             />
           </div>
         )}
+        <div className="px-1 space-y-2">
+          <p>Keterangan (opsional)</p>
+          <Textarea
+            {...register("carabayar.keterangan")}
+          />
+        </div>
         <div>
           <p className="text-base font-bold">Distribusi</p>
           <Button
@@ -463,30 +497,38 @@ export function PembayaranForm ({setOpen} : ModalFormProps) {
         </div>
         <div className="w-full flex justify-center text-sm text-slate-600">
           <p>
-            {(totalCarabayar && totalCarabayar - totalDistribusi != 0)
+            {(detailMetode.length > 0 && totalCarabayar && totalCarabayar - totalDistribusi != 0)
               ? totalDistribusi - totalCarabayar > 0
-                ? "Uang pembayaran sisa " + idr(totalDistribusi - totalCarabayar)
-                : "Uang pembayaran kurang " + idr(totalCarabayar - totalDistribusi)
+                ? detailMetode[metode].batasAtas < totalDistribusi - totalCarabayar &&
+                  "Uang pembayaran sisa " + idr(totalDistribusi - totalCarabayar)
+                : detailMetode[metode].batasBawah < totalCarabayar - totalDistribusi &&
+                  "Uang pembayaran kurang " + idr(totalCarabayar - totalDistribusi)
               : ""}
           </p>
         </div>
-        <Button disabled={totalDistribusi != totalCarabayar} type="submit">
+        <Button disabled={(
+          (
+            detailMetode.length > 0 ?
+            !(
+              totalDistribusi - totalCarabayar < detailMetode[metode].batasAtas && 
+              totalCarabayar - totalDistribusi < detailMetode[metode].batasBawah 
+            )
+            : true
+          )
+        )} type="submit">
           Submit
         </Button>
       </form>
     </Form>
   );
-
 }
 
 interface ModalFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function CreatePembayaranForm({ setOpen } : ModalFormProps) {
-  return (
-    <PembayaranForm setOpen={setOpen} />
-  )
+export function CreatePembayaranForm({ setOpen }: ModalFormProps) {
+  return <PembayaranForm setOpen={setOpen} />;
 }
 
 export function CreatePembayaranModal() {

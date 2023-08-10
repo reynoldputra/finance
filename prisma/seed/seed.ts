@@ -1,17 +1,14 @@
 import { PrismaClient, Prisma, Invoice, Penagihan, Transfer } from "../../src/generated/client";
-// import * as csvParser from "csv-parser";
 const csvParser = require("csv-parser");
-// const csv = require("csv-parser")
-import { parse } from "csv-parse";
 import * as fs from "fs";
 import * as path from "path";
 const prisma = new PrismaClient();
 
 async function main() {
   const metodePembayaran: Prisma.MetodePembayaranUncheckedCreateInput[] = [
-    { id: 1, jenis: "CASH" },
-    { id: 2, jenis: "GIRO" },
-    { id: 3, jenis: "TRANSFER" },
+    { id: 1, jenis: "CASH", batasAtas : 1000, batasBawah : 1000},
+    { id: 2, jenis: "GIRO", batasAtas : 10000, batasBawah : 1000 },
+    { id: 3, jenis: "TRANSFER", batasAtas : 10000, batasBawah : 1000 },
   ];
 
   await prisma.$queryRawUnsafe(`DELETE FROM kolektor_history`);

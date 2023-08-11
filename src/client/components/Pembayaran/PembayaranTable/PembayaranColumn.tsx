@@ -51,6 +51,12 @@ export const pembayaranColumn : ColumnDef<TPembayaranSchema>[] = [
     cell: ({ row }) => <div className="w-[180px]">Rp {idr(row.getValue("Total"))}</div>,
   },
   {
+    accessorKey: "sisa",
+    id : "Sisa",
+    header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Sisa" />,
+    cell: ({ row }) => <div className="w-[180px]">Rp {idr(row.getValue("Sisa"))}</div>,
+  },
+  {
     accessorKey: "jumlahDistribusi",
     id : "Distribusi",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Distribusi" />,

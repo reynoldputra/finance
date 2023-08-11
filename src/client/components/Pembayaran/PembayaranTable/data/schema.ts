@@ -14,6 +14,7 @@ export const pembayaranSchema = z.object({
   id: z.string(),
   metodePembayaran: z.string(),
   total: z.number(),
+  sisa: z.number(),
   namaCustomer : z.string(),
   customerId : z.string(),
   tanggalPembayaran : z.date(),

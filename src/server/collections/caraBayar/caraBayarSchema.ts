@@ -29,7 +29,7 @@ export const updateCaraBayarInput = z.object({
   pembayaran: z.object({
     giro: createGiroInput.optional(),
     transfer: createTransferInput.optional(),
-  }),
+  }).optional(),
 });
 
 export type TCreateCaraBayarInput = z.infer<typeof createCaraBayarInput>;

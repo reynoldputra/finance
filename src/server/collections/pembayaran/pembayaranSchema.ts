@@ -10,6 +10,11 @@ export const distribusiPembayaran = z.object({
   penagihanId : z.string(),
   total : z.coerce.number()
 })
+export const updateDistribusiPembayaran = z.object({
+  id : z.string(),
+  penagihanId : z.string(),
+  total : z.coerce.number()
+})
 
 export const createPembayaranWithCarabayarInput = z.object({
   carabayar : createCaraBayarInput,
@@ -18,7 +23,7 @@ export const createPembayaranWithCarabayarInput = z.object({
 
 export const updatePemabayaranWithCarabayarInput = z.object({
   carabayar : updateCaraBayarInput,
-  distribusi : z.array(distribusiPembayaran)
+  distribusi : z.array(updateDistribusiPembayaran)
 });
 
 export type TCreatePembayaranInput = z.infer<typeof createPembayaranWithCarabayarInput>;

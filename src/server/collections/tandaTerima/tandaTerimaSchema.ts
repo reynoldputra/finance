@@ -14,5 +14,12 @@ export const createTandaTerimaInput = z.object({
   tanggalTT: z.date(),
 });
 
+export const updateTandaTerimaInput = z.object({
+  id: z.string(),
+  manyInvoiceId: z.array(z.string()),
+  tanggalTT: z.date(),
+})
+
 export type TTandaTerimaTable = z.infer<typeof tandaTerimaTable>;
 export type TCreateTandaTerimaInput = z.infer<typeof createTandaTerimaInput>;
+export type TUpdateTandaTerimaInput = z.infer<typeof updateTandaTerimaInput>;

@@ -129,4 +129,20 @@ export const PenagihanRouter = penagihanTrpc.router({
         };
       }
     }),
+
+  updateStatusToNihil: penagihanTrpc.publicProcedure
+    .input(z.string())
+    .mutation(async ({ input: id }) => {
+      try {
+        const res = await PenagihanService.updateStatusToNihil(id);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
 });

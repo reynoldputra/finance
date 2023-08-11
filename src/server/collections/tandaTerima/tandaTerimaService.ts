@@ -1,5 +1,9 @@
 import { prisma } from "@server/prisma";
-import { TCreateTandaTerimaInput } from "./tandaTerimaSchema";
+import {
+  TCreateTandaTerimaInput,
+  TUpdateTandaTerimaInput,
+} from "./tandaTerimaSchema";
+import { Prisma } from "../../../generated/client";
 
 export class TandaTerimaService {
   public static async getTandaTerimaTable() {
@@ -142,4 +146,18 @@ export class TandaTerimaService {
     });
     return res;
   }
+
+  // public static async updateTandaTerima(input: TUpdateTandaTerimaInput) {
+  //   const updateData: Prisma.TandaTerimaUncheckedUpdateInput = {};
+  //   if (input.id) updateData.id = input.id;
+  //   if (input.tanggalTT) updateData.tanggalTT = input.tanggalTT;
+  //   const res = await prisma.tandaTerima.update({
+  //     where: {
+  //       id: input.id,
+  //     },
+  //     data: updateData,
+  //   });
+
+  //   return res;
+  // }
 }

@@ -196,4 +196,17 @@ export class PenagihanService {
 
     return result;
   }
+
+  static async updateStatusToNihil(id: string) {
+    const result = await prisma.penagihan.update({
+      where: {
+        id
+      },
+      data: {
+        status: "NIHIL"
+      }
+    })
+    
+    return result;
+  }
 }

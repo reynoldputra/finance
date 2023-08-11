@@ -40,10 +40,13 @@ export class CaraBayarService {
           bank: r.transfer.bank,
         };
 
+      const jumlahdistribusi = r.distribusiPembayaran.reduce((tot, curr) => tot += curr.jumlah , 0)
+
       return {
         id: r.id,
-        metodePembayaran: r.metode.jenis,
         total: r.total,
+        metodePembayaran: r.metode.jenis,
+        sisa : r.total - jumlahdistribusi,
         tandaTerima: r.tandaTerima,
         namaCustomer: r.distribusiPembayaran[0].penagihan.invoice.customer.nama,
         customerId: r.distribusiPembayaran[0].penagihan.invoice.customer.id,

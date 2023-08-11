@@ -94,10 +94,49 @@ export class PembayaranService {
 
   static async updatePembayaran(input: TUpdatePembayaranInput) {
     const result = await prisma.$transaction(async (ctx) => {
-      await CaraBayarService.deleteCaraBayar(input.carabayar.id)
-      const carabayar = await CaraBayarService.createCaraBayar(input.carabayar)
+      const carabayar = await CaraBayarService.updateCaraBayar(input.carabayar, ctx)
       let distribusiHasil : DistribusiPembayaran[] = []
+      const distribusiLama = await ctx.distribusiPembayaran.findMany({
+        where : {
+          caraBayarId : carabayar.id
+        }
+      })
 
+      const distribusiBaruId = input.distribusi.map(d => d.id)
+      
+      // delete distribusi that doesnt include in new pembayaran
+      // if there is only one distribusi for some penagihan, so penagihan status will changed to waiting
+      for(let idx in distribusiLama) {
+        const distLama = distribusiLama[idx]
+        if(!distribusiBaruId.includes(distLama.id)) {
+          const infopenagihan = await ctx.penagihan.findFirst({
+            where : {
+              id : distLama.penagihanId
+            },
+            include : {
+              distribusiPembayaran : true
+            }
+          })
+          const dist = await ctx.distribusiPembayaran.delete({
+            where : {
+              id : distLama.id
+            }
+          })
+
+          if(infopenagihan?.distribusiPembayaran.length == 1) {
+            await ctx.penagihan.update({
+              where : {
+                id : dist.penagihanId
+              }, 
+                data : { 
+                    status : "WAITING"
+                }
+            })
+          }
+        }
+      }
+
+      //
       for(let idx in input.distribusi) {
         const distribusi = input.distribusi[idx]
         const detailPenagihan = await PenagihanService.getPenagihan(distribusi.penagihanId);

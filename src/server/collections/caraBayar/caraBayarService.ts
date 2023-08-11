@@ -112,42 +112,103 @@ export class CaraBayarService {
     };
   }
 
-  static async updateCaraBayar(input: TUpdateCaraBayarInput) {
+  static async updateCaraBayar(input: TUpdateCaraBayarInput, prismaCtx?: Prisma.TransactionClient) {
+    const prismaClient = prismaCtx ?? prisma
     let updateCaraBayar: Prisma.CaraBayarUncheckedUpdateInput = {};
 
-    if (input.total) {
-      updateCaraBayar = {
-        total: input.total,
-        metodePembayaranId: 1,
-      };
-    }
-
-    if (input.pembayaran) {
-      if (input.pembayaran.giro) {
-        updateCaraBayar.giro = {
-          create: input.pembayaran.giro,
-        };
-        updateCaraBayar.metodePembayaranId = 2;
-      } else if (input.pembayaran.transfer) {
-        updateCaraBayar.transfer = {
-          create: input.pembayaran.transfer,
-        };
-        updateCaraBayar.metodePembayaranId = 3;
-      }
-    }
-
-    if (input.tandaTerima) {
-      updateCaraBayar.tandaTerima = input.tandaTerima;
-    }
-
-    const result = await prisma.caraBayar.update({
-      where: {
-        id: input.id,
+    const oldCarabayar = await prismaClient.caraBayar.findFirst({
+      where : {
+        id : input.id
       },
-      data: updateCaraBayar,
-    });
+      include : {
+        giro : true,
+        transfer : true
+      }
+    })
 
-    return result;
+    let metode = 1
+    if(input.pembayaran?.giro) metode = 2
+    if(input.pembayaran?.transfer) metode = 3
+    
+    // cara bayar tetap
+    if(oldCarabayar?.metodePembayaranId == metode) {
+      if (input.total) {
+        updateCaraBayar = {
+          total: input.total,
+          metodePembayaranId: 1,
+        };
+      }
+
+      if (input.pembayaran) {
+        if (input.pembayaran.giro) {
+          updateCaraBayar.giro = {
+            update: input.pembayaran.giro,
+          };
+          updateCaraBayar.metodePembayaranId = 2;
+        } else if (input.pembayaran.transfer) {
+          updateCaraBayar.transfer = {
+            update: input.pembayaran.transfer,
+          };
+          updateCaraBayar.metodePembayaranId = 3;
+        }
+      }
+
+      if (input.tandaTerima) {
+        updateCaraBayar.tandaTerima = input.tandaTerima;
+      }
+
+      const result = await prismaClient.caraBayar.update({
+        where: {
+          id: input.id,
+        },
+        data: updateCaraBayar,
+      });
+
+      return result;
+    }
+
+    // cara bayar ganti
+    else {
+      if(oldCarabayar?.giro) {
+        await prismaClient.giro.delete({
+          where : {
+            id : oldCarabayar.giro.id
+          }
+        })
+      }
+      
+      if (oldCarabayar?.transfer){
+        await prismaClient.transfer.delete({
+          where : {
+            id : oldCarabayar.transfer.id
+          }
+        })
+      }
+
+      let carabayarUpdateData : Prisma.CaraBayarUpdateInput = {}
+      let {id, pembayaran, ...rest} = input
+      carabayarUpdateData = rest
+      carabayarUpdateData.metode = {
+        connect : {
+          id : metode
+        }
+      }
+      if(metode == 2 && input.pembayaran?.giro) carabayarUpdateData.giro = {
+        create : input.pembayaran.giro
+      }
+
+      if(metode == 3 && input.pembayaran?.transfer) carabayarUpdateData.transfer = {
+        create : input.pembayaran.transfer
+      }
+
+      const result = await prismaClient.caraBayar.update({
+        where : {
+          id : input.id
+        },
+        data : carabayarUpdateData
+      })
+      return result
+    }
   }
 
   static async generateId(metodePembayaran: number, date: Date) {

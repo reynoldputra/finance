@@ -3,12 +3,43 @@ import { Row } from "@tanstack/react-table";
 import { DataTableRowActions } from "@client/components/table/DataTableRowActions";
 import ModalDropdownItem from "@client/components/modal/ModalDropdownItem";
 import DetailTandaTerima from "./DetailTandaTerima";
+import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
+import { trpc } from "@client/lib/trpc";
+import { useToast } from "@client/components/ui/use-toast";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
 }
 
 export function RowAction({ row }: RowActionsProps<TTandaTerimaTable>) {
+  const { toast } = useToast();
+  const utils = trpc.useContext();
+
+  const deleteTandaTerimaMutation =
+    trpc.tandaTerima.deleteTandaTerima.useMutation();
+
+  const handleDelete = async () => {
+    try {
+      const { data, status } = await deleteTandaTerimaMutation.mutateAsync(
+        row.original.id
+      );
+      if (data && status) {
+        toast({
+          description: "Tanda Terima successfully deleted",
+          variant: "success",
+          className: "text-white text-base font-semibold",
+        });
+        utils.tandaTerima.invalidate();
+      }
+    } catch (err) {
+      toast({
+        description: `Failed to delete customer, please try again err : ${err}`,
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
+    }
+  };
+
   return (
     <>
       <DataTableRowActions>
@@ -25,7 +56,7 @@ export function RowAction({ row }: RowActionsProps<TTandaTerimaTable>) {
         >
           <DetailTandaTerima id={row.original.id} />
         </ModalDropdownItem>
-        {/* <ModalDropdownItem triggerChildren="Delete">
+        <ModalDropdownItem triggerChildren="Delete">
           <div className="flex flex-col w-full h-full">
             <div className="flex flex-col">
               <span className="font-bold text-xl">Are you sure ?</span>
@@ -34,12 +65,12 @@ export function RowAction({ row }: RowActionsProps<TTandaTerimaTable>) {
                 <span className="text-base font-semibold"> CANNOT</span> be
                 undone. This will permanently delete the
                 <span className="font-semibold"> "{row.original.id}" </span>
-                Penagihan.
+                Tanda Terima.
               </span>
             </div>
             <div className="flex flex-col text-lg mt-2">
               <span className=" text-base font-semibold">
-                Please type penagihan's id "{row.original.id}" to confirm the
+                Please type Tanda Terima's id "{row.original.id}" to confirm the
                 delete.
               </span>
               <ConfirmDeleteForm
@@ -48,7 +79,7 @@ export function RowAction({ row }: RowActionsProps<TTandaTerimaTable>) {
               />
             </div>
           </div>
-        </ModalDropdownItem> */}
+        </ModalDropdownItem>
       </DataTableRowActions>
     </>
   );

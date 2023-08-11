@@ -71,4 +71,20 @@ export const TandaterimaRouter = tandaTerimaTrpc.router({
         };
       }
     }),
+  deleteTandaTerima: tandaTerimaTrpc.publicProcedure
+    .input(z.string())
+    .mutation(async ({ input }) => {
+      try {
+        const res = await TandaTerimaService.deleteTandaTerima(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+          err: err,
+        };
+      }
+    }),
 });

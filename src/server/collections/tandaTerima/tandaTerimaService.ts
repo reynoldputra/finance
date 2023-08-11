@@ -147,6 +147,15 @@ export class TandaTerimaService {
     return res;
   }
 
+  public static async deleteTandaTerima(id: string) {
+    const res = await prisma.tandaTerima.delete({
+      where: {
+        id,
+      },
+    });
+    return res;
+  }
+
   // public static async updateTandaTerima(input: TUpdateTandaTerimaInput) {
   //   const updateData: Prisma.TandaTerimaUncheckedUpdateInput = {};
   //   if (input.id) updateData.id = input.id;

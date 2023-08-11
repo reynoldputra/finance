@@ -75,7 +75,7 @@ model TandaTerimaInvoice {
   tandaTerimaId String
   invoiceId     String
 
-  tandaTerima TandaTerima @relation(fields: [tandaTerimaId], references: [id])
+  tandaTerima TandaTerima @relation(fields: [tandaTerimaId], references: [id], onDelete: Cascade)
   invoice     Invoice     @relation(fields: [invoiceId], references: [id])
 }
 

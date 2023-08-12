@@ -1,6 +1,7 @@
 export interface ICustomer {
   id: string;
   nama: string;
+  alamat: string;
 }
 
 export interface ICustomerTable extends ICustomer {

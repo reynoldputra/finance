@@ -24,9 +24,13 @@ interface customerData {
 
 interface EditCustomerProps {
   customerData: customerData;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function EditCustomerForm({ customerData }: EditCustomerProps) {
+export default function EditCustomerForm({
+  customerData,
+  setOpen,
+}: EditCustomerProps) {
   const { toast } = useToast();
 
   const form = useForm<TUpdateCustomerInput>({
@@ -62,6 +66,7 @@ export default function EditCustomerForm({ customerData }: EditCustomerProps) {
           variant: "success",
           className: "text-white text-base font-semibold",
         });
+        setOpen(false);
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);

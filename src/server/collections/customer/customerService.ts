@@ -10,6 +10,7 @@ export class CustomerService {
       select: {
         id: true,
         nama: true,
+        alamat: true,
         currentKolektor: true,
         kolektorId: true,
         invoices: {
@@ -38,6 +39,7 @@ export class CustomerService {
       return {
         id: r.id,
         nama: r.nama,
+        alamat: r.alamat ?? "-",
         kolektorId: r.kolektorId,
         kolektorNama: r.currentKolektor.nama,
         invoiceAktif: r.invoices.length,
@@ -79,14 +81,14 @@ export class CustomerService {
     return res;
   }
 
-  public static async getDetailCustomer(id : string) {
-    const res = await prisma.customer.findFirst( {
-      where : {
-        id
+  public static async getDetailCustomer(id: string) {
+    const res = await prisma.customer.findFirst({
+      where: {
+        id,
       },
-      include : {
-        currentKolektor : true 
-      }
+      include: {
+        currentKolektor: true,
+      },
     });
     return res;
   }
@@ -119,7 +121,7 @@ export class CustomerService {
       where: { id },
       select: { kolektorId: true },
     });
-    
+
     const updatedCustomer = await prisma.$transaction(async (prisma) => {
       const updateCostumer = await prisma.customer.update({
         where: { id: id },

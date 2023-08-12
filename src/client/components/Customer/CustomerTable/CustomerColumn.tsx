@@ -41,6 +41,15 @@ export const CustomerColumn: ColumnDef<ICustomerTable>[] = [
     },
   },
   {
+    accessorKey: "alamat",
+    id: "Alamat",
+    header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Alamat" />,
+    cell: ({ row }) => <div className="w-[180px]">{row.getValue("Alamat")}</div>,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
     accessorKey: "kolektorNama",
     id: "Nama Kolektor",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Nama Kolektor" />,

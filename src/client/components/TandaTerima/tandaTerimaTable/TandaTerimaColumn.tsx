@@ -53,9 +53,13 @@ export const TandaTerimaColumn: ColumnDef<TTandaTerimaTable>[] = [
         title="Tanggal Tanda Terima"
       />
     ),
-    cell: ({ row }) => (
-      <div className="w-[180px]">{(new Date(row.getValue("Tanggal Tanda Terima"))).toLocaleDateString()}</div>
-    ),
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("Tanggal Tanda Terima"))
+      const d = date.getDate()
+      const m = date.getMonth() + 1
+      const y = date.getFullYear()
+      return <div className="w-[180px]">{`${d}-${m}-${y}`}</div>
+    },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },

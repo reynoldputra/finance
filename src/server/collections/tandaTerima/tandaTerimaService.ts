@@ -35,31 +35,16 @@ export class TandaTerimaService {
     });
     const tandaTerimaTable = result.map((entry) => {
       const customer = entry.tandaTerimaInvoice[0].invoice.customer;
-      const invoices = entry.tandaTerimaInvoice.map((invoiceData) => {
-        const total =
-          invoiceData.invoice.total -
-          invoiceData.invoice.penagihan.reduce(
-            (totalPembayaran, penagihan) =>
-              totalPembayaran +
-              penagihan.distribusiPembayaran.reduce(
-                (totalDistribusi, distribusi) =>
-                  totalDistribusi + distribusi.jumlah,
-                0
-              ),
-            0
-          );
-        return {
-          transaksiId: invoiceData.invoice.transaksiId,
-          total: total,
-          tanggalTransaksi: new Date(invoiceData.invoice.tanggalTransaksi),
-        };
-      });
+      const invoiceIds = entry.tandaTerimaInvoice.map(
+        (invoiceData) => invoiceData.invoice.id
+      );
       return {
         id: entry.id,
         namaCustomer: customer.nama,
         alamat: customer.alamat,
         tanggalTT: entry.tanggalTT,
-        jumlahInvoice: invoices.length,
+        jumlahInvoice: invoiceIds.length,
+        invoices: invoiceIds,
       };
     });
     return tandaTerimaTable;
@@ -117,14 +102,12 @@ export class TandaTerimaService {
   }
 
   public static async createTandaTerima(input: TCreateTandaTerimaInput) {
-    const { id, tanggalTT, manyInvoiceId } = input;
+    const { tanggalTT, manyInvoiceId } = input;
     const res = await prisma.tandaTerima.create({
       data: {
-        id,
         tanggalTT,
         tandaTerimaInvoice: {
           create: manyInvoiceId.map((invoiceId) => ({
-            tandaTerimaId: id,
             invoiceId,
           })),
         },
@@ -147,6 +130,22 @@ export class TandaTerimaService {
     return res;
   }
 
+  public static async getInvoiceByNameWaiting(customerName: string) {
+    const res = await prisma.invoice.findMany({
+      where: {
+        customer: {
+          nama: customerName,
+        },
+        penagihan: {
+          some: {
+            status: "WAITING",
+          },
+        },
+      },
+    });
+    return res;
+  }
+
   public static async deleteTandaTerima(id: string) {
     const res = await prisma.tandaTerima.delete({
       where: {
@@ -156,17 +155,32 @@ export class TandaTerimaService {
     return res;
   }
 
-  // public static async updateTandaTerima(input: TUpdateTandaTerimaInput) {
-  //   const updateData: Prisma.TandaTerimaUncheckedUpdateInput = {};
-  //   if (input.id) updateData.id = input.id;
-  //   if (input.tanggalTT) updateData.tanggalTT = input.tanggalTT;
-  //   const res = await prisma.tandaTerima.update({
-  //     where: {
-  //       id: input.id,
-  //     },
-  //     data: updateData,
-  //   });
-
-  //   return res;
-  // }
+  public static async updateTandaTerima(input: TUpdateTandaTerimaInput) {
+    const updateData: Prisma.TandaTerimaUncheckedUpdateInput = {};
+    if (input.id) updateData.id = input.id;
+    if (input.tanggalTT) updateData.tanggalTT = input.tanggalTT;
+    const updateManyInvoice = await prisma.$transaction(async (prisma) => {
+      const res = await prisma.tandaTerima.update({
+        where: {
+          id: input.id,
+        },
+        data: updateData,
+      });
+      const deleteInvoices = await prisma.tandaTerimaInvoice.deleteMany({
+        where: {
+          tandaTerimaId: input.id,
+        },
+      });
+      for (const invoiceId of input.manyInvoiceId) {
+        await prisma.tandaTerimaInvoice.create({
+          data: {
+            invoiceId,
+            tandaTerimaId: input.id,
+          },
+        });
+      }
+      return res;
+    });
+    return updateManyInvoice;
+  }
 }

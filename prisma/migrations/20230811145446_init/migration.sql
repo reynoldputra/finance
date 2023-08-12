@@ -42,7 +42,7 @@ CREATE TABLE "Penagihan" (
 -- CreateTable
 CREATE TABLE "TandaTerima" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "tanggalTT" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tanggalTT" DATETIME NOT NULL,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL
 );
@@ -52,7 +52,7 @@ CREATE TABLE "TandaTerimaInvoice" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "tandaTerimaId" TEXT NOT NULL,
     "invoiceId" TEXT NOT NULL,
-    CONSTRAINT "TandaTerimaInvoice_tandaTerimaId_fkey" FOREIGN KEY ("tandaTerimaId") REFERENCES "TandaTerima" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "TandaTerimaInvoice_tandaTerimaId_fkey" FOREIGN KEY ("tandaTerimaId") REFERENCES "TandaTerima" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "TandaTerimaInvoice_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 

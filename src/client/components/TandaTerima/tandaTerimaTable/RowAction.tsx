@@ -6,12 +6,15 @@ import DetailTandaTerima from "./DetailTandaTerima";
 import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
 import { trpc } from "@client/lib/trpc";
 import { useToast } from "@client/components/ui/use-toast";
+import { useState } from "react";
+import UpdateTandaTerimaForm from "../tandaTerimaForm/UpdateTandaTerimaForm";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
 }
 
 export function RowAction({ row }: RowActionsProps<TTandaTerimaTable>) {
+  const [openEdit, setOpenEdit] = useState(false);
   const { toast } = useToast();
   const utils = trpc.useContext();
 
@@ -43,18 +46,18 @@ export function RowAction({ row }: RowActionsProps<TTandaTerimaTable>) {
   return (
     <>
       <DataTableRowActions>
-        {/* <ModalDropdownItem
-          triggerChildren="Edit"
-          open={openEdit}
-          onOpenChange={setOpenEdit}
-        >
-          <UpdateTandaTerimaForm setOpen={setOpenEdit} row={row} />
-        </ModalDropdownItem> */}
         <ModalDropdownItem
           triggerChildren="Detail Tanda Terima"
           modalTitle="Detail Tanda Terima"
         >
-          <DetailTandaTerima id={row.original.id} />
+          <DetailTandaTerima row={row} id={row.original.id} />
+        </ModalDropdownItem>
+        <ModalDropdownItem
+          open={openEdit}
+          onOpenChange={setOpenEdit}
+          triggerChildren="Edit"
+        >
+          <UpdateTandaTerimaForm setOpen={setOpenEdit} row={row} />
         </ModalDropdownItem>
         <ModalDropdownItem triggerChildren="Delete">
           <div className="flex flex-col w-full h-full">

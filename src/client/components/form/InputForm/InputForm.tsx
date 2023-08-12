@@ -17,6 +17,7 @@ interface CustomFormFieldProps {
     label: string;
     value: string;
   }[];
+  defaultValue?: string[];
 }
 
 const InputForm: React.FC<CustomFormFieldProps> = ({
@@ -29,6 +30,7 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
   options,
   placeholder,
   multiOption,
+  defaultValue,
 }) => {
   if (type === "number" || type === "text") {
     return (
@@ -71,10 +73,11 @@ const InputForm: React.FC<CustomFormFieldProps> = ({
         errorMessage={errorMessage}
         disabled={disabled}
         options={multiOption ?? []}
+        defaultValue={defaultValue ?? []}
       />
     );
   } else {
-    return null
+    return null;
   }
 };
 

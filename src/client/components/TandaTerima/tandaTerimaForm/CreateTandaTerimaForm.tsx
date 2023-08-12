@@ -28,6 +28,9 @@ export default function CreateTandaTerimaForm({
 
   const form = useForm<TCreateTandaTerimaInput>({
     resolver: zodResolver(createTandaTerimaInput),
+    defaultValues: {
+      tanggalTT: new Date()
+    }
   });
 
   const utils = trpc.useContext();
@@ -66,7 +69,7 @@ export default function CreateTandaTerimaForm({
       );
       if (data && status) {
         toast({
-          description: `TandaTerima successfully created ${data} ${status}`,
+          description: `Tanda terima successfully created`,
           variant: "success",
           className: "text-white text-base font-semibold",
         });

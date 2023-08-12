@@ -31,7 +31,7 @@ export interface DataTableMultiselectProps {
     label: string;
     value: string;
   }[];
-  defaultValue?: [];
+  defaultValue?: string[];
   description?: string;
   errorMessage?: string;
   disabled?: boolean;

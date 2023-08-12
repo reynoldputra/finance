@@ -4,6 +4,8 @@ import { z } from "zod";
 import {
   createTandaTerimaInput,
   TCreateTandaTerimaInput,
+  TUpdateTandaTerimaInput,
+  updateTandaTerimaInput,
 } from "./tandaTerimaSchema";
 
 const tandaTerimaTrpc = new MainTrpc();
@@ -71,11 +73,43 @@ export const TandaterimaRouter = tandaTerimaTrpc.router({
         };
       }
     }),
+  getInvoiceByNameFiltered: tandaTerimaTrpc.publicProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      try {
+        const res = await TandaTerimaService.getInvoiceByNameWaiting(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+          err: err,
+        };
+      }
+    }),
   deleteTandaTerima: tandaTerimaTrpc.publicProcedure
     .input(z.string())
     .mutation(async ({ input }) => {
       try {
         const res = await TandaTerimaService.deleteTandaTerima(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+          err: err,
+        };
+      }
+    }),
+  updateTandaTerima: tandaTerimaTrpc.publicProcedure
+    .input(updateTandaTerimaInput)
+    .mutation(async ({ input }: { input: TUpdateTandaTerimaInput }) => {
+      try {
+        const res = await TandaTerimaService.updateTandaTerima(input);
         return {
           status: true,
           data: res,

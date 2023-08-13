@@ -5,16 +5,12 @@ import { Button } from "@client/components/ui/button";
 import InputForm from "../../form/InputForm/InputForm";
 import {
   TCreateCustomerInput,
+  TKolektorOption,
   createCustomerInput,
 } from "@server/collections/customer/customerSchema";
 import { trpc } from "@client/lib/trpc";
 import cuid from "cuid";
 import { useToast } from "@client/components/ui/use-toast";
-
-interface Option {
-  title: string;
-  value: string;
-}
 
 interface CreateCustomerFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,12 +26,13 @@ export default function CreateCustomerForm({
     defaultValues: {
       nama: "inu",
       id: "",
+      alamat: "",
     },
   });
 
   const data = trpc.kolektor.getAllKolektor.useQuery();
   const result = data.data?.data ?? [];
-  const kolektors: Option[] = result.map((item) => ({
+  const kolektors: TKolektorOption[] = result.map((item) => ({
     title: item.nama,
     value: item.id,
   }));
@@ -86,6 +83,12 @@ export default function CreateCustomerForm({
           type="text"
           title="Nama Customer"
           description="Input Nama Kolektor Here"
+        />
+        <InputForm
+          name="alamat"
+          type="text"
+          title="Alamat Customer"
+          description="Input Alamat Customer Here"
         />
         <InputForm
           name="kolektorId"

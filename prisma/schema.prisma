@@ -15,6 +15,7 @@ datasource db {
 model Customer {
   id              String            @id @default(cuid())
   nama            String            @unique @map("nama_customer")
+  alamat          String?
   invoices        Invoice[]
   kolektorHistory KolektorHistory[]
   kolektorId      String
@@ -60,14 +61,33 @@ model Penagihan {
   kolektor Kolektor @relation(fields: [kolektorId], references: [id])
 }
 
+model TandaTerima {
+  id                 String               @id @default(cuid())
+  tanggalTT          DateTime
+  tandaTerimaInvoice TandaTerimaInvoice[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model TandaTerimaInvoice {
+  id            String @id @default(cuid())
+  tandaTerimaId String
+  invoiceId     String
+
+  tandaTerima TandaTerima @relation(fields: [tandaTerimaId], references: [id], onDelete: Cascade)
+  invoice     Invoice     @relation(fields: [invoiceId], references: [id])
+}
+
 model Invoice {
-  id               String      @id @default(cuid())
-  transaksiId      String      @unique @default(cuid())
-  total            Int
-  tanggalTransaksi DateTime    @map("tanggal_transaksi")
-  namaSales        String      @map("nama_sales")
-  penagihan        Penagihan[]
-  customerId       String
+  id                 String               @id @default(cuid())
+  transaksiId        String               @unique @default(cuid())
+  total              Int
+  tanggalTransaksi   DateTime             @map("tanggal_transaksi")
+  namaSales          String               @map("nama_sales")
+  penagihan          Penagihan[]
+  tandaTerimaInvoice TandaTerimaInvoice[]
+  customerId         String
 
   customer  Customer @relation(fields: [customerId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")

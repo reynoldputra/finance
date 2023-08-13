@@ -8,16 +8,18 @@ import InputForm from "./InputForm";
 
 interface CreateCustomerFormProps {
   handleDelete: () => void;
-  currName: string; // Tambahkan prop nama pelanggan saat ini
+  currName: string;
+  confirmTitle?: string;
 }
 
 export default function ConfirmDeleteForm({
   handleDelete,
   currName,
+  confirmTitle = "Delete",
 }: CreateCustomerFormProps) {
   const formSchema = z.object({
     name: z.string().refine((value) => value === currName, {
-      message: "Please enter the current customer's name correctly",
+      message: "Please enter correctly",
     }),
   });
 
@@ -48,7 +50,7 @@ export default function ConfirmDeleteForm({
             </Button>
           </Dialog.Close>
           <Button className="text-base" variant={"destructive"} type="submit">
-            Delete
+            {confirmTitle}
           </Button>
         </div>
       </form>

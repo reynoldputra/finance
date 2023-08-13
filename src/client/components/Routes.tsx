@@ -5,6 +5,7 @@ import KolektorPage from "@client/pages/kolektor";
 import InvoicePage from "@client/pages/invoice";
 import PenagihanPage from "@client/pages/penagihan";
 import PembayaranPage from "@client/pages/pembayaran";
+import TandaTerimaPage from "@client/pages/tandaTerima";
 
 export function AppRoutes() {
   return (
@@ -18,6 +19,7 @@ export function AppRoutes() {
             <Route path="/invoice" element={<InvoicePage />} />
             <Route path="/penagihan" element={<PenagihanPage />} />
             <Route path="/pembayaran" element={<PembayaranPage />} />
+            <Route path="/tandaterima" element={<TandaTerimaPage />} />
           </>
         }
       />

@@ -6,6 +6,7 @@ import { useToast } from "@client/components/ui/use-toast";
 import ModalDropdownItem from "@client/components/modal/ModalDropdownItem";
 import EditCustomerForm from "../CustomerForm/EditCustomerForm";
 import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
+import { useState } from "react";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
@@ -14,6 +15,7 @@ interface RowActionsProps<TData> {
 export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
   const { toast } = useToast();
   const utils = trpc.useContext();
+  const [openEdit, setOpenEdit] = useState(false);
 
   const deleteCustomerMutation = trpc.customer.deleteCustomer.useMutation({
     onSuccess: () => {
@@ -30,7 +32,7 @@ export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
         toast({
           description: `Customer ${data.nama} successfully deleted`,
           variant: "success",
-          className: "text-white text-base font-semibold"
+          className: "text-white text-base font-semibold",
         });
       }
     } catch (error) {
@@ -44,8 +46,12 @@ export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
   }
   return (
     <DataTableRowActions>
-      <ModalDropdownItem triggerChildren="Edit">
-        <EditCustomerForm customerData={row.original} />
+      <ModalDropdownItem
+        open={openEdit}
+        onOpenChange={setOpenEdit}
+        triggerChildren="Edit"
+      >
+        <EditCustomerForm setOpen={setOpenEdit} customerData={row.original} />
       </ModalDropdownItem>
       <ModalDropdownItem triggerChildren="Delete">
         <div className="flex flex-col w-full h-full">

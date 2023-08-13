@@ -19,13 +19,18 @@ interface customerData {
   id: string;
   nama: string;
   kolektorId: string;
+  alamat?: string;
 }
 
 interface EditCustomerProps {
   customerData: customerData;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function EditCustomerForm({ customerData }: EditCustomerProps) {
+export default function EditCustomerForm({
+  customerData,
+  setOpen,
+}: EditCustomerProps) {
   const { toast } = useToast();
 
   const form = useForm<TUpdateCustomerInput>({
@@ -34,6 +39,7 @@ export default function EditCustomerForm({ customerData }: EditCustomerProps) {
       nama: customerData.nama,
       id: customerData.id,
       kolektorId: customerData.kolektorId,
+      alamat: customerData.alamat ? customerData.alamat : "",
     },
   });
 
@@ -60,6 +66,7 @@ export default function EditCustomerForm({ customerData }: EditCustomerProps) {
           variant: "success",
           className: "text-white text-base font-semibold",
         });
+        setOpen(false);
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
@@ -85,6 +92,12 @@ export default function EditCustomerForm({ customerData }: EditCustomerProps) {
           type="text"
           title="Nama Customer"
           description="Edit Nama Customer Here"
+        />
+        <InputForm
+          name="alamat"
+          type="text"
+          title="Alamat Customer"
+          description="Edit Alamat Customer Here"
         />
         <InputForm
           name="kolektorId"

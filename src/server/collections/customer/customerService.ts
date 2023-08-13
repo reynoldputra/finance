@@ -10,6 +10,7 @@ export class CustomerService {
       select: {
         id: true,
         nama: true,
+        alamat: true,
         currentKolektor: true,
         kolektorId: true,
         invoices: {
@@ -38,6 +39,7 @@ export class CustomerService {
       return {
         id: r.id,
         nama: r.nama,
+        alamat: r.alamat ?? "-",
         kolektorId: r.kolektorId,
         kolektorNama: r.currentKolektor.nama,
         invoiceAktif: r.invoices.length,
@@ -79,14 +81,14 @@ export class CustomerService {
     return res;
   }
 
-  public static async getDetailCustomer(id : string) {
-    const res = await prisma.customer.findFirst( {
-      where : {
-        id
+  public static async getDetailCustomer(id: string) {
+    const res = await prisma.customer.findFirst({
+      where: {
+        id,
       },
-      include : {
-        currentKolektor : true 
-      }
+      include: {
+        currentKolektor: true,
+      },
     });
     return res;
   }
@@ -108,17 +110,18 @@ export class CustomerService {
   }
 
   public static async updateCostumer(customer: TUpdateCustomerInput) {
-    const { id, nama, kolektorId } = customer;
+    const { id, nama, kolektorId, alamat } = customer;
 
     const updateCustomerData: Prisma.CustomerUncheckedUpdateInput = {};
     if (nama) updateCustomerData.nama = nama;
     if (kolektorId) updateCustomerData.kolektorId = kolektorId;
+    if (alamat) updateCustomerData.alamat = alamat;
 
     const existingCustomer = await prisma.customer.findUnique({
       where: { id },
       select: { kolektorId: true },
     });
-    
+
     const updatedCustomer = await prisma.$transaction(async (prisma) => {
       const updateCostumer = await prisma.customer.update({
         where: { id: id },

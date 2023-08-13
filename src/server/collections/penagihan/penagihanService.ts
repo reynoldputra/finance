@@ -1,6 +1,9 @@
 import { Prisma } from "@server/../generated/client";
 import { prisma } from "../../prisma";
-import { TCreatePenagihanInput, TUpdatePenagihanInput } from "./penagihanSchema";
+import {
+  TCreatePenagihanInput,
+  TUpdatePenagihanInput,
+} from "./penagihanSchema";
 
 export class PenagihanService {
   static async getAllPenagihan() {
@@ -61,6 +64,26 @@ export class PenagihanService {
       });
     }
 
+    parsed.sort((a, b) => {
+      return a.transaksiId.localeCompare(b.transaksiId);
+    });
+  
+    let currentInvoiceId: string | null = null;
+    let cicilanCount = 1;
+  
+    parsed.forEach((data) => {
+      if (data.transaksiId !== currentInvoiceId) {
+        currentInvoiceId = data.transaksiId;
+        cicilanCount = 1;
+      }
+  
+      if (data.status === "CICILAN") {
+        data.status = `CICILAN ${cicilanCount}`;
+        cicilanCount++;
+      }
+    });
+  
+
     return parsed;
   }
 
@@ -91,7 +114,7 @@ export class PenagihanService {
       };
     });
 
-    return parse
+    return parse;
   }
 
   static async getPenagihan(id: string) {
@@ -200,13 +223,13 @@ export class PenagihanService {
   static async updateStatusToNihil(id: string) {
     const result = await prisma.penagihan.update({
       where: {
-        id
+        id,
       },
       data: {
-        status: "NIHIL"
-      }
-    })
-    
+        status: "NIHIL",
+      },
+    });
+
     return result;
   }
 }

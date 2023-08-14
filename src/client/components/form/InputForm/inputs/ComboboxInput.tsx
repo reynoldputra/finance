@@ -28,6 +28,7 @@ interface ComboboxInputProps {
   options?: readonly ComboboxItem[];
   disabled?: boolean;
   width?: number;
+  value?: string
   onChange?: (str: string) => void;
 }
 
@@ -36,6 +37,7 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
   disabled = false,
   title,
   description,
+  value,
   errorMessage,
   onChange,
   options,
@@ -82,7 +84,7 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                     {options?.map((language) => (
                       <CommandItem
                         disabled={language.disabled}
-                        value={language.value.toString()}
+                        value={value ?? language.value.toString()}
                         key={language.value}
                         onSelect={(value) => {
                           form.setValue(name, form.getValues(name) == value ? "" : value);

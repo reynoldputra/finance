@@ -144,7 +144,6 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
   const {
     fields: distribusiFields,
     append,
-    replace,
     remove,
   } = useFieldArray({
     name: "distribusi",
@@ -265,7 +264,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
 
     const sortedPenagihan = filteredPenagihan.sort((a, b) => b.sisa - a.sisa);
 
-    form.setValue("distribusi", [{ penagihanId: "", total: 0 }]);
+    form.setValue("distribusi", []);
 
     const formFieldsValue: { penagihanId: string; total: number }[] = [];
     const newDistState: IDistribusi[] = [];
@@ -280,6 +279,11 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
         else total = totalPembayaran;
 
         totalPembayaran -= total;
+
+        append({
+          penagihanId: penagihan.id,
+          total,
+        })
 
         formFieldsValue.push({
           penagihanId: penagihan.id,
@@ -296,7 +300,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
     }
 
     setTotalDistirbusi(watchCarabayarTotal[0]);
-    replace(formFieldsValue);
+    console.log(formFieldsValue)
     setDistribusi(newDistState);
   };
 
@@ -381,7 +385,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
             <p className={cn("text-center py-1 px-2 border rounded-md", c[2])}>M</p>
             <p className={cn(c[3], "py-1 px-2 border rounded-md")}>Sisa</p>
             <p className={cn(c[4])}></p>
-            {distribusiFields.map((field, idx) => (
+            {useWatchDistribusi && distribusiFields.map((field, idx) => (
               <Fragment key={idx}>
                 <div className={c[0]}>
                   <ComboboxInput
@@ -411,11 +415,12 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
                     }}
                     type="number"
                     className="w-36"
-                    disabled={distribusi[idx] && !distribusi[idx].manualInput}
+                    disabled={distribusi[idx] && !distribusi[idx]?.manualInput}
                   />
                 </div>
                 <div className={cn("flex justify-center items-center", c[2])}>
                   <Checkbox
+                    checked={distribusi[idx] && distribusi[idx].manualInput}
                     onCheckedChange={(v) => {
                       const currentDist = [...distribusi];
                       if (currentDist[idx]) {
@@ -430,8 +435,8 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
                                 const sisa = distribusi[idx].sisa;
                                 if (sisa < totalPembayaran) {
                                   form.setValue(`distribusi.${parseInt(idx)}.total`, sisa);
-                                  totalPembayaran -= sisa;
                                   const newDistState = [...distribusi];
+                                  totalPembayaran -= sisa;
                                   newDistState[idx].total = sisa;
                                   setDistribusi(newDistState);
                                 } else {
@@ -466,7 +471,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
                     variant="destructive"
                     type="button"
                     onClick={() => {
-                      if (idx) remove(idx);
+                      remove(idx);
                       const dist = distribusi;
                       dist.splice(idx);
                       setDistribusi(dist);

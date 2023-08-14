@@ -15,16 +15,18 @@ interface DefaultInputProps {
   description?: string;
   placeholder?: string;
   disabled?: boolean;
+  value?: string | number
   errorMessage?: string;
   type: "text" | "number" | "combobox" | "datepicker";
   className?: string;
-  onChange?: (v : string) => void
+  onChange?: (v : string | number) => void
 }
 
 const DefaultInput: React.FC<DefaultInputProps> = ({
   name,
   title,
   description,
+  value,
   errorMessage,
   disabled,
   type,
@@ -45,10 +47,12 @@ const DefaultInput: React.FC<DefaultInputProps> = ({
               disabled={disabled}
               type={type}
               placeholder={placeholder}
-              value={field.value ?? ""}
+              value={field.value ?? (value && (typeof type == "number" ? parseInt(value?.toString()) : value)) ?? ""}
               onChange={(e) => {
-                field.onChange(e.target.value)
-                if(onChange) onChange(e.target.value)
+                console.log(typeof type)
+                const valParse = type == "number" ? parseInt(e.target.value) : e.target.value
+                field.onChange(valParse)
+                if(onChange) onChange(valParse)
               }}
               onBlur={field.onBlur}
             />

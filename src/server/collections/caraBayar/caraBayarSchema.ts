@@ -23,6 +23,7 @@ export const createCaraBayarInput = z.object({
 
 export const updateCaraBayarInput = z.object({
   id: z.string(),
+  keterangan: z.string(),
   total: z.number(),
   tandaTerima: z.boolean(),
   tanggal : z.date(),

@@ -95,20 +95,39 @@ export class PembayaranService {
   static async updatePembayaran(input: TUpdatePembayaranInput) {
     const result = await prisma.$transaction(async (ctx) => {
       const carabayar = await CaraBayarService.updateCaraBayar(input.carabayar, ctx)
-      let distribusiHasil : DistribusiPembayaran[] = []
       const distribusiLama = await ctx.distribusiPembayaran.findMany({
         where : {
           caraBayarId : carabayar.id
         }
       })
-
-      const distribusiBaruId = input.distribusi.map(d => d.id)
+      let distribusiBaru : DistribusiPembayaran[] = []
+      let distribusiUpdated : DistribusiPembayaran[] = []
+      let distribusiDeleted : DistribusiPembayaran[] = []
       
-      // delete distribusi that doesnt include in new pembayaran
+      // delete unused distribusi
       // if there is only one distribusi for some penagihan, so penagihan status will changed to waiting
+      // update old distirbusi
       for(let idx in distribusiLama) {
         const distLama = distribusiLama[idx]
-        if(!distribusiBaruId.includes(distLama.id)) {
+        const findDistlama = input.distribusiLama.find(f => f.distribusiId == distLama.id)
+        if(findDistlama) {
+          const dist = await ctx.distribusiPembayaran.update({
+            where : {
+              id : findDistlama.distribusiId
+            },
+            data : {
+              jumlah : findDistlama.total
+            }
+          })
+
+          distribusiDeleted.push(dist)
+        } else {
+          const dist = await ctx.distribusiPembayaran.delete({
+            where : {
+              id : distLama.id
+            }
+          })
+
           const infopenagihan = await ctx.penagihan.findFirst({
             where : {
               id : distLama.penagihanId
@@ -117,13 +136,8 @@ export class PembayaranService {
               distribusiPembayaran : true
             }
           })
-          const dist = await ctx.distribusiPembayaran.delete({
-            where : {
-              id : distLama.id
-            }
-          })
 
-          if(infopenagihan?.distribusiPembayaran.length == 1) {
+          if(infopenagihan?.distribusiPembayaran.length == 0) {
             await ctx.penagihan.update({
               where : {
                 id : dist.penagihanId
@@ -133,12 +147,14 @@ export class PembayaranService {
                 }
             })
           }
+
+          distribusiDeleted.push(dist)
         }
       }
 
-      //
-      for(let idx in input.distribusi) {
-        const distribusi = input.distribusi[idx]
+      // recreate new distribusi
+      for(let idx in input.distribusiBaru) {
+        const distribusi = input.distribusiBaru[idx]
         const detailPenagihan = await PenagihanService.getPenagihan(distribusi.penagihanId);
         const invoice = await InvoiceService.getInvoice(detailPenagihan.invoiceId);
 
@@ -150,7 +166,7 @@ export class PembayaranService {
           }
         })
 
-        distribusiHasil.push(distribusiPembayaran)
+        distribusiBaru.push(distribusiPembayaran)
 
         await ctx.penagihan.update({
           where : {
@@ -162,7 +178,11 @@ export class PembayaranService {
         })
       }
 
-      return distribusiHasil;
+      return {
+        deleted : distribusiDeleted,
+        updated : distribusiUpdated,
+        created : distribusiUpdated
+      };
     });
 
     return result;

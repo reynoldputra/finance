@@ -59,7 +59,7 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                     )}
                   >
                     {field.value
-                      ? options?.find((language) => language.value === field.value)?.title
+                      ? options?.find((language) => language.value === field.value)?.title || field.value
                       : `Select ...`}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -75,8 +75,8 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                         disabled={language.disabled}
                         value={language.value.toString()}
                         key={language.value}
-                        onSelect={(value) => {
-                          form.setValue(name, (form.getValues(name) == value ? "" : value));
+                        onSelect={() => {
+                          form.setValue(name, (form.getValues(name) == language.value ? "" : language.value));
                         }}
                       >
                         <Check

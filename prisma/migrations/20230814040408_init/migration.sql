@@ -35,6 +35,7 @@ CREATE TABLE "Penagihan" (
     "kolektorId" TEXT NOT NULL,
     "status" TEXT NOT NULL,
     "keterangan" TEXT,
+    "tandaTerima" BOOLEAN,
     CONSTRAINT "Penagihan_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "Penagihan_kolektorId_fkey" FOREIGN KEY ("kolektorId") REFERENCES "Kolektor" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );

@@ -17,10 +17,25 @@ import { Row } from "@tanstack/react-table";
 
 interface UpdatePenagihanFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  row : Row<TPenagihanTable>
+  row: Row<TPenagihanTable>;
 }
 
-export function UpdatePenagihanForm({ setOpen, row }: UpdatePenagihanFormProps) {
+type StatusOption = {
+  title: string;
+  value: string;
+};
+
+const statusOptions: StatusOption[] = [
+  { title: "NIHIL", value: "NIHIL" },
+  { title: "WAITING", value: "WAITING" },
+  { title: "CICILAN", value: "CICILAN" },
+  { title: "LUNAS", value: "LUNAS" },
+];
+
+export function UpdatePenagihanForm({
+  setOpen,
+  row,
+}: UpdatePenagihanFormProps) {
   const { toast } = useToast();
 
   const res = trpc.invoice.getInvoices.useQuery();
@@ -32,14 +47,18 @@ export function UpdatePenagihanForm({ setOpen, row }: UpdatePenagihanFormProps) 
 
   const form = useForm<TUpdatePenagihanInput>({
     resolver: zodResolver(updatePenagihanInput),
-    defaultValues : {
-      penagihanId : row.original.id,
-      invoiceId : invoices.find((i) => i.title == row.original.transaksiId)?.value.toString() ?? "",
-      tanggalTagihan : row.original.tanggalTagihan,
-      kolektorId : row.original.kolektorId,
-    }
+    defaultValues: {
+      penagihanId: row.original.id,
+      invoiceId:
+        invoices
+          .find((i) => i.title == row.original.transaksiId)
+          ?.value.toString() ?? "",
+      tanggalTagihan: row.original.tanggalTagihan,
+      kolektorId: row.original.kolektorId,
+      status: row.original.status,
+    },
   });
-
+ 
   const kolektor = trpc.kolektor.getAllKolektor.useQuery();
   const kolektorData = kolektor.data?.data ?? [];
   const kolektorOptions: ComboboxItem[] = kolektorData.map((k) => ({
@@ -51,14 +70,15 @@ export function UpdatePenagihanForm({ setOpen, row }: UpdatePenagihanFormProps) 
   const utils = trpc.useContext();
 
   async function onSubmit(values: TUpdatePenagihanInput) {
-    console.log(values)
+    console.log(values);
     try {
+      console.log(values);
       const { data } = await updatePenagihanMutation.mutateAsync(values);
       if (data) {
         toast({
           description: `Penagihan successfully updated`,
           variant: "success",
-          className: "text-white text-base font-semibold"
+          className: "text-white text-base font-semibold",
         });
         setOpen(false);
         utils.penagihan.invalidate();
@@ -85,7 +105,17 @@ export function UpdatePenagihanForm({ setOpen, row }: UpdatePenagihanFormProps) 
           title="Kolektor"
           options={kolektorOptions}
         />
-        <InputForm {...register("tanggalTagihan")} type="datepicker" title="Tanggal Tagihan" />
+        <InputForm
+          {...register("status")}
+          type="combobox"
+          title="Status"
+          options={statusOptions}
+        />
+        <InputForm
+          {...register("tanggalTagihan")}
+          type="datepicker"
+          title="Tanggal Tagihan"
+        />
         <Button type="submit">Submit</Button>
       </form>
     </Form>

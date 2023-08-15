@@ -41,7 +41,7 @@ export class TandaTerimaService {
       return {
         id: entry.id,
         namaCustomer: customer.nama,
-        alamat: customer.alamat,
+        alamat: customer.alamat ?? "",
         tanggalTT: entry.tanggalTT,
         jumlahInvoice: invoiceIds.length,
         invoices: invoiceIds,

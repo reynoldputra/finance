@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const penagihanTableSchema = z.object({
-  id : z.string(),
+  id: z.string(),
   transaksiId: z.string(),
   tanggalTagihan: z.date(),
   status: z.string(),
@@ -10,6 +10,7 @@ export const penagihanTableSchema = z.object({
   kolektorId: z.string(),
   namaCustomer: z.string(),
   customerId: z.string(),
+  tandaTerima: z.boolean().optional(),
   totalPembayaran: z.number(),
   cash: z.number(),
   transfer: z.number(),

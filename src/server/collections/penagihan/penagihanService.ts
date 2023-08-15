@@ -3,6 +3,7 @@ import { prisma } from "../../prisma";
 import {
   TCreatePenagihanInput,
   TUpdatePenagihanInput,
+  TUpdateTT,
 } from "./penagihanSchema";
 
 export class PenagihanService {
@@ -57,6 +58,7 @@ export class PenagihanService {
         namaCustomer: d.invoice.customer.nama,
         customerId: d.invoice.customer.id,
         sisa: d.invoice.total - total,
+        tandaTerima: d.tandaTerima ?? false,
         totalPembayaran: total,
         cash,
         transfer,
@@ -67,22 +69,21 @@ export class PenagihanService {
     parsed.sort((a, b) => {
       return a.transaksiId.localeCompare(b.transaksiId);
     });
-  
+
     let currentInvoiceId: string | null = null;
     let cicilanCount = 1;
-  
+
     parsed.forEach((data) => {
       if (data.transaksiId !== currentInvoiceId) {
         currentInvoiceId = data.transaksiId;
         cicilanCount = 1;
       }
-  
+
       if (data.status === "CICILAN") {
         data.status = `CICILAN ${cicilanCount}`;
         cicilanCount++;
       }
     });
-  
 
     return parsed;
   }
@@ -200,6 +201,7 @@ export class PenagihanService {
     if (input.invoiceId) updateData.invoiceId = input.invoiceId;
     if (input.kolektorId) updateData.kolektorId = input.kolektorId;
     if (input.tanggalTagihan) updateData.tanggalTagihan = input.tanggalTagihan;
+    if (input.status) updateData.status = input.status;
     const result = await prisma.penagihan.update({
       where: {
         id: input.penagihanId,
@@ -227,6 +229,19 @@ export class PenagihanService {
       },
       data: {
         status: "NIHIL",
+      },
+    });
+
+    return result;
+  }
+
+  static async updateTT(input: TUpdateTT) {
+    const result = await prisma.penagihan.update({
+      where: {
+        id: input.id,
+      },
+      data: {
+        tandaTerima: input.value,
       },
     });
 

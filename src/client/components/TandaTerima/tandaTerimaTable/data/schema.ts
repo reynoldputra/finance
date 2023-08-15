@@ -3,7 +3,7 @@ import { z } from "zod";
 export const tandaTerimaTable = z.object({
   id: z.string(),
   namaCustomer: z.string(),
-  alamat: z.string(),
+  alamat: z.string().optional(),
   tanggalTT: z.date(),
   jumlahInvoice: z.number(),
   invoices: z.array(z.string()),

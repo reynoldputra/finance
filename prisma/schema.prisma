@@ -56,6 +56,7 @@ model Penagihan {
   distribusiPembayaran DistribusiPembayaran[]
   status               String
   keterangan           String?
+  tandaTerima          Boolean?
 
   invoice  Invoice  @relation(fields: [invoiceId], references: [id])
   kolektor Kolektor @relation(fields: [kolektorId], references: [id])

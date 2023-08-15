@@ -5,6 +5,8 @@ import {
   TCreatePenagihanInput,
   updatePenagihanInput,
   TUpdatePenagihanInput,
+  updateTT,
+  TUpdateTT,
 } from "./penagihanSchema";
 import { PenagihanService } from "./penagihanService";
 
@@ -24,19 +26,21 @@ export const PenagihanRouter = penagihanTrpc.router({
       };
     }
   }),
-  getPenagihanById: penagihanTrpc.publicProcedure.input(z.string()).query(async ({ input }) => {
-    try {
-      const res = await PenagihanService.getPenagihan(input);
-      return {
-        status: true,
-        data: res,
-      };
-    } catch (err) {
-      return {
-        status: false,
-      };
-    }
-  }),
+  getPenagihanById: penagihanTrpc.publicProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      try {
+        const res = await PenagihanService.getPenagihan(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
   getPenagihanSisa: penagihanTrpc.publicProcedure.query(async () => {
     try {
       const res = await PenagihanService.getPenagihanSisa();
@@ -135,6 +139,21 @@ export const PenagihanRouter = penagihanTrpc.router({
     .mutation(async ({ input: id }) => {
       try {
         const res = await PenagihanService.updateStatusToNihil(id);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
+  updateTT: penagihanTrpc.publicProcedure
+    .input(updateTT)
+    .mutation(async ({ input }: { input: TUpdateTT }) => {
+      try {
+        const res = await PenagihanService.updateTT(input);
         return {
           status: true,
           data: res,

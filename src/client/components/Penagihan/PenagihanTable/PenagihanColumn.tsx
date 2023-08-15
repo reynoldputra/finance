@@ -4,8 +4,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import { TPenagihanTable } from "./data/schema";
 import { idr } from "@client/lib/idr";
 import { RowAction } from "./RowAction";
+import { trpc } from "@client/lib/trpc";
 
-export const PenagihanColumn : ColumnDef<TPenagihanTable>[] = [
+export const PenagihanColumn: ColumnDef<TPenagihanTable>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -35,7 +36,6 @@ export const PenagihanColumn : ColumnDef<TPenagihanTable>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
-
   },
   {
     accessorKey: "namaKolektor",
@@ -45,7 +45,6 @@ export const PenagihanColumn : ColumnDef<TPenagihanTable>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
-
   },
   {
     accessorKey: "tanggalTagihan",
@@ -61,7 +60,6 @@ export const PenagihanColumn : ColumnDef<TPenagihanTable>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
-
   },
   {
     accessorKey: "status",
@@ -74,9 +72,51 @@ export const PenagihanColumn : ColumnDef<TPenagihanTable>[] = [
   },
   {
     accessorKey: "sisa",
-    id : "sisa",
-    header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Sisa" />,
-    cell: ({ row }) => <div className="w-[180px]">{idr(row.getValue("sisa"))}</div>,
+    id: "sisa",
+    header: ({ column, table }) => (
+      <DataTableColumnHeader table={table} column={column} title="Sisa" />
+    ),
+    cell: ({ row }) => (
+      <div className="w-[180px]">{idr(row.getValue("sisa"))}</div>
+    ),
+  },
+  {
+    accessorKey: "tandaTerima",
+    id: "TT",
+    header: ({ table, column }) => (
+      <DataTableColumnHeader table={table} column={column} title="TT" />
+    ),
+    cell: ({ row }) => {
+      const updateTandaTerimaMutation = trpc.penagihan.updateTT.useMutation();
+      const utils = trpc.useContext();
+      return (
+        <Checkbox
+          checked={row.original.tandaTerima ?? false}
+          value={"true"}
+          onCheckedChange={async (value) => {
+            const input = {
+              value: value == false ? false : true,
+              id: row.original.id,
+            };
+            try {
+              const { data } = await updateTandaTerimaMutation.mutateAsync(
+                input
+              );
+              if (data) {
+                utils.penagihan.invalidate();
+                return {
+                  data: data,
+                };
+              }
+            } catch (err) {
+              console.log(err);
+            }
+          }}
+          aria-label="Select row"
+          className="translate-y-[2px]"
+        />
+      );
+    },
   },
   // {
   //   id : "Pembayaran",
@@ -93,4 +133,4 @@ export const PenagihanColumn : ColumnDef<TPenagihanTable>[] = [
     id: "actions",
     cell: ({ row }) => <RowAction row={row} />,
   },
-]
+];

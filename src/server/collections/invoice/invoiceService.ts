@@ -12,6 +12,7 @@ export class InvoiceService {
         tanggalTransaksi: invoice.tanggalTransaksi,
         namaSales: invoice.namaSales,
         total: invoice.total,
+        // type: invoice.type,
       },
     });
     return res;
@@ -48,7 +49,8 @@ export class InvoiceService {
         status : (inv.total - totalPembayaran > 0 ) ? "BELUM" : "LUNAS",
         namaCustomer : inv.customer.nama,
         customerId : inv.customer.id,
-        total : inv.total
+        total : inv.total,
+        // type: inv.type
       });
     }
 

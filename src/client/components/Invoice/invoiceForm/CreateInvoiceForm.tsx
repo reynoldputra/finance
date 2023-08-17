@@ -13,6 +13,16 @@ interface CreateInvoiceFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+// interface TtypeOptions {
+//   title: string,
+//   value: string,
+// }
+
+// const typeOptions: TtypeOptions[] = [
+//   {title: "KREDIT 30 HARI", value: "KREDIT 30 HARI"},
+//   {title: "CASH", value:"CASH"}
+// ]
+
 export function CreateInvoiceForm({ setOpen }: CreateInvoiceFormProps) {
   const { toast } = useToast();
 
@@ -71,6 +81,13 @@ export function CreateInvoiceForm({ setOpen }: CreateInvoiceFormProps) {
           type="datepicker"
           title="Tanggal Transaksi"
         />
+        {/* <InputForm 
+          {...register("type")}
+          name="type"
+          title="Tipe"
+          type="combobox"
+          options={typeOptions}
+        /> */}
         <InputForm {...register("total")} name="total" type="text" title="Total" />
         <Button type="submit">Submit</Button>
       </form>

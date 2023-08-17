@@ -15,6 +15,16 @@ interface UpdateInvoiceFormProps {
   row : Row<TInvoiceSchema>
 }
 
+// interface TtypeOptions {
+//   title: string,
+//   value: string,
+// }
+
+// const typeOptions: TtypeOptions[] = [
+//   {title: "KREDIT 30 HARI", value: "KREDIT 30 HARI"},
+//   {title: "CASH", value:"CASH"}
+// ]
+
 export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
   const { toast } = useToast();
 
@@ -34,6 +44,7 @@ export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
       total : row.original.total,
       tanggalTransaksi : row.original.tanggalTransaksi,
       namaSales : row.original.namaSales,
+      // type: row.original.type
     }
   });
 
@@ -81,6 +92,13 @@ export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
           type="datepicker"
           title="Tanggal Transaksi"
         />
+        {/* <InputForm 
+          {...register("type")}
+          name="type"
+          title="Tipe"
+          type="combobox"
+          options={typeOptions}
+        /> */}
         <InputForm {...register("total")} name="total" type="text" title="Total" />
         <Button type="submit">Submit</Button>
       </form>

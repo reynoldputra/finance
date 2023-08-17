@@ -7,6 +7,7 @@ export const createInvoiceInput = z.object({
   tanggalTransaksi: z.date(),
   customerId: z.string(),
   total: z.coerce.number(),
+  // type: z.string(),
 });
 
 export const updateInvoiceInput = z.object({
@@ -16,6 +17,7 @@ export const updateInvoiceInput = z.object({
   tanggalTransaksi: z.date(),
   customerId: z.string(),
   total: z.number(),
+  // type: z.string(),
 });
 
 export type TCreateInvoiceInput = z.infer<typeof createInvoiceInput>;

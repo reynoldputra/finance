@@ -10,7 +10,7 @@ export const invoiceSchema = z.object({
     namaCustomer: z.string(),
     customerId : z.string(),
     status: z.string(),
-    // type: z.string(),
+    type: z.string(),
 })
 
 export type TInvoiceSchema = z.infer<typeof invoiceSchema>

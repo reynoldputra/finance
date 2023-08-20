@@ -7,8 +7,8 @@ import { trpc } from "@client/lib/trpc";
 import { useToast } from "@client/components/ui/use-toast";
 import { ComboboxItem } from "@client/types/form/ComboboxItem";
 import {
-  createPenagihanInput,
-  TCreatePenagihanInput,
+  manyPenagihanInput,
+  TManyPenagihanInput,
 } from "@client/../server/collections/penagihan/penagihanSchema";
 import { z } from "zod";
 import { Table } from "@tanstack/react-table";
@@ -19,7 +19,10 @@ interface AddPenagihanFormProps<TData> {
   table: Table<TData>;
 }
 
-export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvoiceSchema>) {
+export function AddPenagihanForm({
+  setOpen,
+  table,
+}: AddPenagihanFormProps<TInvoiceSchema>) {
   const { toast } = useToast();
 
   const selectedRows = table.getSelectedRowModel().rows;
@@ -27,18 +30,21 @@ export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvo
   const customers = trpc.customer.customerTable.useQuery();
   const kolektors = trpc.kolektor.getAllKolektor.useQuery();
 
-  const initValue: TCreatePenagihanInput[] = selectedRows.map((r) => {
+  const initValue: TManyPenagihanInput[] = selectedRows.map((r) => {
     const customerData = customers.data ?? [];
-    const customer = customerData.find((c) => c.nama == r.original.namaCustomer);
+    const customer = customerData.find(
+      (c) => c.nama == r.original.namaCustomer
+    );
     return {
       invoiceId: r.original.id,
       kolektorId: customer?.kolektorId ?? "",
       tanggalTagihan: new Date(),
+      status: r.original.status,
     };
   });
 
   const FormSchema = z.object({
-    manyPenagihan: z.array(createPenagihanInput),
+    manyPenagihan: z.array(manyPenagihanInput),
   });
 
   type TFormSchema = z.infer<typeof FormSchema>;
@@ -46,7 +52,7 @@ export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvo
   const form = useForm<TFormSchema>({
     resolver: zodResolver(
       z.object({
-        manyPenagihan: z.array(createPenagihanInput),
+        manyPenagihan: z.array(manyPenagihanInput),
       })
     ),
     defaultValues: {
@@ -65,20 +71,23 @@ export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvo
     value: item.id,
   }));
 
-  const createManyPenagihanMutation = trpc.penagihan.createManyPenagihan.useMutation();
+  const createManyPenagihanMutation =
+    trpc.penagihan.createManyPenagihan.useMutation();
   const utils = trpc.useContext();
 
   async function onSubmit(values: TFormSchema) {
     try {
-      const { data } = await createManyPenagihanMutation.mutateAsync(values.manyPenagihan);
+      const { data } = await createManyPenagihanMutation.mutateAsync(
+        values.manyPenagihan
+      );
       if (data) {
         toast({
           description: `${data.length} penagihan successfully created`,
           variant: "success",
-          className: "text-white text-base font-semibold"
+          className: "text-white text-base font-semibold",
         });
         utils.invoice.invalidate();
-        setOpen(false)
+        setOpen(false);
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
@@ -94,12 +103,25 @@ export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvo
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 flex flex-col gap-y-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 flex flex-col gap-y-4"
+      >
         {fields.map((field, idx) => {
           return (
             <div key={idx} className="flex flex-col gap-y-2">
-              <p className="font-bold">
-                {selectedRows.find((r) => r.original.id == field.invoiceId)?.original.transaksiId}
+              <p
+                className={`font-bold ${
+                  selectedRows.find((r) => r.original.id === field.invoiceId)
+                    ?.original.status === "LUNAS"
+                    ? "text-red-600"
+                    : ""
+                }`}
+              >
+                {
+                  selectedRows.find((r) => r.original.id == field.invoiceId)
+                    ?.original.transaksiId
+                }
               </p>
               <InputForm
                 {...register(`manyPenagihan.${idx}.tanggalTagihan`)}
@@ -112,10 +134,21 @@ export function AddPenagihanForm({ setOpen, table }: AddPenagihanFormProps<TInvo
                 options={kolektorOption}
                 title="Kolektor"
               />
+              {selectedRows.find((r) => r.original.id == field.invoiceId)
+                ?.original.status === "LUNAS" && (
+                <p className="font-semibold text-red-600">
+                  This Invoice is marked as LUNAS
+                </p>
+              )}
             </div>
           );
         })}
-        <Button type="submit">Submit</Button>
+        <Button
+          disabled={fields.some((field) => field.status === "LUNAS")}
+          type="submit"
+        >
+          Submit
+        </Button>
       </form>
     </Form>
   );

@@ -15,9 +15,8 @@ export class KolektorService {
           select: {
             status: true,
           },
-          // ganti jadi waiting
           where: {
-            status: "CICILAN",
+            status: "WAITING",
           },
         },
       },

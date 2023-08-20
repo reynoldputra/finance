@@ -5,29 +5,26 @@ import { Button } from "@client/components/ui/button";
 import InputForm from "../../form/InputForm/InputForm";
 import { trpc } from "@client/lib/trpc";
 import { useToast } from "@client/components/ui/use-toast";
-import { createInvoiceInput, TCreateInvoiceInput } from "@server/collections/invoice/invoiceSchema";
+import {
+  createInvoiceInput,
+  TCreateInvoiceInput,
+} from "@server/collections/invoice/invoiceSchema";
 import { ComboboxItem } from "@client/types/form/ComboboxItem";
-import cuid from "cuid";
 
 interface CreateInvoiceFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-// interface TtypeOptions {
-//   title: string,
-//   value: string,
-// }
-
-// const typeOptions: TtypeOptions[] = [
-//   {title: "KREDIT 30 HARI", value: "KREDIT 30 HARI"},
-//   {title: "CASH", value:"CASH"}
-// ]
+const typeOptions: ComboboxItem[] = [
+  { title: "KREDIT 30 HARI", value: "KREDIT 30 HARI" },
+  { title: "CASH", value: "CASH " },
+];
 
 export function CreateInvoiceForm({ setOpen }: CreateInvoiceFormProps) {
   const { toast } = useToast();
 
   const form = useForm<TCreateInvoiceInput>({
-    resolver: zodResolver(createInvoiceInput)
+    resolver: zodResolver(createInvoiceInput),
   });
 
   const res = trpc.customer.customerOption.useQuery();
@@ -38,19 +35,20 @@ export function CreateInvoiceForm({ setOpen }: CreateInvoiceFormProps) {
   }));
 
   const createInvoiceMutation = trpc.invoice.createInvoice.useMutation();
-  const utils = trpc.useContext()
+  const utils = trpc.useContext();
 
   async function onSubmit(values: TCreateInvoiceInput) {
+    console.log("submitted");
     try {
       const { data } = await createInvoiceMutation.mutateAsync(values);
       if (data) {
         toast({
           description: `Invoice ${data.id} successfully created`,
           variant: "success",
-          className: "text-white text-base font-semibold"
+          className: "text-white text-base font-semibold",
         });
         setOpen(false);
-        utils.invoice.invalidate()
+        utils.invoice.invalidate();
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
@@ -67,28 +65,41 @@ export function CreateInvoiceForm({ setOpen }: CreateInvoiceFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <InputForm {...register("transaksiId")} type="text" title="Transaksi ID" />
+        <InputForm
+          {...register("transaksiId")}
+          type="text"
+          title="Transaksi ID"
+        />
         <InputForm
           {...register("customerId")}
           type="combobox"
           title="Nama Customer"
           options={custemers}
         />
-        <InputForm {...register("namaSales")} name="namaSales" type="text" title="Nama Sales" />
+        <InputForm
+          {...register("namaSales")}
+          name="namaSales"
+          type="text"
+          title="Nama Sales"
+        />
         <InputForm
           {...register("tanggalTransaksi")}
           name="tanggalTransaksi"
           type="datepicker"
           title="Tanggal Transaksi"
         />
-        {/* <InputForm 
+        <InputForm
           {...register("type")}
-          name="type"
           title="Tipe"
           type="combobox"
           options={typeOptions}
-        /> */}
-        <InputForm {...register("total")} name="total" type="text" title="Total" />
+        />
+        <InputForm
+          {...register("total")}
+          name="total"
+          type="text"
+          title="Total"
+        />
         <Button type="submit">Submit</Button>
       </form>
     </Form>

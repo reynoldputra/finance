@@ -6,13 +6,12 @@ export class InvoiceService {
   public static async createInvoice(invoice: TCreateInvoiceInput) {
     const res = await prisma.invoice.create({
       data: {
-        id: invoice.id,
         transaksiId : invoice.transaksiId,
         customerId: invoice.customerId,
         tanggalTransaksi: invoice.tanggalTransaksi,
         namaSales: invoice.namaSales,
         total: invoice.total,
-        // type: invoice.type,
+        type: invoice.type,
       },
     });
     return res;
@@ -50,7 +49,7 @@ export class InvoiceService {
         namaCustomer : inv.customer.nama,
         customerId : inv.customer.id,
         total : inv.total,
-        // type: inv.type
+        type: inv.type
       });
     }
 

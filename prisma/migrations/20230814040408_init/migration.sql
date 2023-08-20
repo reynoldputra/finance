@@ -87,6 +87,7 @@ CREATE TABLE "cara_bayar" (
     "tanda_terima" BOOLEAN NOT NULL,
     "metodePembayaranId" INTEGER NOT NULL,
     "tanggal" DATETIME NOT NULL,
+    "keterangan" TEXT,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL,
     CONSTRAINT "cara_bayar_metodePembayaranId_fkey" FOREIGN KEY ("metodePembayaranId") REFERENCES "metode_pembayaran" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
@@ -95,7 +96,9 @@ CREATE TABLE "cara_bayar" (
 -- CreateTable
 CREATE TABLE "metode_pembayaran" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "jenis" TEXT NOT NULL
+    "jenis" TEXT NOT NULL,
+    "batas_atas" INTEGER NOT NULL,
+    "bayasBawah" INTEGER NOT NULL
 );
 
 -- CreateTable

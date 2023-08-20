@@ -114,6 +114,7 @@ model CaraBayar {
   distribusiPembayaran DistribusiPembayaran[]
   metodePembayaranId   Int
   tanggal              DateTime
+  keterangan           String?
 
   transfer  Transfer?
   giro      Giro?
@@ -128,7 +129,9 @@ model MetodePembayaran {
   id    Int    @id @default(autoincrement())
   jenis String @unique
 
-  caraBayar CaraBayar[]
+  caraBayar  CaraBayar[]
+  batasAtas  Int         @map("batas_atas")
+  batasBawah Int         @map("bayasBawah")
 
   @@map("metode_pembayaran")
 }

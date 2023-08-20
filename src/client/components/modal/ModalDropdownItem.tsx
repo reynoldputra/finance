@@ -3,6 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface IModalItemProps extends Dialog.DialogProps {
   triggerChildren: React.ReactNode;
@@ -44,6 +45,7 @@ const ModalDropdownItem = React.forwardRef<HTMLDivElement, IModalItemProps>(
               )}
             </DialogHeader>
             <hr />
+          <ScrollArea className="max-h-[800px] pr-3">
             {children}
             <Dialog.Close
               asChild
@@ -53,6 +55,7 @@ const ModalDropdownItem = React.forwardRef<HTMLDivElement, IModalItemProps>(
                 <Cross2Icon />
               </button>
             </Dialog.Close>
+          </ScrollArea>
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>

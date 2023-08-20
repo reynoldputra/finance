@@ -26,7 +26,7 @@ export function Combobox({ items, placeholder, onChange, title }: ComboboxProps)
 
   return (
     <>
-      {title && <p className="text-sm">{title}</p>}
+      {title && <p className="text-base">{title}</p>}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button

@@ -1,6 +1,6 @@
 import { Table } from "@tanstack/react-table";
 import { TInvoiceSchema } from "./data/schema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AddPenagihanForm } from "../invoiceForm/AddPenagihanForm";
 import Modal from "@client/components/modal/Modal";
 
@@ -18,7 +18,7 @@ export default function SelectedAction({ table }: SelectedActionProps<TInvoiceSc
           open={openPenagihanForm}
           onOpenChange={setOpenPenagihanForm}
           buttonProps={{
-            disabled : !table.getIsSomeRowsSelected()
+            disabled : !(table.getIsSomeRowsSelected() || table.getIsAllRowsSelected())
           }}
         >
           <div className="flex gap-4">

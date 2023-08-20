@@ -11,22 +11,28 @@ import { Input } from "@client/components/ui/input";
 
 interface DefaultInputProps {
   name: string;
-  title: string;
+  title?: string;
   description?: string;
   placeholder?: string;
-  disabled?: boolean
+  disabled?: boolean;
+  value?: string | number
   errorMessage?: string;
   type: "text" | "number" | "combobox" | "datepicker";
+  className?: string;
+  onChange?: (v : string | number) => void
 }
 
 const DefaultInput: React.FC<DefaultInputProps> = ({
   name,
   title,
   description,
+  value,
   errorMessage,
   disabled,
   type,
-  placeholder
+  className,
+  placeholder,
+  onChange
 }) => {
   const form = useFormContext();
   return (
@@ -34,15 +40,20 @@ const DefaultInput: React.FC<DefaultInputProps> = ({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem>
-          <FormLabel className="text-base">{title}</FormLabel>
+        <FormItem className={className ?? "ml-1 "}>
+          {title && <FormLabel className="text-base">{title}</FormLabel>}
           <FormControl>
             <Input
               disabled={disabled}
               type={type}
               placeholder={placeholder}
-              value={field.value ?? ""}
-              onChange={(e) => field.onChange(e.target.value)}
+              value={field.value ?? (value && (typeof type == "number" ? parseInt(value?.toString()) : value)) ?? ""}
+              onChange={(e) => {
+                console.log(typeof type)
+                const valParse = type == "number" ? parseInt(e.target.value) : e.target.value
+                field.onChange(valParse)
+                if(onChange) onChange(valParse)
+              }}
               onBlur={field.onBlur}
             />
           </FormControl>

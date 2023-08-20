@@ -64,7 +64,37 @@ export class PenagihanService {
         transfer,
         giro,
       });
+
     }
+    // const sorted = parsed.sort((a, b) => {
+    //   if(a.id == b.id) {
+    //     return a.totalPembayaran - b.totalPembayaran
+    //   } else {
+    //     return a.transaksiId.localeCompare(b.transaksiId)
+    //   }
+    // })
+
+    // let curid = ""
+    // let idx = 1
+    // const indexing = sorted.map(p => {
+    //   if(curid == p.transaksiId) {
+    //     if(p.status == "CICILAN") {
+    //       p.status = "CICILAN " + idx
+    //       idx++
+    //     }
+    //     console.log(p.transaksiId, idx, p.status)
+    //     return p
+    //   } else {
+    //     curid = p.transaksiId
+    //     idx = 1
+    //     if(p.status == "CICILAN") {
+    //       p.status = "CICILAN " + idx
+    //       idx++
+    //     }
+    //     console.log(p.transaksiId, idx, p.status)
+    //     return p
+    //   }
+    // })
 
     parsed.sort((a, b) => {
       return a.transaksiId.localeCompare(b.transaksiId);

@@ -23,6 +23,7 @@ import ComboboxInput from "@client/components/form/InputForm/inputs/ComboboxInpu
 import { Checkbox } from "@client/components/ui/checkbox";
 import { cn } from "@client/lib/cn";
 import { Textarea } from "@client/components/ui/textarea";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 interface IDistribusi {
   penagihanId: string;
@@ -32,9 +33,9 @@ interface IDistribusi {
 }
 
 interface IDetailMetodePembayaran {
-  id : number,
-  batasAtas : number,
-  batasBawah : number
+  id: number,
+  batasAtas: number,
+  batasBawah: number
 }
 
 interface ModalFormProps {
@@ -50,6 +51,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
   const [totalDistribusi, setTotalDistirbusi] = useState(0);
   const [distribusi, setDistribusi] = useState<IDistribusi[]>([]);
   const [detailMetode, setDetailMetode] = useState<IDetailMetodePembayaran[]>([]);
+  const [ignoreToleransi, setIgnoreToleransi] = useState<Boolean>(false)
 
   const c = [4, 3, 1, 3, 1].map((v) => "col-span-" + v.toString()); // class for form cols
 
@@ -77,15 +79,15 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
   }));
 
   useEffect(() => {
-    if(metodePembayaranData) {
-      const detail : IDetailMetodePembayaran[] = []
+    if (metodePembayaranData) {
+      const detail: IDetailMetodePembayaran[] = []
 
-      for(let idx in metodePembayaranData) {
+      for (let idx in metodePembayaranData) {
         const m = metodePembayaranData[idx]
         detail[m.id] = {
-          id : m.id,
-          batasBawah : m.batasBawah,
-          batasAtas : m.batasAtas
+          id: m.id,
+          batasBawah: m.batasBawah,
+          batasAtas: m.batasAtas
         }
       }
 
@@ -505,20 +507,36 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
             {(detailMetode.length > 0 && totalCarabayar && totalCarabayar - totalDistribusi != 0)
               ? totalDistribusi - totalCarabayar > 0
                 ? detailMetode[metode].batasAtas < totalDistribusi - totalCarabayar &&
-                  "Uang pembayaran sisa " + idr(totalDistribusi - totalCarabayar)
+                "Uang pembayaran sisa " + idr(totalDistribusi - totalCarabayar)
                 : detailMetode[metode].batasBawah < totalCarabayar - totalDistribusi &&
-                  "Uang pembayaran kurang " + idr(totalCarabayar - totalDistribusi)
+                "Uang pembayaran kurang " + idr(totalCarabayar - totalDistribusi)
               : ""}
           </p>
         </div>
+        {
+          totalCarabayar != totalDistribusi &&
+          <div className="flex gap-2 items-center">
+            <Checkbox
+              id="ignore"
+              checked={ignoreToleransi as CheckedState}
+              onCheckedChange={(v) => {
+                console.log(v)
+                if (v == false) setIgnoreToleransi(false)
+                else setIgnoreToleransi(true)
+              }}
+            />
+            <label htmlFor="ignore">Ignore sisa pembayaran</label>
+          </div>
+        }
         <Button disabled={(
           (
-            detailMetode.length > 0 ?
-            !(
-              totalDistribusi - totalCarabayar < detailMetode[metode].batasAtas && 
-              totalCarabayar - totalDistribusi < detailMetode[metode].batasBawah 
-            )
-            : true
+             !ignoreToleransi ? detailMetode.length > 0 ?
+              !(
+                totalDistribusi - totalCarabayar < detailMetode[metode].batasAtas &&
+                totalCarabayar - totalDistribusi < detailMetode[metode].batasBawah
+              )
+              : true
+              : false
           )
         )} type="submit">
           Submit

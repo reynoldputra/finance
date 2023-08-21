@@ -64,6 +64,7 @@ CREATE TABLE "Invoice" (
     "total" INTEGER NOT NULL,
     "tanggal_transaksi" DATETIME NOT NULL,
     "nama_sales" TEXT NOT NULL,
+    "type" TEXT NOT NULL DEFAULT 'CASH',
     "customerId" TEXT NOT NULL,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL,

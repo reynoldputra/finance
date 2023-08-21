@@ -135,6 +135,19 @@ export const InvoiceColumn: ColumnDef<TInvoiceSchema>[] = [
     },
   },
   {
+    accessorKey: "type",
+    id: "Tipe",
+    header: ({ column, table }) => (
+      <DataTableColumnHeader table={table} column={column} title="Tipe" />
+    ),
+    cell: ({ row }) => (
+      <div className="w-[180px]">{row.getValue("Tipe")}</div>
+    ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => <RowAction row={row} />,
   },

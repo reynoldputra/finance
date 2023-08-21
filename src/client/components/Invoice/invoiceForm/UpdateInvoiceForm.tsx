@@ -9,14 +9,26 @@ import { createInvoiceInput, TCreateInvoiceInput, TUpdateInvoiceInput, updateInv
 import { ComboboxItem } from "@client/types/form/ComboboxItem";
 import { TInvoiceSchema } from "../InvoiceTable/data/schema";
 import { Row } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 
 interface UpdateInvoiceFormProps {
   setOpen : React.Dispatch<React.SetStateAction<boolean>>;
   row : Row<TInvoiceSchema>
 }
 
+interface TtypeOptions {
+  title: string,
+  value: string,
+}
+
+const typeOptions: TtypeOptions[] = [
+  {title: "KREDIT 30 HARI", value: "KREDIT 30 HARI"},
+  {title: "CASH", value:"CASH"}
+]
+
 export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
   const { toast } = useToast();
+  const [customerOptions, setCustomerOptions] = useState<ComboboxItem[]>()
 
   const res = trpc.customer.customerOption.useQuery();
   const result = res.data ?? [];
@@ -25,22 +37,31 @@ export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
     value: item.id,
   }));
 
+  useEffect(() => {
+    if(custemers){
+      const customerId = custemers.find((c) => c.title == row.original.namaCustomer)?.value.toString()
+      setCustomerOptions(custemers)
+      form.setValue("customerId", customerId ?? "")
+    }
+  }, [res.status])
+
   const form = useForm<TUpdateInvoiceInput>({
     resolver: zodResolver(updateInvoiceInput),
     defaultValues: {
       id : row.original.id,
       transaksiId : row.original.transaksiId,
-      customerId : custemers.find((c) => c.title == row.original.namaCustomer)?.value.toString(),
+      customerId : "",
       total : row.original.total,
       tanggalTransaksi : row.original.tanggalTransaksi,
       namaSales : row.original.namaSales,
+      type: row.original.type
     }
   });
 
   const updateInvoiceMutation = trpc.invoice.updateInvoice.useMutation();
   const utils = trpc.useContext()
 
-  async function onSubmit(values: TCreateInvoiceInput) {
+  async function onSubmit(values: TUpdateInvoiceInput) {
     try {
       const { data } = await updateInvoiceMutation.mutateAsync(values);
       if (data) {
@@ -72,7 +93,7 @@ export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
           {...register("customerId")}
           type="combobox"
           title="Nama Customer"
-          options={custemers}
+          options={customerOptions}
         />
         <InputForm {...register("namaSales")} name="namaSales" type="text" title="Nama Sales" />
         <InputForm
@@ -80,6 +101,13 @@ export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
           name="tanggalTransaksi"
           type="datepicker"
           title="Tanggal Transaksi"
+        />
+        <InputForm 
+          {...register("type")}
+          name="type"
+          title="Tipe"
+          type="combobox"
+          options={typeOptions}
         />
         <InputForm {...register("total")} name="total" type="text" title="Total" />
         <Button type="submit">Submit</Button>

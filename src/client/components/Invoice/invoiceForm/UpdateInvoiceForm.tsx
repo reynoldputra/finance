@@ -9,6 +9,7 @@ import { createInvoiceInput, TCreateInvoiceInput, TUpdateInvoiceInput, updateInv
 import { ComboboxItem } from "@client/types/form/ComboboxItem";
 import { TInvoiceSchema } from "../InvoiceTable/data/schema";
 import { Row } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 
 interface UpdateInvoiceFormProps {
   setOpen : React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,6 +28,7 @@ const typeOptions: TtypeOptions[] = [
 
 export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
   const { toast } = useToast();
+  const [customerOptions, setCustomerOptions] = useState<ComboboxItem[]>()
 
   const res = trpc.customer.customerOption.useQuery();
   const result = res.data ?? [];
@@ -35,12 +37,20 @@ export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
     value: item.id,
   }));
 
+  useEffect(() => {
+    if(custemers){
+      const customerId = custemers.find((c) => c.title == row.original.namaCustomer)?.value.toString()
+      setCustomerOptions(custemers)
+      form.setValue("customerId", customerId ?? "")
+    }
+  }, [res.status])
+
   const form = useForm<TUpdateInvoiceInput>({
     resolver: zodResolver(updateInvoiceInput),
     defaultValues: {
       id : row.original.id,
       transaksiId : row.original.transaksiId,
-      customerId : custemers.find((c) => c.title == row.original.namaCustomer)?.value.toString(),
+      customerId : "",
       total : row.original.total,
       tanggalTransaksi : row.original.tanggalTransaksi,
       namaSales : row.original.namaSales,
@@ -51,7 +61,7 @@ export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
   const updateInvoiceMutation = trpc.invoice.updateInvoice.useMutation();
   const utils = trpc.useContext()
 
-  async function onSubmit(values: TCreateInvoiceInput) {
+  async function onSubmit(values: TUpdateInvoiceInput) {
     try {
       const { data } = await updateInvoiceMutation.mutateAsync(values);
       if (data) {
@@ -83,7 +93,7 @@ export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {
           {...register("customerId")}
           type="combobox"
           title="Nama Customer"
-          options={custemers}
+          options={customerOptions}
         />
         <InputForm {...register("namaSales")} name="namaSales" type="text" title="Nama Sales" />
         <InputForm

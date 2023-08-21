@@ -33,6 +33,19 @@ export function AddPenagihanForm({
   const kolektors = trpc.kolektor.getAllKolektor.useQuery();
   const kolektorsQuery = kolektors.data?.data ?? [];
 
+  const initValue: TManyPenagihanInput[] = selectedRows.map((r) => {
+    const customerData = customers.data ?? [];
+    const customer = customerData.find(
+      (c) => c.nama == r.original.namaCustomer
+    );
+    return {
+      invoiceId: r.original.id,
+      kolektorId: customer?.kolektorId ?? "",
+      tanggalTagihan: new Date(),
+      status: r.original.status,
+    };
+  });
+
   const FormSchema = z.object({
     manyPenagihan: z.array(manyPenagihanInput),
   });
@@ -145,7 +158,7 @@ export function AddPenagihanForm({
                 <p className="font-semibold text-red-600">
                   This Invoice is marked as LUNAS
                 </p>
-              )}
+                )}
             </div>
           );
         })}

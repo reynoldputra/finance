@@ -4,6 +4,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { TInvoiceSchema } from "./data/schema";
 import { RowAction } from "./RowAction";
 import { idr } from "@client/lib/idr";
+import { dateBetweenFilterFn, DatePickerWithRangeFilter } from "@client/components/table/DateFilter";
+import { dmyDate } from "@client/lib/dmyDate";
 
 export const InvoiceColumn: ColumnDef<TInvoiceSchema>[] = [
   {
@@ -31,11 +33,13 @@ export const InvoiceColumn: ColumnDef<TInvoiceSchema>[] = [
     accessorKey: "transaksiId",
     id: "Id Transaksi",
     header: ({ column, table }) => (
-      <DataTableColumnHeader
-        table={table}
-        column={column}
-        title="Id Transaksi"
-      />
+      <>
+        <DataTableColumnHeader
+          table={table}
+          column={column}
+          title="Id Transaksi"
+        />
+      </>
     ),
     cell: ({ row }) => (
       <div className="w-[180px]">{row.getValue("Id Transaksi")}</div>
@@ -65,15 +69,18 @@ export const InvoiceColumn: ColumnDef<TInvoiceSchema>[] = [
     accessorKey: "tanggalTransaksi",
     id: "Tanggal Transaksi",
     header: ({ column, table }) => (
-      <DataTableColumnHeader
-        table={table}
-        column={column}
-        title="Tanggal Transaksi"
-      />
+      <>
+        <DataTableColumnHeader
+          table={table}
+          column={column}
+          title="Tanggal Transaksi"
+        />
+      </>
     ),
+    filterFn : dateBetweenFilterFn,
     cell: ({ row }) => (
       <div className="w-[180px]">
-        {new Date(row.getValue("Tanggal Transaksi")).toLocaleDateString()}
+        {dmyDate(new Date(row.getValue("Tanggal Transaksi")))}
       </div>
     ),
   },

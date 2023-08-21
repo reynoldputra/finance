@@ -2,6 +2,7 @@ import { Column, Table } from "@tanstack/react-table";
 import * as React from "react";
 import { Input } from "@client/components/ui/input";
 import DataTableMultiFilter from "./DataTableMultiFilter";
+import { DatePickerWithRangeFilter } from "./DateFilter";
 
 export default function DataTableFilter({
   column,
@@ -80,8 +81,10 @@ export default function DataTableFilter({
         options={items}
       />
     </>
-  ) : (
+  ) : Object.prototype.toString.call(firstValue) === "[object Date]" ? (
     // date
+    <DatePickerWithRangeFilter column={column} />
+  ) : (
     <div></div>
   );
 }

@@ -12,6 +12,7 @@ import {
   useReactTable,
   ColumnDef,
 } from "@tanstack/react-table";
+import { dateBetweenFilterFn } from "@client/components/table/DateFilter";
 
 interface UseDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -30,6 +31,9 @@ export default function useDataTable<TData, TValue> ({
   const table = useReactTable({
     data,
     columns,
+    filterFns : {
+      dateBetween: dateBetweenFilterFn
+    },
     state: {
       sorting,
       columnVisibility,

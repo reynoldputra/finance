@@ -8,7 +8,6 @@ import { useToast } from "@client/components/ui/use-toast";
 import { ComboboxItem } from "@client/types/form/ComboboxItem";
 import {
   manyPenagihanInput,
-  TCreatePenagihanInput,
   TManyPenagihanInput,
 } from "@client/../server/collections/penagihan/penagihanSchema";
 import { z } from "zod";
@@ -34,19 +33,6 @@ export function AddPenagihanForm({
   const kolektors = trpc.kolektor.getAllKolektor.useQuery();
   const kolektorsQuery = kolektors.data?.data ?? [];
 
-  const initValue: TManyPenagihanInput[] = selectedRows.map((r) => {
-    const customerData = customers.data ?? [];
-    const customer = customerData.find(
-      (c) => c.nama == r.original.namaCustomer
-    );
-    return {
-      invoiceId: r.original.id,
-      kolektorId: customer?.kolektorId ?? "",
-      tanggalTagihan: new Date(),
-      status: r.original.status,
-    };
-  });
-
   const FormSchema = z.object({
     manyPenagihan: z.array(manyPenagihanInput),
   });
@@ -69,13 +55,14 @@ export function AddPenagihanForm({
 
   useEffect(() => {
     if (customers.data) {
-      const initValue: TCreatePenagihanInput[] = selectedRows.map((r) => {
+      const initValue: TManyPenagihanInput[] = selectedRows.map((r) => {
         const customerData = customers.data ?? [];
         const customer = customerData.find((c) => c.nama == r.original.namaCustomer);
         return {
           invoiceId: r.original.id,
           kolektorId: customer?.kolektorId ?? "",
           tanggalTagihan: new Date(),
+          status: r.original.status
         };
       });
       if (initValue) form.setValue("manyPenagihan", initValue);

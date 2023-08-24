@@ -96,7 +96,7 @@ export function CreatePenagihanForm({ setOpen }: CreatePenagihanFormProps) {
 
   useEffect(() => {
     if(custDetail.data) {
-      form.setValue("kolektorId", custDetail.data.kolektorId)
+      form.setValue("kolektorId", custDetail.data.kolektorId ?? " ")
     } else {
       form.resetField("kolektorId")
     }

@@ -3,10 +3,10 @@ CREATE TABLE "Customer" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "nama_customer" TEXT NOT NULL,
     "alamat" TEXT,
-    "kolektorId" TEXT NOT NULL,
+    "kolektorId" TEXT,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL,
-    CONSTRAINT "Customer_kolektorId_fkey" FOREIGN KEY ("kolektorId") REFERENCES "Kolektor" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "Customer_kolektorId_fkey" FOREIGN KEY ("kolektorId") REFERENCES "Kolektor" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -55,6 +55,20 @@ CREATE TABLE "TandaTerimaInvoice" (
     "invoiceId" TEXT NOT NULL,
     CONSTRAINT "TandaTerimaInvoice_tandaTerimaId_fkey" FOREIGN KEY ("tandaTerimaId") REFERENCES "TandaTerima" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "TandaTerimaInvoice_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Retur" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "noRetur" TEXT NOT NULL,
+    "transaksiId" TEXT NOT NULL,
+    "total" INTEGER NOT NULL,
+    "tanggal_transaksi" DATETIME NOT NULL,
+    "type" TEXT NOT NULL DEFAULT 'Retur',
+    "invoiceId" TEXT,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME NOT NULL,
+    CONSTRAINT "Retur_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -125,6 +139,9 @@ CREATE UNIQUE INDEX "Customer_nama_customer_key" ON "Customer"("nama_customer");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Kolektor_nama_kolektor_key" ON "Kolektor"("nama_kolektor");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Retur_transaksiId_key" ON "Retur"("transaksiId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Invoice_transaksiId_key" ON "Invoice"("transaksiId");

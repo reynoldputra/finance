@@ -1,7 +1,7 @@
 import Modal from "@client/components/modal/Modal";
 import { Button } from "@client/components/ui/button";
 import { Input } from "@client/components/ui/input";
-import { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent } from "react";
 import {
   TInputInvoiceFileArray,
   TInputInvoiceFileObject,
@@ -9,18 +9,16 @@ import {
 import {
   TInputReturFileArray,
   TInputReturFileObject,
-  inputReturFileArray,
 } from "../../../../server/collections/retur/returSchema";
-
+import { idr } from "@client/lib/idr";
 import { useToast } from "@client/components/ui/use-toast";
+import { trpc } from "@client/lib/trpc";
 
 export default function CreateInvoiceFile() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [returArray, setReturArray] = useState<TInputReturFileArray[]>([]);
-  const [invoiceArray, setInvoiceArray] = useState<TInputInvoiceFileArray[]>(
-    []
-  );
+  const [returArray, setReturArray] = useState<TInputReturFileArray>([]);
+  const [invoiceArray, setInvoiceArray] = useState<TInputInvoiceFileArray>([]);
   const { toast } = useToast();
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -34,22 +32,22 @@ export default function CreateInvoiceFile() {
           const perLine = fileText
             .split(/[\r\n]+/)
             .map((line) => line.split("\t"));
-          perLine.splice(0, 10);
-          const returTrans: TInputReturFileArray[] = [];
-          const invoiceTrans: TInputInvoiceFileArray[] = [];
+          perLine.splice(0, 7);
+          const returTrans: TInputReturFileArray = [];
+          const invoiceTrans: TInputInvoiceFileArray = [];
           for (const line of perLine) {
             if (line.length >= 28) {
               const total = parseFloat(line[4].replace(/[()Rp,.]/g, ""));
               const type = line[9];
               const [day, month, year] = line[0].split("/");
               const tanggalTransaksi = new Date(`${year}-${month}-${day}`);
-              if (type.startsWith("Retur")) {
+              if (line[9].startsWith("Retur")) {
                 const returTransaction: TInputReturFileObject = {
                   transaksiId: line[1],
                   noRetur: line[2],
                   tanggalTransaksi,
                   total,
-                  type,
+                  type: line[9],
                 };
                 returTrans.push(returTransaction);
               } else {
@@ -78,17 +76,28 @@ export default function CreateInvoiceFile() {
     setSelectedFile(null);
   };
 
-  const handleConfirmSubmission = () => {
-    if (returArray.length > 0) {
-      console.log("invoice", invoiceArray);
-      console.log("returr", returArray);
-      const invoicePlural = invoiceArray.length > 1 ? "invoices" : "invoice";
-      const returPlural = returArray.length > 1 ? "returs" : "retur";
-      toast({
-        description: `${returArray.length} ${returPlural} & ${invoiceArray.length} ${invoicePlural} successfully submitted.`,
-        variant: "success",
-        className: "text-white text-base font-semibold",
-      });
+  const utils = trpc.useContext();
+  const createReturMutation = trpc.retur.createReturFromFile.useMutation();
+  const createInvoiceMutation =
+    trpc.invoice.createInvoiceFromFile.useMutation();
+
+  const handleConfirmSubmission = async () => {
+    try {
+      const resRetur = await createReturMutation.mutateAsync(returArray);
+      const resInvoice = await createInvoiceMutation.mutateAsync(invoiceArray);
+      if (resRetur.data && resInvoice.data) {
+        const invoicePlural = invoiceArray.length > 1 ? "Invoices" : "Invoice";
+        const returPlural = returArray.length > 1 ? "Returs" : "Retur";
+        toast({
+          description: `${returArray.length} ${returPlural} & ${invoiceArray.length} ${invoicePlural} successfully submitted.`,
+          variant: "success",
+          className: "text-white text-base font-semibold",
+        });
+        utils.retur.invalidate();
+        handleOpenChange;
+      }
+    } catch (err) {
+      console.error("Terjadi kesalahan:", err);
     }
   };
 
@@ -112,37 +121,71 @@ export default function CreateInvoiceFile() {
               <>
                 <p className="font-medium">
                   Please confirm the submission of the selected file.
-                  {invoiceArray.length > 0 && (
-                    <>
-                      <p className="font-medium">
-                        Invoice ({invoiceArray.length}) :
-                      </p>
-                      <code className="text-sm">
-                        {JSON.stringify(invoiceArray)}
-                      </code>{" "}
-                    </>
-                  )}
-                  {returArray.length > 0 && (
-                    <>
-                      <p className="font-medium">
-                        Retur ({returArray.length}) :
-                      </p>
-                      <code className="text-sm">
-                        {JSON.stringify(returArray)}
-                      </code>{" "}
-                    </>
-                  )}
-                  <p>will be processed.</p>
                 </p>
-                <div className="flex gap-x-3">
-                  <Button onClick={handleConfirmSubmission}>Confirm</Button>
+                {invoiceArray.length > 0 && (
+                  <>
+                    <p className="font-medium">
+                      Invoice ({invoiceArray.length}) :
+                    </p>
+                    <div className="grid grid-cols-6 gap-2">
+                      <div className="font-semibold">Transaksi ID</div>
+                      <div className="font-semibold">Tanggal Transaksi</div>
+                      <div className="font-semibold">Nama Customer</div>
+                      <div className="font-semibold">Nama Sales</div>
+                      <div className="font-semibold">Total</div>
+                      <div className="font-semibold">Tipe</div>
+                      {invoiceArray.map((invoice) => (
+                        <React.Fragment key={invoice.transaksiId}>
+                          <div>{invoice.transaksiId}</div>
+                          <div>{invoice.tanggalTransaksi.toDateString()}</div>
+                          <div>{invoice.namaCustomer}</div>
+                          <div>{invoice.namaSales}</div>
+                          <div>{idr(invoice.total)}</div>
+                          <div>{invoice.type}</div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {returArray.length > 0 && (
+                  <>
+                    <p className="font-medium">Retur ({returArray.length}) :</p>
+                    <div className="grid grid-cols-5 gap-2">
+                      <div className="font-semibold">Transaksi ID</div>
+                      <div className="font-semibold">No. Retur</div>
+                      <div className="font-semibold">Tanggal Transaksi</div>
+                      <div className="font-semibold">Total</div>
+                      <div className="font-semibold">Tipe</div>
+                      {returArray.map((retur) => (
+                        <React.Fragment key={retur.transaksiId}>
+                          <div>{retur.transaksiId}</div>
+                          <div>{retur.noRetur}</div>
+                          <div>{retur.tanggalTransaksi.toDateString()}</div>
+                          <div>{idr(retur.total)}</div>
+                          <div>{retur.type}</div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </>
+                )}
+                <div className="flex gap-x-5 mt-2">
+                  <Button
+                    className="w-36"
+                    variant={"outline"}
+                    onClick={handleOpenChange}
+                  >
+                    Close
+                  </Button>
+                  <Button className="w-36" onClick={handleConfirmSubmission}>
+                    Confirm
+                  </Button>
                 </div>
               </>
             )}
           </div>
-        )}
+        )}{" "}
         <Button
-          className="mt-2 w-72"
+          className={`mt-2 w-72 ${selectedFile && "hidden"}`}
           variant={"outline"}
           onClick={handleOpenChange}
         >

@@ -6,6 +6,7 @@ import InvoicePage from "@client/pages/invoice";
 import PenagihanPage from "@client/pages/penagihan";
 import PembayaranPage from "@client/pages/pembayaran";
 import TandaTerimaPage from "@client/pages/tandaTerima";
+import ReturPage from "@client/pages/retur";
 
 export function AppRoutes() {
   return (
@@ -20,6 +21,7 @@ export function AppRoutes() {
             <Route path="/penagihan" element={<PenagihanPage />} />
             <Route path="/pembayaran" element={<PembayaranPage />} />
             <Route path="/tandaterima" element={<TandaTerimaPage />} />
+            <Route path="/retur" element={<ReturPage />} />
           </>
         }
       />

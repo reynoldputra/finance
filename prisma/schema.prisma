@@ -100,7 +100,7 @@ model Invoice {
   total              Int
   tanggalTransaksi   DateTime             @map("tanggal_transaksi")
   namaSales          String               @map("nama_sales")
-  type               String               @default("CASH")
+  type               String               @default("Cash")
   penagihan          Penagihan[]
   tandaTerimaInvoice TandaTerimaInvoice[]
   retur              Retur[]

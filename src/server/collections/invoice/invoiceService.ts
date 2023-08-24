@@ -1,5 +1,5 @@
 import { prisma } from "../../prisma";
-import { Prisma } from "../../../generated/client";
+import { Invoice, Prisma } from "../../../generated/client";
 import {
   TCreateInvoiceInput,
   TInputInvoiceFileArray,
@@ -125,6 +125,7 @@ export class InvoiceService {
     transactions: TInputInvoiceFileArray
   ) {
     const invoices = await prisma.$transaction(async (tx) => {
+      const createdInvoices: Invoice[] = [];
       for (const transaction of transactions) {
         const {
           transaksiId,
@@ -152,8 +153,9 @@ export class InvoiceService {
             customerId: customer.id,
           },
         });
-        return invoice;
+        createdInvoices.push(invoice);
       }
+      return createdInvoices;
     });
     return invoices;
   }

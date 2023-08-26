@@ -30,6 +30,7 @@ export class InvoiceService {
           },
         },
         customer: true,
+        retur: true,
       },
     });
     const parsed = [];
@@ -43,8 +44,14 @@ export class InvoiceService {
         return (tot += totalPenagihan);
       }, 0);
 
+      const totalRetur = inv.retur.reduce((tot, cur) => {
+        return tot + cur.total;
+      }, 0);
+
+      const sisa = inv.total - totalPembayaran - totalRetur;
+
       parsed.push({
-        sisa: inv.total - totalPembayaran,
+        sisa,
         id: inv.id,
         transaksiId: inv.transaksiId,
         tanggalTransaksi: new Date(inv.tanggalTransaksi),
@@ -72,6 +79,7 @@ export class InvoiceService {
           },
         },
         customer: true,
+        retur: true,
       },
     });
     const totalPembayaran = res.penagihan.reduce((tot, cur) => {
@@ -82,10 +90,16 @@ export class InvoiceService {
       return (tot += totalPenagihan);
     }, 0);
 
+    const totalRetur = res.retur.reduce((tot, cur) => {
+      return tot + cur.total;
+    }, 0);
+
+    const sisa = res.total - totalPembayaran - totalRetur;
+
     return {
       ...res,
       namaCustomer: res.customer.nama,
-      sisa: res.total - totalPembayaran,
+      sisa,
     };
   }
 
@@ -143,6 +157,7 @@ export class InvoiceService {
             data: { nama: namaCustomer },
           });
         }
+
         const invoice = await tx.invoice.create({
           data: {
             transaksiId,

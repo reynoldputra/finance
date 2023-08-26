@@ -13,6 +13,7 @@ import {
 import { idr } from "@client/lib/idr";
 import { useToast } from "@client/components/ui/use-toast";
 import { trpc } from "@client/lib/trpc";
+import { dmyDate } from "@client/lib/dmyDate";
 
 export default function CreateInvoiceFile() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -127,44 +128,52 @@ export default function CreateInvoiceFile() {
                     <p className="font-medium">
                       Invoice ({invoiceArray.length}) :
                     </p>
-                    <div className="grid grid-cols-6 gap-2">
-                      <div className="font-semibold">Transaksi ID</div>
-                      <div className="font-semibold">Tanggal Transaksi</div>
-                      <div className="font-semibold">Nama Customer</div>
-                      <div className="font-semibold">Nama Sales</div>
-                      <div className="font-semibold">Total</div>
-                      <div className="font-semibold">Tipe</div>
-                      {invoiceArray.map((invoice) => (
-                        <React.Fragment key={invoice.transaksiId}>
-                          <div>{invoice.transaksiId}</div>
-                          <div>{invoice.tanggalTransaksi.toDateString()}</div>
-                          <div>{invoice.namaCustomer}</div>
-                          <div>{invoice.namaSales}</div>
-                          <div>{idr(invoice.total)}</div>
-                          <div>{invoice.type}</div>
-                        </React.Fragment>
-                      ))}
+                    <div className="max-w-2xl overflow-x-scroll">
+                      <div className="w-[1250px] grid grid-cols-6 gap-2">
+                        <div className="font-semibold">Transaksi ID</div>
+                        <div className="font-semibold">Tanggal Transaksi</div>
+                        <div className="font-semibold">Nama Customer</div>
+                        <div className="font-semibold">Nama Sales</div>
+                        <div className="font-semibold">Total</div>
+                        <div className="font-semibold">Tipe</div>
+                        {invoiceArray.map((invoice) => (
+                          <React.Fragment key={invoice.transaksiId}>
+                            <div>{invoice.transaksiId}</div>
+                            <div>
+                              {dmyDate(new Date(invoice.tanggalTransaksi))}
+                            </div>
+                            <div>{invoice.namaCustomer}</div>
+                            <div>{invoice.namaSales}</div>
+                            <div>Rp. {idr(invoice.total)}</div>
+                            <div>{invoice.type}</div>
+                          </React.Fragment>
+                        ))}
+                      </div>
                     </div>
                   </>
                 )}
                 {returArray.length > 0 && (
                   <>
                     <p className="font-medium">Retur ({returArray.length}) :</p>
-                    <div className="grid grid-cols-5 gap-2">
-                      <div className="font-semibold">Transaksi ID</div>
-                      <div className="font-semibold">No. Retur</div>
-                      <div className="font-semibold">Tanggal Transaksi</div>
-                      <div className="font-semibold">Total</div>
-                      <div className="font-semibold">Tipe</div>
-                      {returArray.map((retur) => (
-                        <React.Fragment key={retur.transaksiId}>
-                          <div>{retur.transaksiId}</div>
-                          <div>{retur.noRetur}</div>
-                          <div>{retur.tanggalTransaksi.toDateString()}</div>
-                          <div>{idr(retur.total)}</div>
-                          <div>{retur.type}</div>
-                        </React.Fragment>
-                      ))}
+                    <div className="max-w-2xl overflow-x-scroll">
+                      <div className="w-[1100px] grid grid-cols-5 gap-2">
+                        <div className="font-semibold">Transaksi ID</div>
+                        <div className="font-semibold">No. Retur</div>
+                        <div className="font-semibold">Tanggal Transaksi</div>
+                        <div className="font-semibold">Total</div>
+                        <div className="font-semibold">Tipe</div>
+                        {returArray.map((retur) => (
+                          <React.Fragment key={retur.transaksiId}>
+                            <div>{retur.transaksiId}</div>
+                            <div>{retur.noRetur}</div>
+                            <div>
+                              {dmyDate(new Date(retur.tanggalTransaksi))}
+                            </div>
+                            <div>Rp. {idr(retur.total)}</div>
+                            <div>{retur.type}</div>
+                          </React.Fragment>
+                        ))}
+                      </div>
                     </div>
                   </>
                 )}

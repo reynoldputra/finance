@@ -12,7 +12,7 @@ import {
   TUpdateReturInput,
   updateReturInput,
 } from "../../../../server/collections/retur/returSchema";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 interface UpdateReturFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -36,7 +36,7 @@ export function UpdateReturForm({ setOpen, row }: UpdateReturFormProps) {
   useEffect(() => {
     if (invoices) {
       const invoiceId = invoices
-        .find((i) => i.value == row.original.invoiceId)
+        .find((i) => i.title == row.original.transaksiId)
         ?.value.toString();
       form.setValue("invoiceId", invoiceId ?? "");
     }

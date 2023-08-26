@@ -83,13 +83,13 @@ model TandaTerimaInvoice {
 model Retur {
   id               String   @id @default(cuid())
   noRetur          String
-  transaksiId      String   @unique @default(cuid())
+  transaksiId      String  @default(cuid())
   total            Int
   tanggalTransaksi DateTime @map("tanggal_transaksi")
   type             String   @default("Retur")
-  invoiceId        String?
+  invoiceId        String
 
-  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 }

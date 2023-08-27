@@ -26,6 +26,24 @@ export const PenagihanRouter = penagihanTrpc.router({
       };
     }
   }),
+  getReportAccounting: penagihanTrpc.publicProcedure
+    .input(z.object({
+      tanggalPenagihan : z.date(),
+      tanggalPembayaran : z.date()
+    }))
+    .query(async ({input}) => {
+    try {
+      const res = await PenagihanService.getAccoutingReport(input.tanggalPenagihan, input.tanggalPembayaran);
+      return {
+        status: true,
+        data: res,
+      };
+    } catch (err) {
+      return {
+        status: false,
+      };
+    }
+  }),
   getPenagihanById: penagihanTrpc.publicProcedure
     .input(z.string())
     .query(async ({ input }) => {
@@ -70,6 +88,21 @@ export const PenagihanRouter = penagihanTrpc.router({
       }
     }),
 
+  getPenagihanByDate: penagihanTrpc.publicProcedure
+    .input(z.date())
+    .query(async ({ input }) => {
+      try {
+        const res = await PenagihanService.getPenagihanByDate(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
   createPenagihan: penagihanTrpc.publicProcedure
     .input(createPenagihanInput)
     .mutation(async ({ input }: { input: TCreatePenagihanInput }) => {

@@ -20,6 +20,25 @@ export const CarabayarRouter = carabayarTrpc.router({
       };
     }
   }),
+  getReportSetoranBank: carabayarTrpc.publicProcedure
+    .input(z.object({
+      tanggalPenagihan: z.date(),
+      tanggalPembayaran: z.date(),
+    }))
+    .query(async ({ input }) => {
+      try {
+        const res = await CaraBayarService.getReportSetoranBank(input.tanggalPenagihan, input.tanggalPembayaran);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        console.log(err)
+        return {
+          status: false,
+        };
+      }
+    }),
   createCarabayar: carabayarTrpc.publicProcedure
     .input(createCaraBayarInput)
     .mutation(async ({ input }: { input: TCreateCaraBayarInput }) => {
@@ -52,7 +71,7 @@ export const CarabayarRouter = carabayarTrpc.router({
     }),
   deleteCarabayar: carabayarTrpc.publicProcedure
     .input(z.string())
-    .mutation(async ({input : id}) => {
+    .mutation(async ({ input: id }) => {
       try {
         const res = await CaraBayarService.deleteCaraBayar(id);
         return {

@@ -6,7 +6,8 @@ import { trpc } from "@client/lib/trpc"
 import { idr } from "@client/lib/idr"
 import toPascalCase from "@client/lib/pascalCase"
 
-export default function ReportSetoranBank() {
+export default function ReportIncomingBank() {
+
   const [tanggalPembayaran, setTanggalPembayaran] = useState(new Date(2023, 4, 23))
   const [tanggalPenagihan, setTanggalPenagihan] = useState(new Date(2023, 4, 23))
 
@@ -19,10 +20,10 @@ export default function ReportSetoranBank() {
   })
 
   const clickHandle = async () => {
-    const dateStr = tanggalPembayaran.toLocaleDateString('id', {day : '2-digit', month : 'long', year: 'numeric'})
+    const dateStr = tanggalPembayaran.toLocaleDateString('id', { day: '2-digit', month: 'long', year: 'numeric' })
     let dateSplit = dateStr.split(" ")
     let month = dateSplit[1].toUpperCase()
-    let finaldatestr = dateSplit[0] + ` ${month} ` + dateSplit[2] 
+    let finaldatestr = dateSplit[0] + ` ${month} ` + dateSplit[2]
     console.log(finaldatestr)
 
     await query.refetch()
@@ -39,69 +40,77 @@ export default function ReportSetoranBank() {
         q.penagihan.invoice.transaksiId,
         q.penagihan.invoice.total,
         q.jumlah,
-        toPascalCase(q.keterangan)
+        toPascalCase(q.keterangan),
       ]
     })
 
-    const sortedData = data.sort((a,b) => {
+    const sortedData = data.sort((a, b) => {
       return (a[0] as string).localeCompare(b[0] as string) || (a[1] as string).localeCompare(b[1] as string)
     })
 
     let currentTotal = 0
     let prevSalesName = ""
+    let currentSetoran = 1
+    let setoranIdx = 0
+
+    let finalData: (string | number | Date)[][] = []
 
     sortedData.forEach((value, index) => {
-      if((prevSalesName && prevSalesName != value[0]) || index+1 == sortedData.length){
-        sortedData.splice(index, 0, [
-          "", "", "", "Total", "", "Rp " + idr(currentTotal), "", ""
-        ])
-        currentTotal = 0
+      if (index == 0) {
+        finalData.push([currentSetoran, "SETORAN TUNAI", "", ""])
+        currentSetoran += 1
+        setoranIdx = 0
       }
 
-      if(currentTotal + (value[5] as number) > 100000000){
-        sortedData.splice(index, 0, [
-          "", "", "", "Total", "", "Rp " + idr(currentTotal), "", ""
-        ])
+      if ((prevSalesName && prevSalesName != value[0]) || index + 1 == sortedData.length) {
+        finalData[setoranIdx][9] = "Rp " + idr(currentTotal)
+        finalData.push([currentSetoran, "SETORAN TUNAI", "", "", "", "", "", "", ""])
+        currentSetoran += 1
         currentTotal = 0
+        setoranIdx = finalData.length - 1
+      }
+
+      if (currentTotal + (value[5] as number) > 100000000) {
+        finalData[setoranIdx][9] = "Rp " + idr(currentTotal)
+        finalData.push([currentSetoran, "SETORAN TUNAI", "", "", "", "", "", "", ""])
+        currentSetoran += 1
+        currentTotal = 0
+        setoranIdx = finalData.length - 1
       } else {
         currentTotal += (value[5] as number)
       }
+
+      finalData.push(["", value[1], "Ket:" + value[6], ""])
+      finalData.push(["", "Inv " + value[3], "", ""])
+      finalData.push(["", "Rp " + idr(value[5]), "", ""])
+      finalData.push(["", "", "", ""])
       prevSalesName = value[0] as string
     })
-    sortedData.forEach((value) => {
-      if(value[0]) {
-        value[4] = "Rp " + idr(value[4] as number)
-        value[5] = "Rp " + idr(value[5] as number)
-      }
-      console.log(value[4], value[5])
-    })
 
-    console.log(sortedData)
+    console.log(finalData)
 
     const header = [
-      ["SAP LAPORAN HADIRAN TAGIHAN"],
+      ["SAP TRANSAKSI INCOMING BANK BCA"],
       [""],
-      ["DATE : " + finaldatestr],
+      ["PT. SENTRAL AUTO PRATAMA"],
+      ["Date: 31 Mei 2023"],
       [""],
-      ["Nama Sales", "Customer Name", "Tgl Transaksi", "ID Transaksi", "Total Tagihan", "Cara bayar", "Ket"],
-      ["", "", "", "", "", "Cash"],
-      ...data
+      ["No.", "Toko", "", "Cara Pembayaran/Keterangan", "", "", "", "", "", "Amount"],
+      ...finalData
     ]
 
     const ranges = [
-      { s: { c: 0, r: 4 }, e: { c: 0, r: 6 } },
-      { s: { c: 1, r: 4 }, e: { c: 1, r: 6 } },
-      { s: { c: 2, r: 4 }, e: { c: 2, r: 6 } },
-      { s: { c: 3, r: 4 }, e: { c: 3, r: 6 } },
-      { s: { c: 4, r: 4 }, e: { c: 4, r: 6 } },
-      { s: { c: 6, r: 4 }, e: { c: 6, r: 6 } },
+      { s: { c: 0, r: 0 }, e: { c: 9, r: 1 } },
+      { s: { c: 0, r: 2 }, e: { c: 9, r: 2 } },
+      { s: { c: 0, r: 3 }, e: { c: 9, r: 3 } },
 
-      { s: { c: 5, r: 5 }, e: { c: 5, r: 6 } },
+      { s: { c: 1, r: 5 }, e: { c: 2, r: 5 } },
+      { s: { c: 3, r: 5 }, e: { c: 8, r: 5 } },
     ]
 
     const sheetOptions = {
       '!merges': ranges,
-      '!cols' : [{wch: 15}, {wch: 30}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 20}, {wch: 15}]
+      '!cols': [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 5 }, { wch: 5 }, { wch: 5 }, { wch: 5 }, { wch: 5 }, { wch: 5 }, { wch: 15 }]
     };
 
     var buffer = xlsx.build([{ name: 'mySheetName', data: header, options: sheetOptions }]);
@@ -110,7 +119,7 @@ export default function ReportSetoranBank() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'report.xlsx';
+    a.download = 'report incoming bank.xlsx';
     a.click();
 
     URL.revokeObjectURL(url);
@@ -118,7 +127,7 @@ export default function ReportSetoranBank() {
 
   return (
     <div className="mt-12">
-      <p className="text-md font-bold mb-2">Export setoran bank</p>
+      <p className="text-md font-bold mb-2">Report Incoming Bank</p>
       <div className="flex items-center gap-4">
         <div>
           <p>Tanggal Penagihan</p>
@@ -135,3 +144,4 @@ export default function ReportSetoranBank() {
     </div>
   )
 }
+

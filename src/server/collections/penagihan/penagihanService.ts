@@ -14,6 +14,244 @@ export class PenagihanService {
           include: {
             customer: true,
             retur: true,
+            penagihan : {
+              include : {
+                distribusiPembayaran: {
+                  include: {
+                    caraBayar: {
+                      include: {
+                        giro: true,
+                        transfer: true,
+                        metode: true,
+                      },
+                    },
+                  },
+                },
+              }
+            }
+          },
+        },
+        kolektor: true,
+        distribusiPembayaran: {
+          include: {
+            caraBayar: {
+              include: {
+                giro: true,
+                transfer: true,
+                metode: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const parsed = [];
+
+    for (let idx in result) {
+      const d = result[idx];
+      const pembayaranLama = d.invoice.penagihan.reduce((tot, cur) => {
+        if(cur.id == d.id && !(cur.tanggalTagihan < d.tanggalTagihan)) {
+          return tot += 0
+        } else {
+          const sum = cur.distribusiPembayaran.reduce((t, c) => {
+            return (t += c.jumlah);
+          }, 0)
+          return tot += sum
+        }
+      }, 0);
+
+      const pembayaranBaru = d.distribusiPembayaran.reduce((tot, cur) => {
+        return (tot += cur.jumlah);
+      }, 0);
+
+      let cash = 0;
+      let transfer = 0;
+      let giro = 0;
+
+      d.distribusiPembayaran.forEach((d) => {
+        if (d.caraBayar.metodePembayaranId == 1) cash++;
+        if (d.caraBayar.metodePembayaranId == 2) giro++;
+        if (d.caraBayar.metodePembayaranId == 3) transfer++;
+      });
+
+      parsed.push({
+        id: d.id,
+        transaksiId: d.invoice.transaksiId,
+        tanggalTagihan: d.tanggalTagihan,
+        status: d.status,
+        namaKolektor: d.kolektor.nama,
+        kolektorId: d.kolektor.id,
+        namaCustomer: d.invoice.customer.nama,
+        customerId: d.invoice.customer.id,
+        pembayaranLama,
+        pembayaranBaru,
+        sisa: d.invoice.total - pembayaranLama,
+        tandaTerima: d.tandaTerima ?? false,
+        totalPembayaran: pembayaranBaru,
+        cash,
+        transfer,
+        giro,
+      });
+
+    }
+
+    parsed.sort((a, b) => {
+      return a.transaksiId.localeCompare(b.transaksiId);
+    });
+
+    let currentInvoiceId: string | null = null;
+    let cicilanCount = 1;
+
+    parsed.forEach((data) => {
+      if (data.transaksiId !== currentInvoiceId) {
+        currentInvoiceId = data.transaksiId;
+        cicilanCount = 1;
+      }
+
+      if (data.status === "CICILAN") {
+        data.status = `CICILAN ke-${cicilanCount}`;
+        cicilanCount++;
+      }
+    });
+
+    return parsed;
+  }
+
+  static async getAccoutingReport(tanggalPenagihan : Date, tanggalPembayaran ?: Date) {
+    const result = await prisma.penagihan.findMany({
+      where : {
+        tanggalTagihan : tanggalPenagihan,
+        distribusiPembayaran : {
+          some : {
+            caraBayar : {
+              tanggal : tanggalPembayaran
+            }
+          }
+        }
+      },
+      include: {
+        invoice: {
+          include: {
+            customer: true,
+            penagihan : {
+              include : {
+                distribusiPembayaran: {
+                  include: {
+                    caraBayar: {
+                      include: {
+                        giro: true,
+                        transfer: true,
+                        metode: true,
+                      },
+                    },
+                  },
+                },
+              }
+            }
+          },
+        },
+        kolektor: true,
+        distribusiPembayaran: {
+          include: {
+            caraBayar: {
+              include: {
+                giro: true,
+                transfer: true,
+                metode: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const parsed = [];
+
+    for (let idx in result) {
+      const d = result[idx];
+      const pembayaranLama = d.invoice.penagihan.reduce((tot, cur) => {
+        if(cur.id == d.id && !(cur.tanggalTagihan < d.tanggalTagihan)) {
+          return tot += 0
+        } else {
+          const sum = cur.distribusiPembayaran.reduce((t, c) => {
+            return (t += c.jumlah);
+          }, 0)
+          return tot += sum
+        }
+      }, 0);
+
+      const pembayaranBaru = d.distribusiPembayaran.reduce((tot, cur) => {
+        return (tot += cur.jumlah);
+      }, 0);
+
+      let cash = 0;
+      let transfer = 0;
+      let giro = 0;
+
+      d.distribusiPembayaran.forEach((d) => {
+        if (d.caraBayar.metodePembayaranId == 1) cash++;
+        if (d.caraBayar.metodePembayaranId == 2) giro++;
+        if (d.caraBayar.metodePembayaranId == 3) transfer++;
+      });
+
+      parsed.push({
+        distribusi : d.distribusiPembayaran,
+        invoice : d.invoice,
+        id: d.id,
+        namaSales : d.invoice.namaSales,
+        transaksiId: d.invoice.transaksiId,
+        tanggalTagihan: d.tanggalTagihan,
+        status: d.status,
+        namaKolektor: d.kolektor.nama,
+        kolektorId: d.kolektor.id,
+        namaCustomer: d.invoice.customer.nama,
+        customerId: d.invoice.customer.id,
+        pembayaranLama,
+        pembayaranBaru,
+        sisa: d.invoice.total - pembayaranLama,
+        tandaTerima: d.tandaTerima ?? false,
+        totalPembayaran: pembayaranBaru,
+        cash,
+        transfer,
+        giro
+      });
+
+    }
+
+    parsed.sort((a, b) => {
+      return a.transaksiId.localeCompare(b.transaksiId);
+    });
+
+    let currentInvoiceId: string | null = null;
+    let cicilanCount = 1;
+
+    parsed.forEach((data) => {
+      if (data.transaksiId !== currentInvoiceId) {
+        currentInvoiceId = data.transaksiId;
+        cicilanCount = 1;
+      }
+
+      if (data.status === "CICILAN") {
+        data.status = `CICILAN ke-${cicilanCount}`;
+        cicilanCount++;
+      }
+    });
+
+    return parsed;
+  }
+
+  static async getPenagihanByDate(date : Date) {
+    const result = await prisma.penagihan.findMany({
+      where : {
+        tanggalTagihan : {
+          equals : date
+        }
+      },
+      include: {
+        invoice: {
+          include: {
+            customer: true,
           },
         },
         kolektor: true,
@@ -36,7 +274,8 @@ export class PenagihanService {
     for (let idx in result) {
       const d = result[idx];
       const total = d.distribusiPembayaran.reduce((tot, cur) => {
-        return (tot += cur.jumlah);
+        if(cur.caraBayar.tanggal.getTime() < d.tanggalTagihan.getTime()) return (tot += cur.jumlah);
+        else return tot += 0
       }, 0);
 
       const totalRetur = d.invoice.retur.reduce((tot, retur) => {
@@ -57,6 +296,7 @@ export class PenagihanService {
         id: d.id,
         transaksiId: d.invoice.transaksiId,
         tanggalTagihan: d.tanggalTagihan,
+        tanggalTransaksi : d.invoice.tanggalTransaksi,
         status: d.status,
         namaKolektor: d.kolektor.nama,
         kolektorId: d.kolektor.id,
@@ -65,40 +305,13 @@ export class PenagihanService {
         sisa: d.invoice.total - total - totalRetur,
         tandaTerima: d.tandaTerima ?? false,
         totalPembayaran: total,
+        totalTagihan: d.invoice.total,
         cash,
         transfer,
         giro,
+        sales : d.invoice.namaSales
       });
     }
-    // const sorted = parsed.sort((a, b) => {
-    //   if(a.id == b.id) {
-    //     return a.totalPembayaran - b.totalPembayaran
-    //   } else {
-    //     return a.transaksiId.localeCompare(b.transaksiId)
-    //   }
-    // })
-
-    // let curid = ""
-    // let idx = 1
-    // const indexing = sorted.map(p => {
-    //   if(curid == p.transaksiId) {
-    //     if(p.status == "CICILAN") {
-    //       p.status = "CICILAN " + idx
-    //       idx++
-    //     }
-    //     console.log(p.transaksiId, idx, p.status)
-    //     return p
-    //   } else {
-    //     curid = p.transaksiId
-    //     idx = 1
-    //     if(p.status == "CICILAN") {
-    //       p.status = "CICILAN " + idx
-    //       idx++
-    //     }
-    //     console.log(p.transaksiId, idx, p.status)
-    //     return p
-    //   }
-    // })
 
     parsed.sort((a, b) => {
       return a.transaksiId.localeCompare(b.transaksiId);

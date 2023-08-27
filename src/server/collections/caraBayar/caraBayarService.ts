@@ -1,5 +1,6 @@
 import { Prisma } from "@server/../generated/client";
 import { prisma } from "@server/prisma";
+import { PenagihanService } from "../penagihan/penagihanService";
 import { TCreateCaraBayarInput, TUpdateCaraBayarInput } from "./caraBayarSchema";
 
 export class CaraBayarService {
@@ -56,6 +57,58 @@ export class CaraBayarService {
       };
     });
     return resultParse;
+  }
+
+  static async getReportSetoranBank(tanggalPenagihan : Date, tanggalPembayaran : Date) {
+    const result = await prisma.distribusiPembayaran.findMany({
+      where : {
+        caraBayar : {
+          tanggal : tanggalPembayaran
+        },
+        penagihan : {
+          tanggalTagihan : tanggalPenagihan,
+        }
+      },
+      include : {
+        caraBayar : true,
+        penagihan : {
+          include : {
+            kolektor : true,
+            invoice : {
+              include : {
+                customer : true,
+              }
+            }
+          }
+        }
+      }
+    })
+
+    const penagihan = await PenagihanService.getAllPenagihan()
+
+    const resultWithKet = result.map(r => {
+      let ket = ""
+      const p = penagihan.find(i => i.id == r.penagihanId)
+      if(p && p.status != "LUNAS") ket += p.status
+      if(p && (p.status == "LUNAS" || p.status == "PELUNASAN")) {
+        let sisa = p.sisa - p.totalPembayaran
+        if(sisa < 0) {
+          if(!sisa) ket += ", "
+          ket += "Kurang " + sisa
+        }
+        if(sisa > 0) {
+          if(!sisa) ket += ", "
+          ket += "Lebih " + sisa
+        }
+      }
+
+      return {
+        ...r,
+        keterangan : ket
+      }
+    })
+
+    return resultWithKet
   }
 
   static async createCaraBayar(input: TCreateCaraBayarInput, prismaCtx?: Prisma.TransactionClient) {

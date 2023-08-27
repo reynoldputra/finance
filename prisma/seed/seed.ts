@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, Invoice, Penagihan, Transfer } from "../../src/generated/client";
+import { PrismaClient, Prisma } from "../../src/generated/client";
 const csvParser = require("csv-parser");
 import * as fs from "fs";
 import * as path from "path";
@@ -151,7 +151,7 @@ async function main() {
             let tanggal_tagihan = data.tanggal_tagihan;
             let [d, m, y] = tanggal_tagihan.split("/");
             if (!y) y = 2023;
-            const tanggalTagihanDate = new Date(parseInt(y), parseInt(m) - 1 , parseInt(d));
+            const tanggalTagihanDate = new Date(parseInt(y), parseInt(m) - 1 , parseInt(d) );
 
             const penagihan = await ctx.penagihan.create({
               data: {

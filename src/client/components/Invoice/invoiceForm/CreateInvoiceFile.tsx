@@ -20,7 +20,17 @@ export default function CreateInvoiceFile() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [returArray, setReturArray] = useState<TInputReturFileArray>([]);
   const [invoiceArray, setInvoiceArray] = useState<TInputInvoiceFileArray>([]);
+  const [invoiceValidation, setInvoiceValidation] = useState<{
+    [transaksiId: string]: boolean;
+  }>({});
+  const [returValidation, setReturValidation] = useState<{
+    [transaksiId: string]: boolean;
+  }>({});
   const { toast } = useToast();
+
+  const { data: allInvoiceData } = trpc.invoice.getInvoices.useQuery();
+  const allInvoice = allInvoiceData?.data ?? [];
+  const existingInvoiceTransaksiId = allInvoice.map((inv) => inv.transaksiId);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -43,6 +53,17 @@ export default function CreateInvoiceFile() {
               const [day, month, year] = line[0].split("/");
               const tanggalTransaksi = new Date(`${year}-${month}-${day}`);
               if (line[9].startsWith("Retur")) {
+                if (existingInvoiceTransaksiId.includes(line[1])) {
+                  setReturValidation((prevValidation) => ({
+                    ...prevValidation,
+                    [line[1]]: false,
+                  }));
+                } else {
+                  setReturValidation((prevValidation) => ({
+                    ...prevValidation,
+                    [line[1]]: true,
+                  }));
+                }
                 const returTransaction: TInputReturFileObject = {
                   transaksiId: line[1],
                   noRetur: line[2],
@@ -52,6 +73,17 @@ export default function CreateInvoiceFile() {
                 };
                 returTrans.push(returTransaction);
               } else {
+                if (existingInvoiceTransaksiId.includes(line[1])) {
+                  setInvoiceValidation((prevValidation) => ({
+                    ...prevValidation,
+                    [line[1]]: false,
+                  }));
+                } else {
+                  setInvoiceValidation((prevValidation) => ({
+                    ...prevValidation,
+                    [line[1]]: true,
+                  }));
+                }
                 const invoiceTransaction: TInputInvoiceFileObject = {
                   transaksiId: line[1],
                   tanggalTransaksi,
@@ -95,7 +127,7 @@ export default function CreateInvoiceFile() {
           className: "text-white text-base font-semibold",
         });
         utils.retur.invalidate();
-        handleOpenChange;
+        handleOpenChange();
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
@@ -129,15 +161,24 @@ export default function CreateInvoiceFile() {
                       Invoice ({invoiceArray.length}) :
                     </p>
                     <div className="max-w-2xl overflow-x-scroll">
-                      <div className="w-[1250px] grid grid-cols-6 gap-2">
+                      <div className="w-[1250px] grid grid-cols-6 gap-2 mb-2">
                         <div className="font-semibold">Transaksi ID</div>
                         <div className="font-semibold">Tanggal Transaksi</div>
                         <div className="font-semibold">Nama Customer</div>
                         <div className="font-semibold">Nama Sales</div>
                         <div className="font-semibold">Total</div>
                         <div className="font-semibold">Tipe</div>
+                      </div>
+                      <div className="flex flex-col gap-y-2">
                         {invoiceArray.map((invoice) => (
-                          <React.Fragment key={invoice.transaksiId}>
+                          <div
+                            className={`w-[1250px] grid grid-cols-6 gap-y-2 ${
+                              invoiceValidation[invoice.transaksiId] === false
+                                ? "bg-red-200"
+                                : ""
+                            }`}
+                            key={invoice.transaksiId}
+                          >
                             <div>{invoice.transaksiId}</div>
                             <div>
                               {dmyDate(new Date(invoice.tanggalTransaksi))}
@@ -146,7 +187,7 @@ export default function CreateInvoiceFile() {
                             <div>{invoice.namaSales}</div>
                             <div>Rp. {idr(invoice.total)}</div>
                             <div>{invoice.type}</div>
-                          </React.Fragment>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -156,14 +197,23 @@ export default function CreateInvoiceFile() {
                   <>
                     <p className="font-medium">Retur ({returArray.length}) :</p>
                     <div className="max-w-2xl overflow-x-scroll">
-                      <div className="w-[1100px] grid grid-cols-5 gap-2">
+                      <div className="w-[1100px] grid grid-cols-5 gap-2 mb-2">
                         <div className="font-semibold">Transaksi ID</div>
                         <div className="font-semibold">No. Retur</div>
                         <div className="font-semibold">Tanggal Transaksi</div>
                         <div className="font-semibold">Total</div>
                         <div className="font-semibold">Tipe</div>
+                      </div>
+                      <div className="flex flex-col gap-y-2">
                         {returArray.map((retur) => (
-                          <React.Fragment key={retur.transaksiId}>
+                          <div
+                            className={`w-[1100px] grid grid-cols-5 gap-y-2 ${
+                              returValidation[retur.transaksiId] === true
+                                ? "bg-red-200"
+                                : ""
+                            }`}
+                            key={retur.transaksiId}
+                          >
                             <div>{retur.transaksiId}</div>
                             <div>{retur.noRetur}</div>
                             <div>
@@ -171,7 +221,7 @@ export default function CreateInvoiceFile() {
                             </div>
                             <div>Rp. {idr(retur.total)}</div>
                             <div>{retur.type}</div>
-                          </React.Fragment>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -185,7 +235,14 @@ export default function CreateInvoiceFile() {
                   >
                     Close
                   </Button>
-                  <Button className="w-36" onClick={handleConfirmSubmission}>
+                  <Button
+                    className="w-36"
+                    onClick={handleConfirmSubmission}
+                    disabled={
+                      Object.values(invoiceValidation).some((valid) => !valid) ||
+                      Object.values(returValidation).some((valid) => valid)
+                    }
+                  >
                     Confirm
                   </Button>
                 </div>
@@ -197,6 +254,7 @@ export default function CreateInvoiceFile() {
           className={`mt-2 w-72 ${selectedFile && "hidden"}`}
           variant={"outline"}
           onClick={handleOpenChange}
+          disabled={Object.values(invoiceValidation).some((valid) => valid)}
         >
           Close
         </Button>

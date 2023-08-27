@@ -17,17 +17,22 @@ export class returService {
         let invoice = await tx.invoice.findUnique({
           where: { transaksiId: transaksiId },
         });
-        const retur = await tx.retur.create({
-          data: {
-            transaksiId,
-            noRetur,
-            total,
-            tanggalTransaksi,
-            type,
-            invoiceId: invoice?.id ?? null,
-          },
-        });
-        createdReturs.push(retur);
+        if (invoice) {
+          const retur = await tx.retur.create({
+            data: {
+              transaksiId,
+              noRetur,
+              total,
+              tanggalTransaksi,
+              type,
+              invoice: { connect: { id: invoice.id } },
+            },
+          });
+          createdReturs.push(retur);
+        } else {
+          // Handle the case where the associated invoice doesn't exist
+          console.error(`Invoice with transaksiId ${transaksiId} not found.`);
+        }
       }
       return createdReturs;
     });
@@ -40,7 +45,8 @@ export class returService {
   }
 
   public static async createRetur(input: TCreateReturInput) {
-    const { transaksiId, noRetur, tanggalTransaksi, type, total } = input;
+    const { transaksiId, noRetur, tanggalTransaksi, type, total, invoiceId } =
+      input;
     const res = await prisma.retur.create({
       data: {
         transaksiId,
@@ -48,7 +54,7 @@ export class returService {
         tanggalTransaksi,
         type,
         total,
-        invoiceId: input.invoiceId ?? undefined,
+        invoiceId,
       },
     });
     return res;

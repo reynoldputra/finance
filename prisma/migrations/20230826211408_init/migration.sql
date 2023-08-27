@@ -65,10 +65,10 @@ CREATE TABLE "Retur" (
     "total" INTEGER NOT NULL,
     "tanggal_transaksi" DATETIME NOT NULL,
     "type" TEXT NOT NULL DEFAULT 'Retur',
-    "invoiceId" TEXT,
+    "invoiceId" TEXT NOT NULL,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL,
-    CONSTRAINT "Retur_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT "Retur_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -139,9 +139,6 @@ CREATE UNIQUE INDEX "Customer_nama_customer_key" ON "Customer"("nama_customer");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Kolektor_nama_kolektor_key" ON "Kolektor"("nama_kolektor");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Retur_transaksiId_key" ON "Retur"("transaksiId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Invoice_transaksiId_key" ON "Invoice"("transaksiId");

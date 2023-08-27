@@ -13,11 +13,11 @@ export const inputReturFileArray = z.array(inputReturFileObject);
 
 export const updateReturInput = inputReturFileObject.extend({
   id: z.string(),
-  invoiceId: z.string().optional(),
+  invoiceId: z.string(),
 });
 
 export const createReturInput = inputReturFileObject.extend({
-  invoiceId: z.string().optional(),
+  invoiceId: z.string(),
 });
 
 export type TInputReturFileArray = z.infer<typeof inputReturFileArray>;

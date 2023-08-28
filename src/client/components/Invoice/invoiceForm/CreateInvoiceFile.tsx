@@ -26,11 +26,16 @@ export default function CreateInvoiceFile() {
   const [returValidation, setReturValidation] = useState<{
     [transaksiId: string]: boolean;
   }>({});
+  const [existingRetur, setExistingRetur] = useState<string[]>([]);
   const { toast } = useToast();
 
   const { data: allInvoiceData } = trpc.invoice.getInvoices.useQuery();
   const allInvoice = allInvoiceData?.data ?? [];
   const existingInvoiceTransaksiId = allInvoice.map((inv) => inv.transaksiId);
+
+  const { data: allReturData } = trpc.retur.getAllRetur.useQuery();
+  const allRetur = allReturData?.data ?? [];
+  const existingNoRetur = allRetur.map((retur) => retur.noRetur);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -57,6 +62,11 @@ export default function CreateInvoiceFile() {
                   setReturValidation((prevValidation) => ({
                     ...prevValidation,
                     [line[1]]: false,
+                  }));
+                } else if (existingNoRetur.includes(line[2])) {
+                  setReturValidation((prevValidation) => ({
+                    ...prevValidation,
+                    [line[1]]: true,
                   }));
                 } else {
                   setReturValidation((prevValidation) => ({
@@ -208,7 +218,8 @@ export default function CreateInvoiceFile() {
                         {returArray.map((retur) => (
                           <div
                             className={`w-[1100px] grid grid-cols-5 gap-y-2 ${
-                              returValidation[retur.transaksiId] === true
+                              returValidation[retur.transaksiId] === true ||
+                              existingNoRetur.includes(retur.noRetur)
                                 ? "bg-red-200"
                                 : ""
                             }`}
@@ -239,8 +250,9 @@ export default function CreateInvoiceFile() {
                     className="w-36"
                     onClick={handleConfirmSubmission}
                     disabled={
-                      Object.values(invoiceValidation).some((valid) => !valid) ||
-                      Object.values(returValidation).some((valid) => valid)
+                      Object.values(invoiceValidation).some(
+                        (valid) => !valid
+                      ) || Object.values(returValidation).some((valid) => valid)
                     }
                   >
                     Confirm

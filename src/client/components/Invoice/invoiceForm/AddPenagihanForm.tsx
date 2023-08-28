@@ -65,28 +65,30 @@ export function AddPenagihanForm({
     control: form.control,
   });
 
+  const formWatch = form.watch();
 
   useEffect(() => {
     if (customers.data) {
       const initValue: TManyPenagihanInput[] = selectedRows.map((r) => {
         const customerData = customers.data ?? [];
-        const customer = customerData.find((c) => c.nama == r.original.namaCustomer);
+        const customer = customerData.find(
+          (c) => c.nama == r.original.namaCustomer
+        );
         return {
           invoiceId: r.original.id,
           kolektorId: customer?.kolektorId ?? "",
           tanggalTagihan: new Date(),
-          status: r.original.status
+          status: r.original.status,
         };
       });
       if (initValue) form.setValue("manyPenagihan", initValue);
     }
-    if(kolektorsQuery){
+    if (kolektorsQuery) {
       const kolektorsData: ComboboxItem[] = kolektorsQuery.map((item) => ({
         title: item.nama,
         value: item.id,
       }));
-      console.log(kolektorsData);
-      setKolektorOptions(kolektorsData)
+      setKolektorOptions(kolektorsData);
     }
   }, [kolektors.status, customers.status]);
 
@@ -158,12 +160,14 @@ export function AddPenagihanForm({
                 <p className="font-semibold text-red-600">
                   This Invoice is marked as LUNAS
                 </p>
-                )}
+              )}
             </div>
           );
         })}
         <Button
-          disabled={fields.some((field) => field.status === "LUNAS")}
+          disabled={formWatch.manyPenagihan?.some(
+            (entry) => entry.status === "LUNAS" || entry.kolektorId === ""
+          )}
           type="submit"
         >
           Submit

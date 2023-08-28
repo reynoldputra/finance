@@ -5,6 +5,8 @@ import { TPenagihanTable } from "./data/schema";
 import { idr } from "@client/lib/idr";
 import { RowAction } from "./RowAction";
 import { trpc } from "@client/lib/trpc";
+import { dmyDate } from "@client/lib/dmyDate";
+import { dateBetweenFilterFn } from "@client/components/table/DateFilter";
 
 export const PenagihanColumn: ColumnDef<TPenagihanTable>[] = [
   {
@@ -50,7 +52,8 @@ export const PenagihanColumn: ColumnDef<TPenagihanTable>[] = [
     accessorKey: "tanggalTagihan",
     id : "Tanggal Tagihan",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Tanggal Tagihan" />,
-    cell: ({ row }) => <div className="w-[180px]">{(new Date(row.getValue("Tanggal Tagihan"))).toLocaleDateString()}</div>,
+    cell: ({ row }) => <div className="w-[180px]">{dmyDate(new Date(row.getValue("Tanggal Tagihan")))}</div>,
+    filterFn : dateBetweenFilterFn,
   },
   {
     accessorKey: "namaCustomer",

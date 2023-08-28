@@ -252,6 +252,7 @@ export class PenagihanService {
         invoice: {
           include: {
             customer: true,
+            retur : true
           },
         },
         kolektor: true,

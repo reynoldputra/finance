@@ -137,6 +137,13 @@ async function main() {
               where: { transaksiId: data.transaksi_id },
               create: newInvoice,
               update: newInvoice,
+              include : {
+                penagihan : {
+                  include : {
+                    distribusiPembayaran : true
+                  }
+                }
+              }
             });
             invoiceId = invoice.id;
 
@@ -153,12 +160,20 @@ async function main() {
             if (!y) y = 2023;
             const tanggalTagihanDate = new Date(parseInt(y), parseInt(m) - 1 , parseInt(d) );
 
+            const terbayar = invoice.penagihan.reduce((t,c) => {
+              const totaldistribusi = c.distribusiPembayaran.reduce((t2, c2) => {
+                return t2 += c2.jumlah
+              }, 0)
+              return t += totaldistribusi
+            }, 0)
+
             const penagihan = await ctx.penagihan.create({
               data: {
                 tanggalTagihan: tanggalTagihanDate,
                 invoiceId: invoice.id,
                 kolektorId: kolektor.id,
                 status: "WAITING",
+                sisa : invoice.total - terbayar
               },
             });
 

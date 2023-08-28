@@ -14,8 +14,8 @@ export class PenagihanService {
           include: {
             customer: true,
             retur: true,
-            penagihan : {
-              include : {
+            penagihan: {
+              include: {
                 distribusiPembayaran: {
                   include: {
                     caraBayar: {
@@ -85,7 +85,13 @@ export class PenagihanService {
     }
 
     parsed.sort((a, b) => {
-      return a.transaksiId.localeCompare(b.transaksiId);
+      const transaksiIdComparison = a.transaksiId.localeCompare(b.transaksiId);
+
+      if (transaksiIdComparison !== 0) {
+        return transaksiIdComparison;
+      }
+
+      return a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime();
     });
 
     let currentInvoiceId: string | null = null;
@@ -105,25 +111,20 @@ export class PenagihanService {
 
     return parsed;
   }
-
-  static async getAccoutingReport(tanggalPenagihan : Date, tanggalPembayaran ?: Date) {
+  static async getTableMaster(start: Date, end?: Date) {
     const result = await prisma.penagihan.findMany({
-      where : {
-        tanggalTagihan : tanggalPenagihan,
-        distribusiPembayaran : {
-          some : {
-            caraBayar : {
-              tanggal : tanggalPembayaran
-            }
-          }
+      where: {
+        tanggalTagihan : {
+          lte : end,
+          gte : start
         }
       },
       include: {
         invoice: {
           include: {
             customer: true,
-            penagihan : {
-              include : {
+            penagihan: {
+              include: {
                 distribusiPembayaran: {
                   include: {
                     caraBayar: {
@@ -174,10 +175,10 @@ export class PenagihanService {
       });
 
       parsed.push({
-        distribusi : d.distribusiPembayaran,
-        invoice : d.invoice,
+        distribusi: d.distribusiPembayaran,
+        invoice: d.invoice,
         id: d.id,
-        namaSales : d.invoice.namaSales,
+        namaSales: d.invoice.namaSales,
         transaksiId: d.invoice.transaksiId,
         tanggalTagihan: d.tanggalTagihan,
         status: d.status,
@@ -196,7 +197,13 @@ export class PenagihanService {
     }
 
     parsed.sort((a, b) => {
-      return a.transaksiId.localeCompare(b.transaksiId);
+      const transaksiIdComparison = a.transaksiId.localeCompare(b.transaksiId);
+
+      if (transaksiIdComparison !== 0) {
+        return transaksiIdComparison;
+      }
+
+      return a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime();
     });
 
     let currentInvoiceId: string | null = null;
@@ -217,18 +224,135 @@ export class PenagihanService {
     return parsed;
   }
 
-  static async getPenagihanByDate(date : Date) {
+  static async getAccoutingReport(tanggalPenagihan: Date, tanggalPembayaran?: Date) {
     const result = await prisma.penagihan.findMany({
-      where : {
-        tanggalTagihan : {
-          equals : date
+      where: {
+        tanggalTagihan: tanggalPenagihan,
+        distribusiPembayaran: {
+          some: {
+            caraBayar: {
+              tanggal: tanggalPembayaran
+            }
+          }
         }
       },
       include: {
         invoice: {
           include: {
             customer: true,
-            retur : true
+            penagihan: {
+              include: {
+                distribusiPembayaran: {
+                  include: {
+                    caraBayar: {
+                      include: {
+                        giro: true,
+                        transfer: true,
+                        metode: true,
+                      },
+                    },
+                  },
+                },
+              }
+            }
+          },
+        },
+        kolektor: true,
+        distribusiPembayaran: {
+          include: {
+            caraBayar: {
+              include: {
+                giro: true,
+                transfer: true,
+                metode: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const parsed = [];
+
+    for (let idx in result) {
+      const d = result[idx];
+
+      const pembayaranBaru = d.distribusiPembayaran.reduce((tot, cur) => {
+        return (tot += cur.jumlah);
+      }, 0);
+
+      let cash = 0;
+      let transfer = 0;
+      let giro = 0;
+
+      d.distribusiPembayaran.forEach((d) => {
+        if (d.caraBayar.metodePembayaranId == 1) cash++;
+        if (d.caraBayar.metodePembayaranId == 2) giro++;
+        if (d.caraBayar.metodePembayaranId == 3) transfer++;
+      });
+
+      parsed.push({
+        distribusi: d.distribusiPembayaran,
+        invoice: d.invoice,
+        id: d.id,
+        namaSales: d.invoice.namaSales,
+        transaksiId: d.invoice.transaksiId,
+        tanggalTagihan: d.tanggalTagihan,
+        status: d.status,
+        namaKolektor: d.kolektor.nama,
+        kolektorId: d.kolektor.id,
+        namaCustomer: d.invoice.customer.nama,
+        customerId: d.invoice.customer.id,
+        sisa: d.sisa,
+        tandaTerima: d.tandaTerima ?? false,
+        totalPembayaran: pembayaranBaru,
+        cash,
+        transfer,
+        giro
+      });
+
+    }
+
+    parsed.sort((a, b) => {
+      const transaksiIdComparison = a.transaksiId.localeCompare(b.transaksiId);
+
+      if (transaksiIdComparison !== 0) {
+        return transaksiIdComparison;
+      }
+
+      return a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime();
+    });
+
+    let currentInvoiceId: string | null = null;
+    let cicilanCount = 1;
+
+    parsed.forEach((data) => {
+      if (data.transaksiId !== currentInvoiceId) {
+        currentInvoiceId = data.transaksiId;
+        cicilanCount = 1;
+      }
+
+      if (data.status === "CICILAN") {
+        data.status = `CICILAN ke-${cicilanCount}`;
+        cicilanCount++;
+      }
+    });
+
+    return parsed;
+  }
+
+  static async getPenagihanByDate(date: Date) {
+    const result = await prisma.penagihan.findMany({
+      where: {
+        tanggalTagihan: {
+          equals: date
+        }
+      },
+      include: {
+        invoice: {
+          include: {
+            customer: true,
+            retur: true
           },
         },
         kolektor: true,
@@ -251,7 +375,7 @@ export class PenagihanService {
     for (let idx in result) {
       const d = result[idx];
       const total = d.distribusiPembayaran.reduce((tot, cur) => {
-        if(cur.caraBayar.tanggal.getTime() < d.tanggalTagihan.getTime()) return (tot += cur.jumlah);
+        if (cur.caraBayar.tanggal.getTime() < d.tanggalTagihan.getTime()) return (tot += cur.jumlah);
         else return tot += 0
       }, 0);
 
@@ -269,7 +393,7 @@ export class PenagihanService {
         id: d.id,
         transaksiId: d.invoice.transaksiId,
         tanggalTagihan: d.tanggalTagihan,
-        tanggalTransaksi : d.invoice.tanggalTransaksi,
+        tanggalTransaksi: d.invoice.tanggalTransaksi,
         status: d.status,
         namaKolektor: d.kolektor.nama,
         kolektorId: d.kolektor.id,
@@ -282,7 +406,7 @@ export class PenagihanService {
         cash,
         transfer,
         giro,
-        sales : d.invoice.namaSales
+        sales: d.invoice.namaSales
       });
     }
 
@@ -402,22 +526,22 @@ export class PenagihanService {
 
   static async createPenagihan(input: TCreatePenagihanInput) {
     const invoice = await prisma.invoice.findFirst({
-      where : {
-        id : input.invoiceId
+      where: {
+        id: input.invoiceId
       },
-      include : {
-        penagihan : {
-          include : {
-            distribusiPembayaran : true
+      include: {
+        penagihan: {
+          include: {
+            distribusiPembayaran: true
           }
         },
-        retur : true
+        retur: true
       }
     })
 
-    if(!invoice) return false
+    if (!invoice) return false
 
-    const terbayar = invoice.penagihan.reduce((t,c) => {
+    const terbayar = invoice.penagihan.reduce((t, c) => {
       const totaldistribusi = c.distribusiPembayaran.reduce((t2, c2) => {
         return t2 += c2.jumlah
       }, 0)
@@ -428,11 +552,11 @@ export class PenagihanService {
     const totalRetur = invoice.retur.reduce((tot, retur) => {
       return (tot += retur.total);
     }, 0);
-    
-    
+
+
     const result = await prisma.penagihan.create({
       data: {
-        sisa : invoice.total - terbayar - totalRetur,
+        sisa: invoice.total - terbayar - totalRetur,
         invoiceId: input.invoiceId,
         kolektorId: input.kolektorId,
         tanggalTagihan: input.tanggalTagihan,

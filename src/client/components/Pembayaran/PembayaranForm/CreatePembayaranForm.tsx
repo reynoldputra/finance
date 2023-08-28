@@ -391,7 +391,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
               <Fragment key={idx}>
                 <div className={c[0]}>
                   <ComboboxInput
-                    width={200}
+                    width={220}
                     name={`distribusi.${idx}.penagihanId`}
                     onChange={(v) => onPenagihanChange(v)}
                     options={(() => {
@@ -469,7 +469,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
                 </div>
                 <div className={cn("flex justify-center", c[4])}>
                   <Button
-                    className={cn("w-10 p-0", idx == 0 ? "invisible" : "")}
+                    className="w-10 p-0"
                     variant="destructive"
                     type="button"
                     onClick={() => {
@@ -507,9 +507,9 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
             {(detailMetode.length > 0 && totalCarabayar && totalCarabayar - totalDistribusi != 0)
               ? totalDistribusi - totalCarabayar > 0
                 ? detailMetode[metode].batasAtas < totalDistribusi - totalCarabayar &&
-                "Uang pembayaran sisa " + idr(totalDistribusi - totalCarabayar)
+                "Uang pembayaran kurang " + idr(totalDistribusi - totalCarabayar)
                 : detailMetode[metode].batasBawah < totalCarabayar - totalDistribusi &&
-                "Uang pembayaran kurang " + idr(totalCarabayar - totalDistribusi)
+                "Uang pembayaran sisa " + idr(totalCarabayar - totalDistribusi)
               : ""}
           </p>
         </div>

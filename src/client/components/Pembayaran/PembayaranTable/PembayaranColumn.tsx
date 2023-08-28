@@ -3,6 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { TPembayaranSchema } from "./data/schema";
 import { RowAction } from "./RowAction";
 import { idr } from "@client/lib/idr";
+import { dateBetweenFilterFn } from "@client/components/table/DateFilter";
 
 export const pembayaranColumn : ColumnDef<TPembayaranSchema>[] = [
   {
@@ -36,6 +37,7 @@ export const pembayaranColumn : ColumnDef<TPembayaranSchema>[] = [
     accessorKey: "tanggalPembayaran",
     id : "Tanggal",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Tanggal" />,
+    filterFn : dateBetweenFilterFn,
     cell: ({ row }) => {
       const date = new Date(row.getValue("Tanggal"))
       const d = date.getDate()

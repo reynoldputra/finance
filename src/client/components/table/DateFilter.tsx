@@ -1,6 +1,6 @@
-import { Column, Table, Row, FilterFn } from "@tanstack/react-table";
+import { Column, Row } from "@tanstack/react-table";
 import * as React from "react"
-import { addDays, format } from "date-fns"
+import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
 
@@ -17,6 +17,7 @@ export function dateBetweenFilterFn<T>(row: Row<T>, id: string, filterValues: un
   let sd = (filterValues as number[])?.[0];
   let ed = (filterValues as number[])?.[1];
   const val = row.getValue(id)
+  console.log(sd, ed, (val as Date).getTime())
   if (!val) return false
   if (sd) {
     var time = (val as Date).getTime()

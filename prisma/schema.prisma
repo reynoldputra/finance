@@ -18,11 +18,11 @@ model Customer {
   alamat          String?
   invoices        Invoice[]
   kolektorHistory KolektorHistory[]
-  kolektorId      String
+  kolektorId      String?
 
-  currentKolektor Kolektor @relation(fields: [kolektorId], references: [id])
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  currentKolektor Kolektor? @relation(fields: [kolektorId], references: [id])
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 }
 
 model KolektorHistory {
@@ -80,15 +80,30 @@ model TandaTerimaInvoice {
   invoice     Invoice     @relation(fields: [invoiceId], references: [id])
 }
 
+model Retur {
+  id               String   @id @default(cuid())
+  noRetur          String   @unique
+  transaksiId      String   @default(cuid())
+  total            Int
+  tanggalTransaksi DateTime @map("tanggal_transaksi")
+  type             String   @default("Retur")
+  invoiceId        String
+
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
 model Invoice {
   id                 String               @id @default(cuid())
   transaksiId        String               @unique @default(cuid())
   total              Int
   tanggalTransaksi   DateTime             @map("tanggal_transaksi")
   namaSales          String               @map("nama_sales")
-  type               String               @default("CASH")
+  type               String               @default("Cash")
   penagihan          Penagihan[]
   tandaTerimaInvoice TandaTerimaInvoice[]
+  retur              Retur[]
   customerId         String
 
   customer  Customer @relation(fields: [customerId], references: [id])

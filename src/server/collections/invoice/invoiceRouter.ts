@@ -1,6 +1,13 @@
 import { MainTrpc } from "../../trpc";
 import { InvoiceService } from "./invoiceService";
-import { createInvoiceInput, TCreateInvoiceInput, updateInvoiceInput, TUpdateInvoiceInput } from "./invoiceSchema";
+import {
+  createInvoiceInput,
+  TCreateInvoiceInput,
+  updateInvoiceInput,
+  TUpdateInvoiceInput,
+  inputInvoiceFileArray,
+  TInputInvoiceFileArray,
+} from "./invoiceSchema";
 import { z } from "zod";
 
 const invoiceTrpc = new MainTrpc();
@@ -22,9 +29,9 @@ export const InvoiceRouter = invoiceTrpc.router({
       }
     }),
 
-  updateInvoice : invoiceTrpc.publicProcedure
+  updateInvoice: invoiceTrpc.publicProcedure
     .input(updateInvoiceInput)
-    .mutation(async ({input} : {input : TUpdateInvoiceInput}) => {
+    .mutation(async ({ input }: { input: TUpdateInvoiceInput }) => {
       try {
         const res = await InvoiceService.updateInvoice(input);
         return {
@@ -38,9 +45,9 @@ export const InvoiceRouter = invoiceTrpc.router({
       }
     }),
 
-  deleteInvoice : invoiceTrpc.publicProcedure
+  deleteInvoice: invoiceTrpc.publicProcedure
     .input(z.string())
-    .mutation( async ({input : id}) => {
+    .mutation(async ({ input: id }) => {
       try {
         const res = await InvoiceService.deleteInvoice(id);
         return {
@@ -50,15 +57,30 @@ export const InvoiceRouter = invoiceTrpc.router({
       } catch (err) {
         return {
           status: false,
-          message : (err as Error).message ?? ""
+          message: (err as Error).message ?? "",
         };
       }
     }),
 
-  getInvoices : invoiceTrpc.publicProcedure
-    .query(async () => {
+  getInvoices: invoiceTrpc.publicProcedure.query(async () => {
+    try {
+      const res = await InvoiceService.getAllInvoices();
+      return {
+        status: true,
+        data: res,
+      };
+    } catch (err) {
+      return {
+        status: false,
+      };
+    }
+  }),
+
+  createInvoiceFromFile: invoiceTrpc.publicProcedure
+    .input(inputInvoiceFileArray)
+    .mutation(async ({ input }: { input: TInputInvoiceFileArray }) => {
       try {
-        const res = await InvoiceService.getAllInvoices();
+        const res = await InvoiceService.createInvoiceFromFile(input);
         return {
           status: true,
           data: res,
@@ -68,5 +90,5 @@ export const InvoiceRouter = invoiceTrpc.router({
           status: false,
         };
       }
-    })
+    }),
 });

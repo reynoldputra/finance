@@ -40,8 +40,8 @@ export class CustomerService {
         id: r.id,
         nama: r.nama,
         alamat: r.alamat ?? "-",
-        kolektorId: r.kolektorId,
-        kolektorNama: r.currentKolektor.nama,
+        kolektorId: r.kolektorId || "",
+        kolektorNama: r.currentKolektor?.nama || "",
         invoiceAktif: r.invoices.length,
         jumlahTagihan,
       };

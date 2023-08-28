@@ -6,6 +6,7 @@ import SelectedAction from "./SelectedAction";
 import { Table } from "@tanstack/react-table";
 import { TInvoiceSchema } from "./data/schema";
 import CreateInvoice from "../CreateInvoice";
+import CreateInvoiceFile from "../invoiceForm/CreateInvoiceFile";
 
 export default function InvoiceTable() {
   const data = trpc.invoice.getInvoices.useQuery().data;
@@ -26,6 +27,7 @@ const ToolbarInvoice = ({table} : {table : Table<TInvoiceSchema>}) => {
     <>
       <SelectedAction table={table} />
       <CreateInvoice />
+      <CreateInvoiceFile />
     </>
   )
 } 

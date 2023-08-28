@@ -23,7 +23,7 @@ interface TtypeOptions {
 
 const typeOptions: TtypeOptions[] = [
   {title: "KREDIT 30 HARI", value: "KREDIT 30 HARI"},
-  {title: "CASH", value:"CASH"}
+  {title: "Cash", value:"Cash"}
 ]
 
 export function UpdateInvoiceForm({ setOpen, row }: UpdateInvoiceFormProps) {

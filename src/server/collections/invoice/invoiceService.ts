@@ -1,12 +1,16 @@
 import { prisma } from "../../prisma";
-import { Prisma } from "../../../generated/client";
-import { TCreateInvoiceInput, TUpdateInvoiceInput } from "./invoiceSchema";
+import { Invoice, Prisma } from "../../../generated/client";
+import {
+  TCreateInvoiceInput,
+  TInputInvoiceFileArray,
+  TUpdateInvoiceInput,
+} from "./invoiceSchema";
 
 export class InvoiceService {
   public static async createInvoice(invoice: TCreateInvoiceInput) {
     const res = await prisma.invoice.create({
       data: {
-        transaksiId : invoice.transaksiId,
+        transaksiId: invoice.transaksiId,
         customerId: invoice.customerId,
         tanggalTransaksi: invoice.tanggalTransaksi,
         namaSales: invoice.namaSales,
@@ -25,7 +29,8 @@ export class InvoiceService {
             distribusiPembayaran: true,
           },
         },
-        customer : true
+        customer: true,
+        retur: true,
       },
     });
     const parsed = [];
@@ -39,17 +44,23 @@ export class InvoiceService {
         return (tot += totalPenagihan);
       }, 0);
 
+      const totalRetur = inv.retur.reduce((tot, cur) => {
+        return tot + cur.total;
+      }, 0);
+
+      const sisa = inv.total - totalPembayaran - totalRetur;
+
       parsed.push({
-        sisa : inv.total - totalPembayaran,
-        id : inv.id,
-        transaksiId : inv.transaksiId,
-        tanggalTransaksi : new Date(inv.tanggalTransaksi),
-        namaSales : inv.namaSales,
-        status : (inv.total - totalPembayaran > 0 ) ? "BELUM" : "LUNAS",
-        namaCustomer : inv.customer.nama,
-        customerId : inv.customer.id,
-        total : inv.total,
-        type: inv.type
+        sisa,
+        id: inv.id,
+        transaksiId: inv.transaksiId,
+        tanggalTransaksi: new Date(inv.tanggalTransaksi),
+        namaSales: inv.namaSales,
+        status: inv.total - totalPembayaran > 0 ? "BELUM" : "LUNAS",
+        namaCustomer: inv.customer.nama,
+        customerId: inv.customer.id,
+        total: inv.total,
+        type: inv.type,
       });
     }
 
@@ -67,7 +78,8 @@ export class InvoiceService {
             distribusiPembayaran: true,
           },
         },
-        customer : true
+        customer: true,
+        retur: true,
       },
     });
     const totalPembayaran = res.penagihan.reduce((tot, cur) => {
@@ -78,15 +90,20 @@ export class InvoiceService {
       return (tot += totalPenagihan);
     }, 0);
 
+    const totalRetur = res.retur.reduce((tot, cur) => {
+      return tot + cur.total;
+    }, 0);
+
+    const sisa = res.total - totalPembayaran - totalRetur;
+
     return {
       ...res,
-      namaCustomer : res.customer.nama,
-      sisa : res.total - totalPembayaran
+      namaCustomer: res.customer.nama,
+      sisa,
     };
   }
 
   public static async updateInvoice(invoice: TUpdateInvoiceInput) {
-
     const res = await prisma.invoice.update({
       where: { id: invoice.id },
       data: invoice,
@@ -97,16 +114,16 @@ export class InvoiceService {
 
   public static async deleteInvoice(id: string) {
     const cek = await prisma.invoice.findFirst({
-      where : {
-        id
+      where: {
+        id,
       },
-      include : {
-        penagihan : true
-      }
-    })
+      include: {
+        penagihan: true,
+      },
+    });
 
-    if(cek?.penagihan.length) {
-      throw new Error("Terdapat pembayaran yang terhubung ke invoice ini")
+    if (cek?.penagihan.length) {
+      throw new Error("Terdapat pembayaran yang terhubung ke invoice ini");
     }
 
     const res = await prisma.invoice.delete({
@@ -116,5 +133,45 @@ export class InvoiceService {
     });
 
     return res;
+  }
+
+  public static async createInvoiceFromFile(
+    transactions: TInputInvoiceFileArray
+  ) {
+    const invoices = await prisma.$transaction(async (tx) => {
+      const createdInvoices: Invoice[] = [];
+      for (const transaction of transactions) {
+        const {
+          transaksiId,
+          tanggalTransaksi,
+          total,
+          type,
+          namaCustomer,
+          namaSales,
+        } = transaction;
+        let customer = await tx.customer.findUnique({
+          where: { nama: namaCustomer },
+        });
+        if (!customer) {
+          customer = await tx.customer.create({
+            data: { nama: namaCustomer },
+          });
+        }
+
+        const invoice = await tx.invoice.create({
+          data: {
+            transaksiId,
+            total,
+            tanggalTransaksi,
+            namaSales,
+            type,
+            customerId: customer.id,
+          },
+        });
+        createdInvoices.push(invoice);
+      }
+      return createdInvoices;
+    });
+    return invoices;
   }
 }

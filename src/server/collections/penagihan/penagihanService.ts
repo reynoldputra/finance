@@ -13,6 +13,7 @@ export class PenagihanService {
         invoice: {
           include: {
             customer: true,
+            retur: true,
           },
         },
         kolektor: true,
@@ -38,6 +39,10 @@ export class PenagihanService {
         return (tot += cur.jumlah);
       }, 0);
 
+      const totalRetur = d.invoice.retur.reduce((tot, retur) => {
+        return (tot += retur.total);
+      }, 0);
+
       let cash = 0;
       let transfer = 0;
       let giro = 0;
@@ -57,14 +62,13 @@ export class PenagihanService {
         kolektorId: d.kolektor.id,
         namaCustomer: d.invoice.customer.nama,
         customerId: d.invoice.customer.id,
-        sisa: d.invoice.total - total,
+        sisa: d.invoice.total - total - totalRetur,
         tandaTerima: d.tandaTerima ?? false,
         totalPembayaran: total,
         cash,
         transfer,
         giro,
       });
-
     }
     // const sorted = parsed.sort((a, b) => {
     //   if(a.id == b.id) {
@@ -121,7 +125,11 @@ export class PenagihanService {
   static async getPenagihanSisa() {
     const result = await prisma.penagihan.findMany({
       include: {
-        invoice: true,
+        invoice: {
+          include: {
+            retur: true,
+          },
+        },
         distribusiPembayaran: {
           include: {
             caraBayar: {
@@ -139,9 +147,12 @@ export class PenagihanService {
       const total = r.distribusiPembayaran.reduce((tot, cur) => {
         return (tot += cur.jumlah);
       }, 0);
+      const totalRetur = r.invoice.retur.reduce((tot, retur) => {
+        return (tot += retur.total);
+      }, 0);
       return {
         penagihanId: r.id,
-        sisa: r.invoice.total - total,
+        sisa: r.invoice.total - total - totalRetur,
       };
     });
 
@@ -154,7 +165,11 @@ export class PenagihanService {
         id,
       },
       include: {
-        invoice: true,
+        invoice: {
+          include: {
+            retur: true,
+          },
+        },
         distribusiPembayaran: {
           include: {
             caraBayar: {
@@ -173,10 +188,14 @@ export class PenagihanService {
       return (tot += cur.jumlah);
     }, 0);
 
+    const totalRetur = result.invoice.retur.reduce((tot, retur) => {
+      return (tot += retur.total);
+    }, 0);
+
     return {
       ...result,
       totalPembayaran: total,
-      sisa: result.invoice.total - total,
+      sisa: result.invoice.total - total - totalRetur,
     };
   }
 

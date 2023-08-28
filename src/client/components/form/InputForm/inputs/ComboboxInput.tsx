@@ -19,6 +19,7 @@ import { useFormContext } from "react-hook-form";
 import { cn } from "@client/lib/cn";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { ComboboxItem } from "@client/types/form/ComboboxItem";
+import { ScrollArea } from "@client/components/ui/scroll-area";
 
 interface ComboboxInputProps {
   name: string;
@@ -80,7 +81,8 @@ const ComboboxInput: React.FC<ComboboxInputProps> = ({
                 <Command>
                   <CommandInput placeholder={`Search...`} />
                   <CommandEmpty>{`Item not found.`}</CommandEmpty>
-                  <CommandGroup>
+                  <ScrollArea></ScrollArea>
+                  <CommandGroup className="overflow-y-scroll max-h-[300px]">
                     {options?.map((language) => (
                       <CommandItem
                         disabled={language.disabled}

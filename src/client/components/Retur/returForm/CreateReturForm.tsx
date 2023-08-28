@@ -5,55 +5,61 @@ import { Button } from "@client/components/ui/button";
 import InputForm from "../../form/InputForm/InputForm";
 import { trpc } from "@client/lib/trpc";
 import { useToast } from "@client/components/ui/use-toast";
-import {
-  createInvoiceInput,
-  TCreateInvoiceInput,
-} from "@server/collections/invoice/invoiceSchema";
 import { ComboboxItem } from "@client/types/form/ComboboxItem";
+import { useEffect, useState } from "react";
+import { Combobox } from "@client/components/form/Combobox";
+import {
+  createReturInput,
+  TCreateReturInput,
+} from "../../../../server/collections/retur/returSchema";
 
-interface CreateInvoiceFormProps {
+interface CreateReturFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const typeOptions: ComboboxItem[] = [
-  { title: "KREDIT 30 HARI", value: "KREDIT 30 HARI" },
-  { title: "Cash", value: "Cash" },
+  { title: "Retur", value: "Retur" },
+  { title: "Retur Tarik Barang", value: "Retur Tarik Barang" },
+  { title: "Retur Batal", value: "Retur Batal" },
 ];
 
-export function CreateInvoiceForm({ setOpen }: CreateInvoiceFormProps) {
+export function CreateReturForm({ setOpen }: CreateReturFormProps) {
   const { toast } = useToast();
+  const [invoiceOption, setInvoiceOption] = useState<ComboboxItem[]>();
 
-  const form = useForm<TCreateInvoiceInput>({
-    resolver: zodResolver(createInvoiceInput),
+  const form = useForm<TCreateReturInput>({
+    resolver: zodResolver(createReturInput),
   });
 
-  const res = trpc.customer.customerOption.useQuery();
-  const result = res.data ?? [];
-  const custemers: ComboboxItem[] = result.map((item) => ({
-    title: item.nama,
+  const res = trpc.invoice.getInvoices.useQuery();
+  const result = res.data?.data ?? [];
+  let invoices: ComboboxItem[] = result.map((item) => ({
+    title: item.transaksiId,
     value: item.id,
   }));
+  useEffect(() => {
+    setInvoiceOption(invoices);
+  }, []);
 
-  const createInvoiceMutation = trpc.invoice.createInvoice.useMutation();
+  const createReturMutation = trpc.retur.createRetur.useMutation();
   const utils = trpc.useContext();
 
-  async function onSubmit(values: TCreateInvoiceInput) {
-    console.log("submitted");
+  async function onSubmit(values: TCreateReturInput) {
     try {
-      const { data } = await createInvoiceMutation.mutateAsync(values);
+      const { data } = await createReturMutation.mutateAsync(values);
       if (data) {
         toast({
-          description: `Invoice ${data.id} successfully created`,
+          description: `Penagihan successfully created`,
           variant: "success",
           className: "text-white text-base font-semibold",
         });
         setOpen(false);
-        utils.invoice.invalidate();
+        utils.retur.invalidate();
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
       toast({
-        description: `Failed to create invoice, please try again`,
+        description: `Failed to create retur, please try again`,
         variant: "destructive",
         className: "text-white text-base font-semibold",
       });
@@ -70,35 +76,29 @@ export function CreateInvoiceForm({ setOpen }: CreateInvoiceFormProps) {
           type="text"
           title="Transaksi ID"
         />
-        <InputForm
-          {...register("customerId")}
-          type="combobox"
-          title="Nama Customer"
-          options={custemers}
-        />
-        <InputForm
-          {...register("namaSales")}
-          name="namaSales"
-          type="text"
-          title="Nama Sales"
-        />
+        <InputForm {...register("noRetur")} type="text" title="Nomor Retur" />
         <InputForm
           {...register("tanggalTransaksi")}
-          name="tanggalTransaksi"
           type="datepicker"
           title="Tanggal Transaksi"
+        />
+        <InputForm
+          {...register("invoiceId")}
+          type="combobox"
+          title="Invoice Id"
+          options={invoiceOption}
+        />
+        <InputForm
+          {...register("total")}
+          name="total"
+          type="number"
+          title="Total"
         />
         <InputForm
           {...register("type")}
           title="Tipe"
           type="combobox"
           options={typeOptions}
-        />
-        <InputForm
-          {...register("total")}
-          name="total"
-          type="text"
-          title="Total"
         />
         <Button type="submit">Submit</Button>
       </form>

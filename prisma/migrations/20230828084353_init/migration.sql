@@ -141,6 +141,9 @@ CREATE UNIQUE INDEX "Customer_nama_customer_key" ON "Customer"("nama_customer");
 CREATE UNIQUE INDEX "Kolektor_nama_kolektor_key" ON "Kolektor"("nama_kolektor");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Retur_noRetur_key" ON "Retur"("noRetur");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Invoice_transaksiId_key" ON "Invoice"("transaksiId");
 
 -- CreateIndex

@@ -85,7 +85,6 @@ export function AddPenagihanForm({
         title: item.nama,
         value: item.id,
       }));
-      console.log(kolektorsData);
       setKolektorOptions(kolektorsData)
     }
   }, [kolektors.status, customers.status]);
@@ -163,7 +162,7 @@ export function AddPenagihanForm({
           );
         })}
         <Button
-          disabled={fields.some((field) => field.status === "LUNAS")}
+          disabled={fields.some((field) => field.status === "LUNAS" || field.kolektorId === "")}
           type="submit"
         >
           Submit

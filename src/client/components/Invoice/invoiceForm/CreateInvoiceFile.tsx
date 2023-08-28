@@ -26,7 +26,6 @@ export default function CreateInvoiceFile() {
   const [returValidation, setReturValidation] = useState<{
     [transaksiId: string]: boolean;
   }>({});
-  const [existingRetur, setExistingRetur] = useState<string[]>([]);
   const { toast } = useToast();
 
   const { data: allInvoiceData } = trpc.invoice.getInvoices.useQuery();
@@ -137,6 +136,7 @@ export default function CreateInvoiceFile() {
           className: "text-white text-base font-semibold",
         });
         utils.retur.invalidate();
+        utils.invoice.invalidate();
         handleOpenChange();
       }
     } catch (err) {
@@ -266,7 +266,6 @@ export default function CreateInvoiceFile() {
           className={`mt-2 w-72 ${selectedFile && "hidden"}`}
           variant={"outline"}
           onClick={handleOpenChange}
-          disabled={Object.values(invoiceValidation).some((valid) => valid)}
         >
           Close
         </Button>

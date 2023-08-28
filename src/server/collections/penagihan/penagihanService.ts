@@ -50,16 +50,6 @@ export class PenagihanService {
 
     for (let idx in result) {
       const d = result[idx];
-      const pembayaranLama = d.invoice.penagihan.reduce((tot, cur) => {
-        if(cur.id == d.id && !(cur.tanggalTagihan < d.tanggalTagihan)) {
-          return tot += 0
-        } else {
-          const sum = cur.distribusiPembayaran.reduce((t, c) => {
-            return (t += c.jumlah);
-          }, 0)
-          return tot += sum
-        }
-      }, 0);
 
       const pembayaranBaru = d.distribusiPembayaran.reduce((tot, cur) => {
         return (tot += cur.jumlah);
@@ -84,9 +74,7 @@ export class PenagihanService {
         kolektorId: d.kolektor.id,
         namaCustomer: d.invoice.customer.nama,
         customerId: d.invoice.customer.id,
-        pembayaranLama,
-        pembayaranBaru,
-        sisa: d.invoice.total - pembayaranLama,
+        sisa: d.sisa,
         tandaTerima: d.tandaTerima ?? false,
         totalPembayaran: pembayaranBaru,
         cash,
@@ -170,16 +158,6 @@ export class PenagihanService {
 
     for (let idx in result) {
       const d = result[idx];
-      const pembayaranLama = d.invoice.penagihan.reduce((tot, cur) => {
-        if(cur.id == d.id && !(cur.tanggalTagihan < d.tanggalTagihan)) {
-          return tot += 0
-        } else {
-          const sum = cur.distribusiPembayaran.reduce((t, c) => {
-            return (t += c.jumlah);
-          }, 0)
-          return tot += sum
-        }
-      }, 0);
 
       const pembayaranBaru = d.distribusiPembayaran.reduce((tot, cur) => {
         return (tot += cur.jumlah);
@@ -207,9 +185,7 @@ export class PenagihanService {
         kolektorId: d.kolektor.id,
         namaCustomer: d.invoice.customer.nama,
         customerId: d.invoice.customer.id,
-        pembayaranLama,
-        pembayaranBaru,
-        sisa: d.invoice.total - pembayaranLama,
+        sisa: d.sisa,
         tandaTerima: d.tandaTerima ?? false,
         totalPembayaran: pembayaranBaru,
         cash,
@@ -279,10 +255,6 @@ export class PenagihanService {
         else return tot += 0
       }, 0);
 
-      const totalRetur = d.invoice.retur.reduce((tot, retur) => {
-        return (tot += retur.total);
-      }, 0);
-
       let cash = 0;
       let transfer = 0;
       let giro = 0;
@@ -303,7 +275,7 @@ export class PenagihanService {
         kolektorId: d.kolektor.id,
         namaCustomer: d.invoice.customer.nama,
         customerId: d.invoice.customer.id,
-        sisa: d.invoice.total - total - totalRetur,
+        sisa: d.sisa,
         tandaTerima: d.tandaTerima ?? false,
         totalPembayaran: total,
         totalTagihan: d.invoice.total,
@@ -358,15 +330,9 @@ export class PenagihanService {
       },
     });
     const parse = result.map((r) => {
-      const total = r.distribusiPembayaran.reduce((tot, cur) => {
-        return (tot += cur.jumlah);
-      }, 0);
-      const totalRetur = r.invoice.retur.reduce((tot, retur) => {
-        return (tot += retur.total);
-      }, 0);
       return {
         penagihanId: r.id,
-        sisa: r.invoice.total - total - totalRetur,
+        sisa: r.sisa,
       };
     });
 
@@ -402,14 +368,10 @@ export class PenagihanService {
       return (tot += cur.jumlah);
     }, 0);
 
-    const totalRetur = result.invoice.retur.reduce((tot, retur) => {
-      return (tot += retur.total);
-    }, 0);
 
     return {
       ...result,
       totalPembayaran: total,
-      sisa: result.invoice.total - total - totalRetur,
     };
   }
 
@@ -439,8 +401,38 @@ export class PenagihanService {
   }
 
   static async createPenagihan(input: TCreatePenagihanInput) {
+    const invoice = await prisma.invoice.findFirst({
+      where : {
+        id : input.invoiceId
+      },
+      include : {
+        penagihan : {
+          include : {
+            distribusiPembayaran : true
+          }
+        },
+        retur : true
+      }
+    })
+
+    if(!invoice) return false
+
+    const terbayar = invoice.penagihan.reduce((t,c) => {
+      const totaldistribusi = c.distribusiPembayaran.reduce((t2, c2) => {
+        return t2 += c2.jumlah
+      }, 0)
+      return t += totaldistribusi
+    }, 0)
+
+
+    const totalRetur = invoice.retur.reduce((tot, retur) => {
+      return (tot += retur.total);
+    }, 0);
+    
+    
     const result = await prisma.penagihan.create({
       data: {
+        sisa : invoice.total - terbayar - totalRetur,
         invoiceId: input.invoiceId,
         kolektorId: input.kolektorId,
         tanggalTagihan: input.tanggalTagihan,

@@ -55,6 +55,7 @@ model Penagihan {
   kolektorId           String
   distribusiPembayaran DistribusiPembayaran[]
   status               String
+  sisa                 Int
   keterangan           String?
   tandaTerima          Boolean?
 

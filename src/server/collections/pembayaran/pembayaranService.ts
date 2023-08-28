@@ -53,7 +53,6 @@ export class PembayaranService {
     };
   }
 
-
   static async createPembayaran(input: TCreatePembayaranInput) {
     const result = await prisma.$transaction(async (ctx) => {
       const carabayar = await CaraBayarService.createCaraBayar(input.carabayar, ctx)
@@ -75,12 +74,22 @@ export class PembayaranService {
 
         distribusiHasil.push(distribusiPembayaran)
 
+        const semuaDistribusi = await ctx.distribusiPembayaran.findMany({
+          where : {
+            penagihanId : distribusi.penagihanId
+          },
+        })
+
+        const totalDistirbusi = semuaDistribusi.reduce((t,c) => {
+          return t += c.jumlah
+        }, 0)
+
         await ctx.penagihan.update({
           where : {
             id : distribusiPembayaran.penagihanId,
           },
           data : {
-            status : distribusiPembayaran.jumlah <= invoice.sisa ? "CICILAN" : "LUNAS"
+            status : totalDistirbusi <= invoice.sisa ? "CICILAN" : (invoice.penagihan.length > 1 ? "PELUNASAN" : "LUNAS")
           }
         })
       }
@@ -169,12 +178,22 @@ export class PembayaranService {
 
         distribusiBaru.push(distribusiPembayaran)
 
+        const semuaDistribusi = await ctx.distribusiPembayaran.findMany({
+          where : {
+            penagihanId : distribusi.penagihanId
+          },
+        })
+
+        const totalDistirbusi = semuaDistribusi.reduce((t,c) => {
+          return t += c.jumlah
+        }, 0)
+
         await ctx.penagihan.update({
           where : {
             id : distribusiPembayaran.penagihanId,
           },
           data : {
-            status : distribusiPembayaran.jumlah <= invoice.sisa ? "CICILAN" : "LUNAS"
+            status : totalDistirbusi <= invoice.sisa ? "CICILAN" : (invoice.penagihan.length > 1 ? "PELUNASAN" : "LUNAS")
           }
         })
       }

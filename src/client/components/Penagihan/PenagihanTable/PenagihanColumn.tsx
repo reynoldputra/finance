@@ -34,7 +34,7 @@ export const PenagihanColumn: ColumnDef<TPenagihanTable>[] = [
     accessorKey: "transaksiId",
     id : "Id Transaksi",
     header: ({ column, table }) => <DataTableColumnHeader table={table} column={column} title="Id Transaksi" />,
-    cell: ({ row }) => <div className="w-[180px]">{row.getValue("Id Transaksi")}</div>,
+    cell: ({ row }) => <div className="w-[180px]">{row.getValue("Id Transaksi") as string}</div>,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },

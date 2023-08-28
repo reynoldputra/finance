@@ -82,6 +82,7 @@ export class InvoiceService {
         retur: true,
       },
     });
+
     const totalPembayaran = res.penagihan.reduce((tot, cur) => {
       const totalPenagihan = cur.distribusiPembayaran.reduce((tot, cur) => {
         return (tot += cur.jumlah);

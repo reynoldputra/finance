@@ -5,6 +5,7 @@ import { DatePicker } from "../form/DatePicker"
 import { trpc } from "@client/lib/trpc"
 import { idr } from "@client/lib/idr"
 import toPascalCase from "@client/lib/pascalCase"
+import { dmyDate } from "@client/lib/dmyDate"
 
 export default function ReportIncomingBank() {
 
@@ -113,13 +114,17 @@ export default function ReportIncomingBank() {
       '!cols': [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 5 }, { wch: 5 }, { wch: 5 }, { wch: 5 }, { wch: 5 }, { wch: 5 }, { wch: 15 }]
     };
 
+    const titlePenagihan = dmyDate(tanggalPenagihan, "-")
+    const titlePembayaran = dmyDate(tanggalPembayaran, "-")
+    const title = `incomingbank_${titlePenagihan}_${titlePembayaran}.xlsx`
+
     var buffer = xlsx.build([{ name: 'mySheetName', data: header, options: sheetOptions }]);
 
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'report incoming bank.xlsx';
+    a.download =title;
     a.click();
 
     URL.revokeObjectURL(url);

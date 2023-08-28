@@ -5,6 +5,7 @@ import { useState } from "react"
 import { DatePicker } from "../form/DatePicker"
 import { dmyDate } from "@client/lib/dmyDate"
 import { idr } from "@client/lib/idr"
+import toPascalCase from "@client/lib/pascalCase"
 
 export default function ReportTableMaster() {
   const [tanggalPembayaran, setTanggalPembayaran] = useState(new Date(2023, 4, 23))
@@ -33,19 +34,19 @@ export default function ReportTableMaster() {
     let finalResult: (string | number | boolean)[][] = []
 
     queryResult.forEach(q => {
-      let template = ["", q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.tandaTerima, q.invoice.total, q.sisa]
+      let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.tandaTerima, q.invoice.total, q.sisa]
       q.distribusi.forEach((v) => {
         if (v.caraBayar.metodePembayaranId == 1) {
-          data.push([...template, v.jumlah, "", "", "", "", q.status])
+          data.push([...template, v.jumlah, "", "", "", "", "", "", "", toPascalCase(q.status)])
           return
         }
         if (v.caraBayar.giro) {
           const giro = v.caraBayar.giro
-          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), v.caraBayar.total, q.status])
+          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), v.caraBayar.total, "", "", "", toPascalCase(q.status)])
           return
         }
         if (v.caraBayar.transfer) {
-          data.push([...template, "", "", "", "", "", dmyDate(v.caraBayar.tanggal), v.jumlah, "", q.status])
+          data.push([...template, "", "", "", "", "", dmyDate(v.caraBayar.tanggal), v.jumlah, "", toPascalCase(q.status)])
           return
         }
         data.push([...template, "", "", "", "", "", "", "", "TRUE", ""])
@@ -136,13 +137,17 @@ export default function ReportTableMaster() {
       '!cols': [{ wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }]
     };
 
+    const titlePenagihan = dmyDate(tanggalPenagihan, "-")
+    const titlePembayaran = dmyDate(tanggalPembayaran, "-")
+    const title = `tablemaster_${titlePenagihan}_${titlePembayaran}.xlsx`
+
     var buffer = xlsx.build([{ name: 'mySheetName', data: header, options: sheetOptions }]);
 
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'report table master.xlsx';
+    a.download = title;
     a.click();
 
     URL.revokeObjectURL(url);

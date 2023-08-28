@@ -11,7 +11,6 @@ export default function ReportPenagihan() {
   const [date, setDate] = useState(new Date(2023, 4, 23))
 
   const clickHandle = async () => {
-    const newDate = date
     date.setMinutes(0)
     date.setHours(0)
     date.setSeconds(0)
@@ -66,13 +65,15 @@ export default function ReportPenagihan() {
       '!cols': [{ wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }]
     };
 
+    const dateTitle = dmyDate(date, "-")
+
     var buffer = xlsx.build([{ name: 'mySheetName', data: header, options: sheetOptions }]);
 
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'report penagihan.xlsx';
+    a.download = `penagihan_${dateTitle}.xlsx`;
     a.click();
 
     URL.revokeObjectURL(url);

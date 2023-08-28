@@ -37,11 +37,11 @@ export default function ReportAccounting() {
       let template = ["", q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.invoice.total, q.sisa]
       q.distribusi.forEach((v) => {
         if (v.caraBayar.metodePembayaranId == 1) {
-          data.push([...template, v.jumlah, "", "", "", "", q.status])
+          data.push([...template, v.jumlah, "", "", "", "", toPascalCase(q.status)])
         }
         if (v.caraBayar.giro) {
           const giro = v.caraBayar.giro
-          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), v.jumlah, q.status])
+          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), v.jumlah, toPascalCase(q.status)])
         }
       })
     })
@@ -128,13 +128,17 @@ export default function ReportAccounting() {
       '!cols': [{ wch: 5 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }]
     };
 
+    const titlePenagihan = dmyDate(tanggalPenagihan, "-")
+    const titlePembayaran = dmyDate(tanggalPembayaran, "-")
+    const title = `accounting_${titlePenagihan}_${titlePembayaran}.xlsx`
+
     var buffer = xlsx.build([{ name: 'mySheetName', data: header, options: sheetOptions }]);
 
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'accounting_report.xlsx';
+    a.download = title;
     a.click();
 
     URL.revokeObjectURL(url);

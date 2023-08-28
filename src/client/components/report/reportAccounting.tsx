@@ -28,23 +28,28 @@ export default function ReportAccounting() {
 
     await query.refetch()
 
-    const queryResult = query.data?.data ?? []
+    let queryResult = query.data?.data ?? []
 
     let data: (string | number)[][] = []
     let finalResult: (string | number)[][] = []
 
-    queryResult.forEach(q => {
-      let template = ["", q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.invoice.total, q.sisa]
+    for(let idx in queryResult) {
+      let q = queryResult[idx]
+      let template = ["", q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, idr(q.invoice.total), idr(q.sisa)]
+      console.log(template)
       q.distribusi.forEach((v) => {
+        const sisa = v.jumlah - q.sisa
+        const ketsisa = sisa > 0 ? `, Lebih ${sisa}` : (sisa < 0 ? `, Kurang ${sisa}` : "")
+        const ket = (q.status == "LUNAS" || q.status == "PELUNASAN") ? ketsisa : ""
         if (v.caraBayar.metodePembayaranId == 1) {
-          data.push([...template, v.jumlah, "", "", "", "", toPascalCase(q.status)])
+          data.push([...template, idr(v.jumlah), "", "", "", "", toPascalCase(q.status + ket)])
         }
         if (v.caraBayar.giro) {
           const giro = v.caraBayar.giro
-          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), v.jumlah, toPascalCase(q.status)])
+          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), idr(v.jumlah), toPascalCase(q.status + ket)])
         }
       })
-    })
+    }
 
     data = data.sort((a, b) => {
       return (
@@ -55,14 +60,17 @@ export default function ReportAccounting() {
     })
 
     let currentKolektor = ""
+    let currentCustomer = ""
     let currentIdTransaksi = ""
 
     data.forEach(d => {
-      let space = false
-      if (currentKolektor == d[1]) {
-        space = true
+      let temp = d
+      let space = true
+
+      if (currentCustomer && currentKolektor && d[3] == currentCustomer && d[1] == currentKolektor) {
+        space = false
         d = d.map((v, idx) => {
-          if (idx <= 4) {
+          if (idx <= 3) {
             return ""
           } else {
             return v
@@ -70,8 +78,8 @@ export default function ReportAccounting() {
         })
       }
 
-
       if (currentIdTransaksi == d[5]) {
+        space = false
         d = d.map((v, idx) => {
           if (idx <= 7) {
             return ""
@@ -79,16 +87,20 @@ export default function ReportAccounting() {
             return v
           }
         })
+        d[d.length-1] = ""
       }
-
-      finalResult.push(d)
 
       if (space) {
         finalResult.push([""])
+        finalResult.push(d)
+      } else {
+        finalResult.push(d)
       }
 
-      currentKolektor = d[1] as string
-      currentIdTransaksi = d[5] as string
+
+      currentKolektor = temp[1] as string
+      currentIdTransaksi = temp[5] as string
+      currentCustomer = temp[3] as string
     })
 
     console.log(data)
@@ -97,7 +109,7 @@ export default function ReportAccounting() {
     const header = [
       ["SAP LAPORAN HADIRAN TAGIHAN"],
       [""],
-      ["DATE : 30 MEI 2023"],
+      ["DATE : " + finaldatestr],
       [""],
       ["No", "Nama Kolektor", "Nama Sales", "Customer Name", "Tanggal Transaksi", "Id Transaksi", "Total Tagihan", "Sisa Tagihan", "Cara Bayar", "", "", "", "", "Ket"],
       ["", "", "", "", "", "", "", "", "Cash", "Giro", "", "", "", ""],

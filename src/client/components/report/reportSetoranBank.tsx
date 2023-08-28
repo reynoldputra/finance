@@ -50,8 +50,16 @@ export default function ReportSetoranBank() {
 
     let currentTotal = 0
     let prevSalesName = ""
+    let lengthdata = sortedData.length
 
     sortedData.forEach((value, index) => {
+      console.log(index, sortedData.length-1)
+      if(index == lengthdata-1) {
+        sortedData.push([
+          "", "", "", "Total", "", "Rp " + idr(currentTotal), "", ""
+        ])
+        return
+      }
       if((prevSalesName && prevSalesName != value[0]) || index+1 == sortedData.length){
         sortedData.splice(index, 0, [
           "", "", "", "Total", "", "Rp " + idr(currentTotal), "", ""
@@ -74,7 +82,6 @@ export default function ReportSetoranBank() {
         value[4] = "Rp " + idr(value[4] as number)
         value[5] = "Rp " + idr(value[5] as number)
       }
-      console.log(value[4], value[5])
     })
 
     console.log(sortedData)

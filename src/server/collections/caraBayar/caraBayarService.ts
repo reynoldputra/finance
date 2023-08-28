@@ -67,6 +67,9 @@ export class CaraBayarService {
         },
         penagihan : {
           tanggalTagihan : tanggalPenagihan,
+          invoice : {
+            type : "Cash"
+          }
         }
       },
       include : {

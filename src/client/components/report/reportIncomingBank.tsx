@@ -81,7 +81,7 @@ export default function ReportIncomingBank() {
         currentTotal += (value[5] as number)
       }
 
-      finalData.push(["", value[1], "Ket:" + value[6], ""])
+      finalData.push(["", value[1], value[6] ? "Ket:" + value[6] : "", ""])
       finalData.push(["", "Inv " + value[3], "", ""])
       finalData.push(["", "Rp " + idr(value[5]), "", ""])
       finalData.push(["", "", "", ""])
@@ -94,7 +94,7 @@ export default function ReportIncomingBank() {
       ["SAP TRANSAKSI INCOMING BANK BCA"],
       [""],
       ["PT. SENTRAL AUTO PRATAMA"],
-      ["Date: 31 Mei 2023"],
+      ["Date: " + finaldatestr],
       [""],
       ["No.", "Toko", "", "Cara Pembayaran/Keterangan", "", "", "", "", "", "Amount"],
       ...finalData

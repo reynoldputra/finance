@@ -29,11 +29,29 @@ export const PenagihanRouter = penagihanTrpc.router({
   getReportAccounting: penagihanTrpc.publicProcedure
     .input(z.object({
       tanggalPenagihan : z.date(),
-      tanggalPembayaran : z.date()
+      tanggalPembayaran : z.date().optional()
     }))
     .query(async ({input}) => {
     try {
       const res = await PenagihanService.getAccoutingReport(input.tanggalPenagihan, input.tanggalPembayaran);
+      return {
+        status: true,
+        data: res,
+      };
+    } catch (err) {
+      return {
+        status: false,
+      };
+    }
+  }),
+  getTableMaster: penagihanTrpc.publicProcedure
+    .input(z.object({
+      start : z.date(),
+      end : z.date()
+    }))
+    .query(async ({input}) => {
+    try {
+      const res = await PenagihanService.getTableMaster(input.start, input.end);
       return {
         status: true,
         data: res,

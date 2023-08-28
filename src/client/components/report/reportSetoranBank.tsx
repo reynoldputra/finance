@@ -5,6 +5,7 @@ import { DatePicker } from "../form/DatePicker"
 import { trpc } from "@client/lib/trpc"
 import { idr } from "@client/lib/idr"
 import toPascalCase from "@client/lib/pascalCase"
+import { dmyDate } from "@client/lib/dmyDate"
 
 export default function ReportSetoranBank() {
   const [tanggalPembayaran, setTanggalPembayaran] = useState(new Date(2023, 4, 23))
@@ -78,6 +79,10 @@ export default function ReportSetoranBank() {
 
     console.log(sortedData)
 
+    const titlePenagihan = dmyDate(tanggalPenagihan, "-")
+    const titlePembayaran = dmyDate(tanggalPembayaran, "-")
+    const title = `setoranbank_${titlePenagihan}_${titlePembayaran}.xlsx`
+
     const header = [
       ["SAP LAPORAN HADIRAN TAGIHAN"],
       [""],
@@ -110,7 +115,7 @@ export default function ReportSetoranBank() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'report.xlsx';
+    a.download = title;
     a.click();
 
     URL.revokeObjectURL(url);

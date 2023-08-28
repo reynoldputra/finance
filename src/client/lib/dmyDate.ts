@@ -1,9 +1,9 @@
-export const dmyDate = (date : Date) => {
+export const dmyDate = (date : Date, delimiter: string = "/") => {
   let d = date.getDate()
   let m = date.getMonth() + 1
   let y = date.getFullYear().toString()
 
-  return `${d}/${m}/${y}`
+  return `${d}${delimiter}${m}${delimiter}${y}`
 }
 
 export const parseDmy = (str : string) => {

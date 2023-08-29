@@ -38,17 +38,17 @@ export class InvoiceService {
       const inv = res[idx];
       const totalPembayaran = inv.penagihan.reduce((tot, cur) => {
         const totalPenagihan = cur.distribusiPembayaran.reduce((tot, cur) => {
-          return (tot += cur.jumlah);
+          return (tot += Number(cur.jumlah));
         }, 0);
 
         return (tot += totalPenagihan);
       }, 0);
 
       const totalRetur = inv.retur.reduce((tot, cur) => {
-        return tot + cur.total;
+        return tot + Number(cur.total);
       }, 0);
 
-      const sisa = inv.total - totalPembayaran - totalRetur;
+      const sisa = Number(inv.total) - totalPembayaran - totalRetur;
 
       parsed.push({
         sisa,
@@ -56,10 +56,10 @@ export class InvoiceService {
         transaksiId: inv.transaksiId,
         tanggalTransaksi: new Date(inv.tanggalTransaksi),
         namaSales: inv.namaSales,
-        status: inv.total - totalPembayaran > 0 ? "BELUM" : "LUNAS",
+        status: Number(inv.total) - totalPembayaran > 0 ? "BELUM" : "LUNAS",
         namaCustomer: inv.customer.nama,
         customerId: inv.customer.id,
-        total: inv.total,
+        total: Number(inv.total),
         type: inv.type,
       });
     }
@@ -85,17 +85,17 @@ export class InvoiceService {
 
     const totalPembayaran = res.penagihan.reduce((tot, cur) => {
       const totalPenagihan = cur.distribusiPembayaran.reduce((tot, cur) => {
-        return (tot += cur.jumlah);
+        return (tot += Number(cur.jumlah));
       }, 0);
 
       return (tot += totalPenagihan);
     }, 0);
 
     const totalRetur = res.retur.reduce((tot, cur) => {
-      return tot + cur.total;
+      return tot + Number(cur.total);
     }, 0);
 
-    const sisa = res.total - totalPembayaran - totalRetur;
+    const sisa = Number(res.total) - totalPembayaran - totalRetur;
 
     return {
       ...res,

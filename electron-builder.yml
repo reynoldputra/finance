@@ -1,6 +1,6 @@
-productName: ElectronPrismaTrpcExample
+productName: Finance
 appId: com.funtoimagine.electron-prisma-trpc-example
-copyright: Copyright 2022 Ayron Wohletz
+copyright: Copyright 2023 Finance
 afterSign: notarize.js
 publish:
   provider: github

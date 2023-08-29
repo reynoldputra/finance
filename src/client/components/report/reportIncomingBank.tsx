@@ -39,8 +39,8 @@ export default function ReportIncomingBank() {
         q.penagihan.invoice.customer.nama,
         q.caraBayar.tanggal,
         q.penagihan.invoice.transaksiId,
-        q.penagihan.invoice.total,
-        q.jumlah,
+        Number(q.penagihan.invoice.total),
+        Number(q.jumlah),
         toPascalCase(q.keterangan),
       ]
     })

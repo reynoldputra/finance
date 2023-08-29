@@ -41,13 +41,13 @@ export class CaraBayarService {
           bank: r.transfer.bank,
         };
 
-      const jumlahdistribusi = r.distribusiPembayaran.reduce((tot, curr) => tot += curr.jumlah , 0)
+      const jumlahdistribusi = r.distribusiPembayaran.reduce((tot, curr) => tot += Number(curr.jumlah) , 0)
 
       return {
         id: r.id,
-        total: r.total,
+        total: Number(r.total),
         metodePembayaran: r.metode.jenis,
-        sisa : r.total - jumlahdistribusi,
+        sisa : Number(r.total) - jumlahdistribusi,
         tandaTerima: r.tandaTerima,
         namaCustomer: r.distribusiPembayaran[0].penagihan.invoice.customer.nama,
         customerId: r.distribusiPembayaran[0].penagihan.invoice.customer.id,
@@ -94,7 +94,7 @@ export class CaraBayarService {
       const p = penagihan.find(i => i.id == r.penagihanId)
       if(p && p.status != "LUNAS") ket += p.status
       if(p && (p.status == "LUNAS" || p.status == "PELUNASAN")) {
-        let sisa = p.sisa - p.totalPembayaran
+        let sisa = Number(p.sisa) - p.totalPembayaran
         if(sisa < 0) {
           if(!sisa) ket += ", "
           ket += "Kurang " + sisa

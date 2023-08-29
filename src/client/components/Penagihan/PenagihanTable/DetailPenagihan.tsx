@@ -1,7 +1,11 @@
 import { dmyDate } from "@client/lib/dmyDate";
 import { trpc } from "@client/lib/trpc";
 import { Fragment } from "react";
-export default function DetailPenagihan({ penagihanId }: { penagihanId: string }) {
+export default function DetailPenagihan({
+  penagihanId,
+}: {
+  penagihanId: string;
+}) {
   const detailPenagihan = trpc.penagihan.getPenagihanById.useQuery(penagihanId);
   const dataPenagihan = detailPenagihan.data?.data;
 
@@ -16,7 +20,7 @@ export default function DetailPenagihan({ penagihanId }: { penagihanId: string }
           <p className={cnheader}>Tanggal Penagihan</p>
           <p>{dmyDate(dataPenagihan.tanggalTagihan)}</p>
           <p className={cnheader}>Total Tagihan</p>
-          <p>{dataPenagihan.invoice.total}</p>
+          <p>{dataPenagihan.invoice.total.toString()}</p>
           <hr className="my-6" />
           <p className={cnheader}>Pembayaran</p>
           {dataPenagihan.distribusiPembayaran.length > 0 ? (
@@ -30,7 +34,7 @@ export default function DetailPenagihan({ penagihanId }: { penagihanId: string }
                   <p>{d.caraBayarId}</p>
                   <p>{dmyDate(d.caraBayar.tanggal)}</p>
                   <p>{d.caraBayar.metode.jenis}</p>
-                  <p>{d.jumlah}</p>
+                  <p>{d.jumlah.toString()}</p>
                 </Fragment>
               ))}
             </div>

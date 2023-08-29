@@ -6,7 +6,6 @@ import { PenagihanColumn } from "./PenagihanColumn";
 
 export default function PenagihanTable() {
   const data = trpc.penagihan.getAllPenagihan.useQuery().data;
-  // console.log(data?.data)
   const table = useDataTable({
     columns: PenagihanColumn,
     data: data?.data ?? [],

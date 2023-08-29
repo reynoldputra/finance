@@ -42,11 +42,11 @@ export default function ReportTableMaster() {
         }
         if (v.caraBayar.giro) {
           const giro = v.caraBayar.giro
-          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), v.caraBayar.total, "", "", "", toPascalCase(q.status)])
+          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), Number(v.caraBayar.total), "", "", "", toPascalCase(q.status)])
           return
         }
         if (v.caraBayar.transfer) {
-          data.push([...template, "", "", "", "", "", dmyDate(v.caraBayar.tanggal), v.jumlah, "", toPascalCase(q.status)])
+          data.push([...template, "", "", "", "", "", dmyDate(v.caraBayar.tanggal), Number(v.jumlah), "", toPascalCase(q.status)])
           return
         }
         data.push([...template, "", "", "", "", "", "", "", "TRUE", ""])

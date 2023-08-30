@@ -15,6 +15,8 @@ import { useToast } from "@client/components/ui/use-toast";
 import { trpc } from "@client/lib/trpc";
 import { dmyDate } from "@client/lib/dmyDate";
 import LoadingOverlay from "react-loading-overlay-ts";
+import { Checkbox } from "@client/components/ui/checkbox";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 export default function CreateInvoiceFile() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -28,6 +30,7 @@ export default function CreateInvoiceFile() {
   const [returValidation, setReturValidation] = useState<{
     [transaksiId: string]: boolean;
   }>({});
+  const [ignoreToleransi, setIgnoreToleransi] = useState<Boolean>(false);
   const { toast } = useToast();
 
   const handleButtonClicked = useCallback(() => {
@@ -133,19 +136,50 @@ export default function CreateInvoiceFile() {
 
   const handleConfirmSubmission = async () => {
     try {
-      const resRetur = await createReturMutation.mutateAsync(returArray);
-      const resInvoice = await createInvoiceMutation.mutateAsync(invoiceArray);
-      if (resRetur.data && resInvoice.data) {
-        const invoicePlural = invoiceArray.length > 1 ? "Invoices" : "Invoice";
-        const returPlural = returArray.length > 1 ? "Returs" : "Retur";
-        toast({
-          description: `${returArray.length} ${returPlural} & ${invoiceArray.length} ${invoicePlural} successfully submitted.`,
-          variant: "success",
-          className: "text-white text-base font-semibold",
-        });
-        utils.retur.invalidate();
-        utils.invoice.invalidate();
-        handleOpenChange();
+      if (ignoreToleransi) {
+        const highlightedReturs = returArray.filter(
+          (retur) => returValidation[retur.transaksiId] === false
+        );
+        const highlightedInvoices = invoiceArray.filter(
+          (invoice) => invoiceValidation[invoice.transaksiId] === true
+        );
+        const resRetur = await createReturMutation.mutateAsync(
+          highlightedReturs
+        );
+        const resInvoice = await createInvoiceMutation.mutateAsync(
+          highlightedInvoices
+        );
+        if (resRetur.data && resInvoice.data) {
+          const invoicePlural =
+            highlightedInvoices.length > 1 ? "Invoices" : "Invoice";
+          const returPlural = highlightedReturs.length > 1 ? "Returs" : "Retur";
+          toast({
+            description: `${highlightedReturs.length} ${returPlural} & ${highlightedInvoices.length} ${invoicePlural} successfully submitted.`,
+            variant: "success",
+            className: "text-white text-base font-semibold",
+          });
+          utils.retur.invalidate();
+          utils.invoice.invalidate();
+          handleOpenChange();
+        }
+      } else {
+        const resRetur = await createReturMutation.mutateAsync(returArray);
+        const resInvoice = await createInvoiceMutation.mutateAsync(
+          invoiceArray
+        );
+        if (resRetur.data && resInvoice.data) {
+          const invoicePlural =
+            invoiceArray.length > 1 ? "Invoices" : "Invoice";
+          const returPlural = returArray.length > 1 ? "Returs" : "Retur";
+          toast({
+            description: `${returArray.length} ${returPlural} & ${invoiceArray.length} ${invoicePlural} successfully submitted.`,
+            variant: "success",
+            className: "text-white text-base font-semibold",
+          });
+          utils.retur.invalidate();
+          utils.invoice.invalidate();
+          handleOpenChange();
+        }
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);
@@ -252,6 +286,17 @@ export default function CreateInvoiceFile() {
                     </div>
                   </>
                 )}
+                <div className="flex gap-2 items-center">
+                  <Checkbox
+                    id="ignore"
+                    checked={ignoreToleransi as CheckedState}
+                    onCheckedChange={(v) => {
+                      if (v == false) setIgnoreToleransi(false);
+                      else setIgnoreToleransi(true);
+                    }}
+                  />
+                  <label htmlFor="ignore">Ignore highlight error</label>
+                </div>
                 <div className="flex gap-x-5 mt-2">
                   <Button
                     className="w-36"
@@ -264,9 +309,14 @@ export default function CreateInvoiceFile() {
                     className="w-36"
                     onClick={handleConfirmSubmission}
                     disabled={
-                      Object.values(invoiceValidation).some(
-                        (valid) => !valid
-                      ) || Object.values(returValidation).some((valid) => valid)
+                      (!ignoreToleransi &&
+                        (Object.values(invoiceValidation).some(
+                          (valid) => !valid
+                        ) ||
+                          Object.values(returValidation).some(
+                            (valid) => valid
+                          ))) ||
+                      false
                     }
                   >
                     Confirm

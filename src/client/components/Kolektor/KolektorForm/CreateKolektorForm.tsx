@@ -20,7 +20,6 @@ export function CreateKolektorForm({ setOpen }: CreateKolektorFormProps) {
     resolver: zodResolver(createKolektorInput),
     defaultValues: {
       nama: "inu",
-      id: "",
     },
   });
 
@@ -59,12 +58,6 @@ export function CreateKolektorForm({ setOpen }: CreateKolektorFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <InputForm
-          name="id"
-          type="text"
-          title="ID Kolektor"
-          description="ID kolektor will be generated automatically when empty"
-        />
         <InputForm
           name="nama"
           type="text"

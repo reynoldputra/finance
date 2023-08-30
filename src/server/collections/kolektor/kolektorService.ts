@@ -37,10 +37,9 @@ export class KolektorService {
   }
 
   public static async createKolektor(kolektor: TCreateKolektorInput) {
-    const { id, nama } = kolektor;
+    const { nama } = kolektor;
     const res = await prisma.kolektor.create({
       data: {
-        id,
         nama,
       },
     });

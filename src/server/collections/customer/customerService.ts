@@ -5,7 +5,7 @@ import { Prisma } from "../../../generated/client";
 import { InvoiceService } from "../invoice/invoiceService";
 
 export class CustomerService {
-  public static async getCustomerTable(): Promise<ICustomerTable[]> {
+  public static async getCustomerTable() {
     const result = await prisma.customer.findMany({
       select: {
         id: true,
@@ -31,6 +31,7 @@ export class CustomerService {
         },
       },
     });
+
     const customerTable: ICustomerTable[] = result.map((r): ICustomerTable => {
       const invoicesArray = r?.invoices ?? [];
       const jumlahTagihan = CustomerService.getTotalPembayaran({
@@ -43,9 +44,10 @@ export class CustomerService {
         kolektorId: r.kolektorId || "",
         kolektorNama: r.currentKolektor?.nama || "",
         invoiceAktif: r.invoices.length,
-        jumlahTagihan,
+        jumlahTagihan : Number(jumlahTagihan),
       };
     });
+
     return customerTable;
   }
 
@@ -56,7 +58,7 @@ export class CustomerService {
       .flatMap((penagihan: any) => penagihan.distribusiPembayaran ?? []);
     const totalPembayaran = distribusiPembayaranArray.reduce(
       (total: number, cur: any) => {
-        return (total += cur.jumlah);
+        return (total += Number(cur.jumlah));
       },
       0
     );

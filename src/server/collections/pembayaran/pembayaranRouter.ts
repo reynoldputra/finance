@@ -88,6 +88,20 @@ export const pembayaranRouter = pembayaranTrpc.router({
           status: false,
         };
       }
+  }),
+  upsertMetode: pembayaranTrpc.publicProcedure
+    .mutation(async () => {
+      try {
+        const res = await PembayaranService.upsertMetode();
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
   })
 
 });

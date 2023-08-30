@@ -1,4 +1,4 @@
-import { DistribusiPembayaran } from "@server/../generated/client";
+import { DistribusiPembayaran, Prisma } from "@server/../generated/client";
 import { prisma } from "@server/prisma";
 import { CaraBayarService } from "../caraBayar/caraBayarService";
 import { InvoiceService } from "../invoice/invoiceService";
@@ -211,5 +211,22 @@ export class PembayaranService {
   static async getMetodePembayaran () {
     const result = await prisma.metodePembayaran.findMany()
     return result
+  }
+
+  static async upsertMetode () {
+    const metodePembayaran: Prisma.MetodePembayaranUncheckedCreateInput[] = [
+      { id: 1, jenis: "CASH", batasAtas : 1000, batasBawah : 1000},
+      { id: 2, jenis: "GIRO", batasAtas : 10000, batasBawah : 1000 },
+      { id: 3, jenis: "TRANSFER", batasAtas : 10000, batasBawah : 1000 },
+    ];
+
+    for (let idx in metodePembayaran) {
+      const m = metodePembayaran[idx];
+      await prisma.metodePembayaran.upsert({
+        where: { id: m.id },
+        create: m,
+        update: m,
+      });
+    }
   }
 }

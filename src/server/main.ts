@@ -1,17 +1,17 @@
-import {appRouter} from "./router";
-import {app, BrowserWindow, ipcMain, protocol} from 'electron';
+import { appRouter } from "./router";
+import { app, BrowserWindow, ipcMain, protocol } from 'electron';
 import path from "path";
-import {ipcRequestHandler} from "./ipcRequestHandler";
-import {IpcRequest} from "../api";
+import { ipcRequestHandler } from "./ipcRequestHandler";
+import { IpcRequest } from "../api";
 import fs from "fs";
-import {dbPath, dbUrl, isDev, latestMigration, Migration} from "./constants";
+import { dbPath, dbUrl, isDev, latestMigration, Migration } from "./constants";
 import log from "electron-log";
-import {prisma, runPrismaCommand} from "./prisma";
-import {MenuBuilder} from "./menu";
+import { prisma, runPrismaCommand } from "./prisma";
+import { MenuBuilder } from "./menu";
 import { createFileRoute, createURLRoute } from "electron-router-dom";
+import prodSeeder from "./prodSeed"
 
-const createWindow = async (id : string) => {
-
+const createWindow = async (id: string) => {
   let needsMigration;
   const dbExists = fs.existsSync(dbPath);
   if (!dbExists) {
@@ -22,7 +22,7 @@ const createWindow = async (id : string) => {
   } else {
     try {
       const latest: Migration[] = await prisma.$queryRaw`select * from _prisma_migrations order by finished_at`;
-      needsMigration = latest[latest.length-1]?.migration_name !== latestMigration;
+      needsMigration = latest[latest.length - 1]?.migration_name !== latestMigration;
     } catch (e) {
       log.error(e);
       needsMigration = true;
@@ -48,9 +48,6 @@ const createWindow = async (id : string) => {
       });
       log.info("Migration done.")
 
-      // seed
-      // log.info("Seeding...");
-      // await seed(prisma);
 
     } catch (e) {
       log.error(e);
@@ -60,6 +57,10 @@ const createWindow = async (id : string) => {
     log.info("Does not need migration");
   }
 
+  // seed
+  log.info("Seeding...");
+  await prodSeeder(prisma);
+
   // The Vite build of the client code uses src URLs like "/assets/main.1234.js" and we need to
   // intercept those requests and serve the files from the dist folder.
   protocol.interceptFileProtocol("file", (request, callback) => {
@@ -67,9 +68,9 @@ const createWindow = async (id : string) => {
 
     if (parsedUrl.dir.includes("assets")) {
       const webAssetPath = path.join(__dirname, "..", "assets", parsedUrl.base);
-      callback({path: webAssetPath})
+      callback({ path: webAssetPath })
     } else {
-      callback({url: request.url});
+      callback({ url: request.url });
     }
   });
 

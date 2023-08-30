@@ -6,7 +6,7 @@ import {
   FileText,
   Banknote,
   Receipt,
-  Undo2
+  Undo2,
   // File
 } from "lucide-react";
 

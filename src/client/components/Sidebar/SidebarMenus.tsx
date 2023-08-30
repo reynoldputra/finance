@@ -1,7 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { ISidebarItem } from "@client/types/SidebarItem";
 import SidebarItems from "../../data/sidebarItems";
-
 interface sidebarMenusProps {
   open: boolean;
 }
@@ -29,9 +28,8 @@ const SidebarMenus: React.FC<sidebarMenusProps> = ({ open }) => {
       {SidebarItems.map((item: ISidebarItem, index) => (
         <li
           key={item.title}
-          className={`flex rounded-md p-2 cursor-pointer text-gray-800 font-semibold text-lg items-center gap-x-4 ${
-            item.gap ? "mt-9" : "mt-2"
-          } ${index === 0 && "bg-light-white"} ${!open && "justify-center"} `}
+          className={`flex rounded-md p-2 cursor-pointer text-gray-800 font-semibold text-lg items-center gap-x-4 ${item.gap ? "mt-9" : "mt-2"
+            } ${index === 0 && "bg-light-white"} ${!open && "justify-center"} `}
           onClick={() => navigate(item.route)}
         >
           <div

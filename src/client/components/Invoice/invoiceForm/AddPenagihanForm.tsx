@@ -33,19 +33,6 @@ export function AddPenagihanForm({
   const kolektors = trpc.kolektor.getAllKolektor.useQuery();
   const kolektorsQuery = kolektors.data?.data ?? [];
 
-  const initValue: TManyPenagihanInput[] = selectedRows.map((r) => {
-    const customerData = customers.data ?? [];
-    const customer = customerData.find(
-      (c) => c.nama == r.original.namaCustomer
-    );
-    return {
-      invoiceId: r.original.id,
-      kolektorId: customer?.kolektorId ?? "",
-      tanggalTagihan: new Date(),
-      status: r.original.status,
-    };
-  });
-
   const FormSchema = z.object({
     manyPenagihan: z.array(manyPenagihanInput),
   });
@@ -69,6 +56,7 @@ export function AddPenagihanForm({
 
   useEffect(() => {
     if (customers.data) {
+      console.log(customers.data)
       const initValue: TManyPenagihanInput[] = selectedRows.map((r) => {
         const customerData = customers.data ?? [];
         const customer = customerData.find(

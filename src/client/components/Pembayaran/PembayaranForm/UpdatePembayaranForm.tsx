@@ -23,6 +23,7 @@ import { Checkbox } from "@client/components/ui/checkbox";
 import { cn } from "@client/lib/cn";
 import { Textarea } from "@client/components/ui/textarea";
 import { TUpdateCaraBayarInput } from "@server/collections/caraBayar/caraBayarSchema";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 interface IDistribusi {
   penagihanId: string;
@@ -62,6 +63,7 @@ export function UpdatePembayaranForm({ setOpen, carabayarId }: ModalFormProps) {
   const [distribusiLama, setDistribusiLama] = useState<IDistribusiLama[]>([]);
   const [distribusiBaru, setDistribusiBaru] = useState<IDistribusi[]>([]);
   const [detailMetode, setDetailMetode] = useState<IDetailMetodePembayaran[]>([]);
+  const [ignoreToleransi, setIgnoreToleransi] = useState<Boolean>(false)
 
   const c = [4, 3, 1, 3, 1].map((v) => "col-span-" + v.toString()); // class for form cols
 
@@ -813,18 +815,34 @@ export function UpdatePembayaranForm({ setOpen, carabayarId }: ModalFormProps) {
                 : ""}
             </p>
           </div>
+        {
+          totalCarabayar != totalDistribusi &&
+          <div className="flex gap-2 items-center">
+            <Checkbox
+              id="ignore"
+              checked={ignoreToleransi as CheckedState}
+              onCheckedChange={(v) => {
+                console.log(v)
+                if (v == false) setIgnoreToleransi(false)
+                else setIgnoreToleransi(true)
+              }}
+            />
+            <label htmlFor="ignore">Ignore sisa pembayaran</label>
+          </div>
+        }
           <Button
             onClick={() => {
               console.log(form.getValues())
               console.log(form.formState.errors)
             }}
             disabled={
-              detailMetode.length > 0
-                ? !(
-                    totalDistribusi - totalCarabayar < detailMetode[metode].batasAtas &&
-                    totalCarabayar - totalDistribusi < detailMetode[metode].batasBawah
-                  )
-                : true
+             !ignoreToleransi ? detailMetode.length > 0 ?
+              !(
+                totalDistribusi - totalCarabayar < detailMetode[metode].batasAtas &&
+                totalCarabayar - totalDistribusi < detailMetode[metode].batasBawah
+              )
+              : true
+              : false
             }
             type="submit"
           >

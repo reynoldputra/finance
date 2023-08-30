@@ -11,13 +11,13 @@ async function main() {
     { id: 3, jenis: "TRANSFER", batasAtas : 10000, batasBawah : 1000 },
   ];
 
-  await prisma.$queryRawUnsafe(`DELETE FROM kolektor_history`);
-  await prisma.$queryRawUnsafe(`DELETE FROM giro;`);
-  await prisma.$queryRawUnsafe(`DELETE FROM transfer;`);
-  await prisma.$queryRawUnsafe(`DELETE FROM distribusi_pembayaran;`);
-  await prisma.$queryRawUnsafe(`DELETE FROM cara_bayar;`);
-  await prisma.$queryRawUnsafe(`DELETE FROM penagihan`);
-  await prisma.$queryRawUnsafe(`DELETE FROM invoice`);
+  // await prisma.$queryRawUnsafe(`DELETE FROM kolektor_history`);
+  // await prisma.$queryRawUnsafe(`DELETE FROM giro;`);
+  // await prisma.$queryRawUnsafe(`DELETE FROM transfer;`);
+  // await prisma.$queryRawUnsafe(`DELETE FROM distribusi_pembayaran;`);
+  // await prisma.$queryRawUnsafe(`DELETE FROM cara_bayar;`);
+  // await prisma.$queryRawUnsafe(`DELETE FROM penagihan`);
+  // await prisma.$queryRawUnsafe(`DELETE FROM invoice`);
 
   for (let idx in metodePembayaran) {
     const m = metodePembayaran[idx];

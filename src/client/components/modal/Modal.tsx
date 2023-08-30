@@ -46,7 +46,7 @@ export default function Modal({
             {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>
           <hr />
-          <ScrollArea className="max-h-[800px] pr-3">{children}</ScrollArea>
+          <ScrollArea className="max-h-[600px] pr-3">{children}</ScrollArea>
         </DialogContent>
       </Dialog>
     </>

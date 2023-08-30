@@ -30,7 +30,6 @@ export class returService {
           });
           createdReturs.push(retur);
         } else {
-          // Handle the case where the associated invoice doesn't exist
           console.error(`Invoice with transaksiId ${transaksiId} not found.`);
         }
       }
@@ -41,7 +40,11 @@ export class returService {
 
   public static async getAllRetur() {
     const res = await prisma.retur.findMany();
-    return res;
+    const convertedReturs = res.map(retur => ({
+      ...retur,
+      total: Number(retur.total)
+    }));
+    return convertedReturs;
   }
 
   public static async createRetur(input: TCreateReturInput) {

@@ -34,6 +34,7 @@ CREATE TABLE "Penagihan" (
     "invoiceId" TEXT NOT NULL,
     "kolektorId" TEXT NOT NULL,
     "status" TEXT NOT NULL,
+    "sisa" BIGINT NOT NULL,
     "keterangan" TEXT,
     "tandaTerima" BOOLEAN,
     CONSTRAINT "Penagihan_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -62,7 +63,7 @@ CREATE TABLE "Retur" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "noRetur" TEXT NOT NULL,
     "transaksiId" TEXT NOT NULL,
-    "total" INTEGER NOT NULL,
+    "total" BIGINT NOT NULL,
     "tanggal_transaksi" DATETIME NOT NULL,
     "type" TEXT NOT NULL DEFAULT 'Retur',
     "invoiceId" TEXT NOT NULL,
@@ -75,7 +76,7 @@ CREATE TABLE "Retur" (
 CREATE TABLE "Invoice" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "transaksiId" TEXT NOT NULL,
-    "total" INTEGER NOT NULL,
+    "total" BIGINT NOT NULL,
     "tanggal_transaksi" DATETIME NOT NULL,
     "nama_sales" TEXT NOT NULL,
     "type" TEXT NOT NULL DEFAULT 'Cash',
@@ -88,7 +89,7 @@ CREATE TABLE "Invoice" (
 -- CreateTable
 CREATE TABLE "distribusi_pembayaran" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "jumlah" INTEGER NOT NULL,
+    "jumlah" BIGINT NOT NULL,
     "caraBayarId" TEXT NOT NULL,
     "penagihanId" TEXT NOT NULL,
     CONSTRAINT "distribusi_pembayaran_penagihanId_fkey" FOREIGN KEY ("penagihanId") REFERENCES "Penagihan" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -98,7 +99,7 @@ CREATE TABLE "distribusi_pembayaran" (
 -- CreateTable
 CREATE TABLE "cara_bayar" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "total" INTEGER NOT NULL,
+    "total" BIGINT NOT NULL,
     "tanda_terima" BOOLEAN NOT NULL,
     "metodePembayaranId" INTEGER NOT NULL,
     "tanggal" DATETIME NOT NULL,

@@ -1,7 +1,7 @@
 import Modal from "@client/components/modal/Modal";
 import { Button } from "@client/components/ui/button";
 import { Input } from "@client/components/ui/input";
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useCallback } from "react";
 import {
   TInputInvoiceFileArray,
   TInputInvoiceFileObject,
@@ -14,9 +14,11 @@ import { idr } from "@client/lib/idr";
 import { useToast } from "@client/components/ui/use-toast";
 import { trpc } from "@client/lib/trpc";
 import { dmyDate } from "@client/lib/dmyDate";
+import LoadingOverlay from "react-loading-overlay-ts";
 
 export default function CreateInvoiceFile() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isActive, setActive] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [returArray, setReturArray] = useState<TInputReturFileArray>([]);
   const [invoiceArray, setInvoiceArray] = useState<TInputInvoiceFileArray>([]);
@@ -27,6 +29,10 @@ export default function CreateInvoiceFile() {
     [transaksiId: string]: boolean;
   }>({});
   const { toast } = useToast();
+
+  const handleButtonClicked = useCallback(() => {
+    setActive((value) => !value);
+  }, []);
 
   const { data: allInvoiceData } = trpc.invoice.getInvoices.useQuery();
   const allInvoice = allInvoiceData?.data ?? [];
@@ -116,6 +122,8 @@ export default function CreateInvoiceFile() {
   const handleOpenChange = () => {
     setShowConfirmModal(!showConfirmModal);
     setSelectedFile(null);
+    setInvoiceValidation({});
+    setReturValidation({});
   };
 
   const utils = trpc.useContext();
@@ -150,6 +158,12 @@ export default function CreateInvoiceFile() {
       onOpenChange={handleOpenChange}
       buttonTitle="New Invoice File"
     >
+      <LoadingOverlay
+        active={isActive}
+        className=""
+        spinner
+        text="Submitting...."
+      />
       <div className="flex flex-col gap-y-3 m-2 mt-0">
         <span className="font-semibold text-xl">Input Invoice By File</span>
         <Input

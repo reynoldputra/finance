@@ -81,13 +81,13 @@ export class TandaTerimaService {
     });
     const invoices = result?.tandaTerimaInvoice.map((invoiceData) => {
       const total =
-        invoiceData.invoice.total -
+        Number(invoiceData.invoice.total) -
         invoiceData.invoice.penagihan.reduce(
           (totalPembayaran, penagihan) =>
             totalPembayaran +
             penagihan.distribusiPembayaran.reduce(
               (totalDistribusi, distribusi) =>
-                totalDistribusi + distribusi.jumlah,
+                totalDistribusi + Number(distribusi.jumlah),
               0
             ),
           0

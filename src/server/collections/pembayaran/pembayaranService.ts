@@ -81,7 +81,7 @@ export class PembayaranService {
         })
 
         const totalDistirbusi = semuaDistribusi.reduce((t,c) => {
-          return t += c.jumlah
+          return t += Number(c.jumlah)
         }, 0)
 
         await ctx.penagihan.update({
@@ -185,7 +185,7 @@ export class PembayaranService {
         })
 
         const totalDistirbusi = semuaDistribusi.reduce((t,c) => {
-          return t += c.jumlah
+          return t += Number(c.jumlah)
         }, 0)
 
         await ctx.penagihan.update({

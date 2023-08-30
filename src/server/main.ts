@@ -99,7 +99,7 @@ const createWindow = async (id : string) => {
   } else {
     await win.loadFile(...fileRoute);
   }
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 };
 
 app.whenReady().then(() => {

@@ -370,7 +370,7 @@ export function UpdatePembayaranForm({ setOpen, carabayarId }: ModalFormProps) {
       if(result) {
         const carabayar : TUpdateCaraBayarInput = {
           id: result.id,
-          total: result.total,
+          total: Number(result.total),
           tandaTerima: result.tandaTerima,
           tanggal : result.tanggal,
           keterangan : result.keterangan ?? ""
@@ -398,7 +398,7 @@ export function UpdatePembayaranForm({ setOpen, carabayarId }: ModalFormProps) {
           const dist = result.distribusiPembayaran[idx]
           distLama.push({
             distribusiId : dist.id,
-            total : dist.jumlah
+            total : Number(dist.jumlah)
           })
 
 
@@ -407,15 +407,15 @@ export function UpdatePembayaranForm({ setOpen, carabayarId }: ModalFormProps) {
             const date = dmyDate(p.tanggalTagihan)
             penLamaOption.push({
               value : dist.id,
-              title: `${p.transaksiId} ${date} ${idr(p.sisa + dist.jumlah)}`,
+              title: `${p.transaksiId} ${date} ${idr(p.sisa + Number(dist.jumlah))}`,
             })
 
             distLamaState.push({
               distribusiId : dist.id,
-              total : dist.jumlah,
+              total : Number(dist.jumlah),
               penagihanId : dist.penagihanId,
               deleted : false,
-              sisa: p.sisa + dist.jumlah,
+              sisa: p.sisa + Number(dist.jumlah),
               manualInput: false
             })
           }

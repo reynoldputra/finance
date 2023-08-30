@@ -162,7 +162,7 @@ async function main() {
 
             const terbayar = invoice.penagihan.reduce((t,c) => {
               const totaldistribusi = c.distribusiPembayaran.reduce((t2, c2) => {
-                return t2 += c2.jumlah
+                return t2 += Number(c2.jumlah)
               }, 0)
               return t += totaldistribusi
             }, 0)
@@ -173,7 +173,7 @@ async function main() {
                 invoiceId: invoice.id,
                 kolektorId: kolektor.id,
                 status: "WAITING",
-                sisa : invoice.total - terbayar
+                sisa :  Number(invoice.total) - terbayar
               },
             });
 
@@ -264,12 +264,12 @@ async function main() {
               if (findInvoice) {
                 const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
                   const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
-                    return (tot += cur.jumlah);
+                    return (tot +=  Number(cur.jumlah));
                   }, 0);
 
                   return (tot += pem);
                 }, 0);
-                sisaTagihan = invoice.total - telahDibayar;
+                sisaTagihan =  Number(invoice.total) - telahDibayar;
               }
 
               const distribusiPembayaran = await ctx.distribusiPembayaran.create({
@@ -287,7 +287,7 @@ async function main() {
                 },
               });
 
-              totalPembayaran += giro.caraBayar.total;
+              totalPembayaran +=  Number(giro.caraBayar.total);
               console.log(codepembayaran);
             }
 
@@ -341,7 +341,7 @@ async function main() {
               if (findTransfer) {
                 carabayarId = findTransfer.caraBayarId;
                 transferId = findTransfer.id;
-                total = findTransfer.caraBayar.total;
+                total =  Number(findTransfer.caraBayar.total);
               } else {
                 newTransfer = {
                   ...newTransfer,
@@ -365,7 +365,7 @@ async function main() {
 
                 transferId = createNewTf.id;
                 carabayarId = createNewTf.caraBayarId;
-                total = createNewTf.caraBayar.total;
+                total =  Number(createNewTf.caraBayar.total);
               }
 
               const findInvoice = await ctx.invoice.findFirst({
@@ -384,12 +384,12 @@ async function main() {
               if (findInvoice) {
                 const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
                   const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
-                    return (tot += cur.jumlah);
+                    return (tot +=  Number(cur.jumlah));
                   }, 0);
 
                   return (tot += pem);
                 }, 0);
-                sisaTagihan = invoice.total - telahDibayar;
+                sisaTagihan =  Number(invoice.total) - telahDibayar;
               }
 
               const newDistribusi: Prisma.DistribusiPembayaranCreateInput = {
@@ -467,12 +467,12 @@ async function main() {
               if (findInvoice) {
                 const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
                   const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
-                    return (tot += cur.jumlah);
+                    return (tot +=  Number(cur.jumlah));
                   }, 0);
 
                   return (tot += pem);
                 }, 0);
-                sisaTagihan = invoice.total - telahDibayar;
+                sisaTagihan =  Number(invoice.total)- telahDibayar;
               }
               console.log(codepembayaran);
 
@@ -512,12 +512,12 @@ async function main() {
             if (findInvoice) {
               const telahDibayar = findInvoice.penagihan.reduce((tot, cur) => {
                 const pem = cur.distribusiPembayaran.reduce((tot, cur) => {
-                  return (tot += cur.jumlah);
+                  return (tot +=  Number(cur.jumlah));
                 }, 0);
 
                 return (tot += pem);
               }, 0);
-              sisaTagihan = findInvoice.total - telahDibayar;
+              sisaTagihan =  Number(findInvoice.total) - telahDibayar;
             }
 
             await prisma.penagihan.update({

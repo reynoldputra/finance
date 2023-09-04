@@ -7,7 +7,7 @@ import { TPembayaranSchema } from "./data/schema";
 
 export default function DetailDistribusi({ row }: { row: Row<TPembayaranSchema> }) {
   const result = trpc.penagihan.getPenagihanByCarabayar.useQuery(row.original.id).data;
-  const data = result?.data?.sort((a,b) => (Number(b.distribusi?.jumlah as BigInt) ?? 0) - (Number(a.distribusi?.jumlah as BigInt) ?? 0));
+  const data = result?.data?.sort((a,b) => (Number(b.distribusi?.jumlah ) ?? 0) - (Number(a.distribusi?.jumlah) ?? 0));
 
   return (
     <>
@@ -19,7 +19,7 @@ export default function DetailDistribusi({ row }: { row: Row<TPembayaranSchema> 
           <Fragment key={idx}>
             <p>{d.invoice.transaksiId}</p>
             <p>{dmyDate(d.tanggalTagihan)}</p>
-            <p>Rp {idr(Number(d.distribusi?.jumlah as BigInt))}</p>
+            <p>Rp {idr(Number(d.distribusi?.jumlah))}</p>
           </Fragment>
         ))}
       </div>

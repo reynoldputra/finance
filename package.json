@@ -10,7 +10,7 @@
     "tsc:path-resolve": "npx tscpaths -p ./src/server/tsconfig.json -s ./src/server -o ./dist/server",
     "dev": "concurrently \"npm run tsc:build-watch\" \"vite\" \"cross-env NODE_ENV=development electron .\"",
     "start": "npm run build && npm run dev",
-    "pack": "npm run build && electron-builder --dir --win portable",
+    "pack": "npm run build && electron-builder --dir",
     "test": "cross-env TESTING=true NODE_ENV=development npx jest ./src/server/__tests__/",
     "studio": "npx prisma studio",
     "generate": "npx prisma generate",

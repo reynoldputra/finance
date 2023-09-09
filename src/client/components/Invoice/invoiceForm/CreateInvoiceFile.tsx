@@ -61,7 +61,11 @@ export default function CreateInvoiceFile() {
           const invoiceTrans: TInputInvoiceFileArray = [];
           for (const line of perLine) {
             if (line.length >= 28) {
-              const total = parseFloat(line[4].replace(/[()Rp,.]/g, ""));
+              const totalStr = line[4]
+                .replace(/[()Rp]/g, "")
+                .replace(/\./g, "")
+                .replace(/,/g, ".");
+              const total = parseFloat(totalStr);
               const type = line[9];
               const [day, month, year] = line[0].split("/");
               const tanggalTransaksi = new Date(`${year}-${month}-${day}`);
@@ -138,7 +142,9 @@ export default function CreateInvoiceFile() {
     try {
       if (ignoreToleransi) {
         const highlightedReturs = returArray.filter(
-          (retur) => returValidation[retur.transaksiId] === false
+          (retur) =>
+            !existingNoRetur.includes(retur.noRetur) &&
+            returValidation[retur.transaksiId] === false
         );
         const highlightedInvoices = invoiceArray.filter(
           (invoice) => invoiceValidation[invoice.transaksiId] === true

@@ -9,6 +9,8 @@ import {
   inputReturFileArray,
   updateReturInput,
 } from "./returSchema";
+import { Prisma } from "../../../generated/client";
+import { PrismaClientValidationError } from "../../../generated/client/runtime";
 
 const returTrpc = new MainTrpc();
 
@@ -23,8 +25,18 @@ export const returRouter = returTrpc.router({
           data: res,
         };
       } catch (err) {
+        if(err instanceof Prisma.PrismaClientKnownRequestError) {
+          if(err.code == "P2002") {
+            return {
+              status : false,
+              message : "Unique constraint violation"
+            }
+          }
+        }
+          
         return {
           status: false,
+          message : "Internal server error",
         };
       }
     }),

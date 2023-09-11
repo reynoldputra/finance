@@ -89,7 +89,7 @@ export class PembayaranService {
             id : distribusiPembayaran.penagihanId,
           },
           data : {
-            status : totalDistirbusi <= invoice.sisa ? "CICILAN" : (invoice.penagihan.length > 1 ? "PELUNASAN" : "LUNAS")
+            status : distribusi.lunas ? "LUNAS" : totalDistirbusi <= invoice.sisa ? "CICILAN" : (invoice.penagihan.length > 1 ? "PELUNASAN" : "LUNAS")
           }
         })
       }

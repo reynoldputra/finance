@@ -46,6 +46,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
   const { toast } = useToast();
   const [penagihanOption, setPenagihanOption] = useState<ComboboxItem[]>();
   const [currCust, setCurrentCust] = useState("");
+  const [customer, setCustomer] = useState<ComboboxItem[]>([])
   const [metode, setMetode] = useState(1);
   const [totalCarabayar, setTotalcarabayar] = useState(0);
   const [totalDistribusi, setTotalDistirbusi] = useState(0);
@@ -53,7 +54,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
   const [detailMetode, setDetailMetode] = useState<IDetailMetodePembayaran[]>([]);
   const [ignoreToleransi, setIgnoreToleransi] = useState<Boolean>(false)
 
-  const c = [4, 3, 1, 3, 1].map((v) => "col-span-" + v.toString()); // class for form cols
+  const c = [4, 3, 1, 2, 1, 1].map((v) => "col-span-" + v.toString()); // class for form cols
 
   const penagihan = trpc.penagihan.getAllPenagihan.useQuery();
   const penagihanData = penagihan.data?.data ?? [];
@@ -73,10 +74,17 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
 
   const res = trpc.customer.customerOption.useQuery();
   const result = res.data ?? [];
-  const custemers: ComboboxItem[] = result.map((item) => ({
-    title: item.nama,
-    value: item.id,
-  }));
+
+  useEffect(() => {
+    if(result) {
+      const custemers: ComboboxItem[] = result.map((item) => ({
+        title: item.nama,
+        value: item.id,
+      }));
+      console.log(custemers)
+      setCustomer(custemers)
+    }
+  }, [res.status])
 
   useEffect(() => {
     if (metodePembayaranData) {
@@ -153,7 +161,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
   });
 
   const addDistribusiField = () => {
-    append({ penagihanId: "", total: 0 });
+    append({ penagihanId: "", total: 0, lunas: false });
   };
 
   const watchDistribusi = form.watch(["distribusi"]);
@@ -268,7 +276,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
 
     form.setValue("distribusi", []);
 
-    const formFieldsValue: { penagihanId: string; total: number }[] = [];
+    const formFieldsValue: { penagihanId: string; total: number, lunas : boolean }[] = [];
     const newDistState: IDistribusi[] = [];
 
     let totalPembayaran = watchCarabayarTotal[0];
@@ -285,11 +293,13 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
         append({
           penagihanId: penagihan.id,
           total,
+          lunas : false
         })
 
         formFieldsValue.push({
           penagihanId: penagihan.id,
           total,
+          lunas: false
         });
 
         newDistState.push({
@@ -311,7 +321,7 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <p className="text-base font-bold">Cara bayar</p>
         <div className="space-y-2">
-          <Combobox title="Nama Customer" items={custemers} onChange={(v) => setCurrentCust(v)} />
+          <Combobox title="Nama Customer" items={customer} onChange={(v) => setCurrentCust(v)} />
         </div>
         <div>
           <p className="text-base mb-2">Metode</p>
@@ -386,7 +396,8 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
             <p className={cn(c[1], "py-1 px-2 border rounded-md")}>Jumlah</p>
             <p className={cn("text-center py-1 px-2 border rounded-md", c[2])}>M</p>
             <p className={cn(c[3], "py-1 px-2 border rounded-md")}>Sisa</p>
-            <p className={cn(c[4])}></p>
+            <p className={cn(c[4], "text-center py-1 px-2 border rounded-md")}>L</p>
+            <p className={cn(c[5])}></p>
             {useWatchDistribusi && distribusiFields.map((field, idx) => (
               <Fragment key={idx}>
                 <div className={c[0]}>
@@ -466,6 +477,15 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
                 </div>
                 <div className={cn(c[3], "flex items-center")}>
                   {idr(distribusi[idx] ? distribusi[idx].sisa - distribusi[idx].total : 0)}
+                </div>
+                <div className={cn("flex justify-center items-center", c[2])}>
+                  <Checkbox
+                    name={`distribusi.${idx}.lunas`}
+                    checked={watchDistribusi[0][idx].lunas}
+                    onCheckedChange={(v) => {
+                      form.setValue(`distribusi.${idx}.lunas`, v == false ? false : true)
+                    }}
+                  />
                 </div>
                 <div className={cn("flex justify-center", c[4])}>
                   <Button

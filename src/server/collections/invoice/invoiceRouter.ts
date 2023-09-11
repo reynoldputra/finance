@@ -88,6 +88,7 @@ export const InvoiceRouter = invoiceTrpc.router({
       } catch (err) {
         return {
           status: false,
+          err
         };
       }
     }),

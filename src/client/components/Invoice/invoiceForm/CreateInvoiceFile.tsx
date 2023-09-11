@@ -155,6 +155,21 @@ export default function CreateInvoiceFile() {
         const resInvoice = await createInvoiceMutation.mutateAsync(
           highlightedInvoices
         );
+        if (resRetur.status == false) {
+          if (resRetur.message) {
+            toast({
+              description: resRetur.message,
+              variant: "destructive",
+              className: "text-white text-base font-semibold",
+            });
+            return;
+          }
+          toast({
+            description: "Internal server error",
+            variant: "destructive",
+            className: "text-white text-base font-semibold",
+          });
+        }
         if (resRetur.data && resInvoice.data) {
           const invoicePlural =
             highlightedInvoices.length > 1 ? "Invoices" : "Invoice";
@@ -173,6 +188,21 @@ export default function CreateInvoiceFile() {
         const resInvoice = await createInvoiceMutation.mutateAsync(
           invoiceArray
         );
+        if (resRetur.status == false) {
+          if (resRetur.message) {
+            toast({
+              description: resRetur.message,
+              variant: "destructive",
+              className: "text-white text-base font-semibold",
+            });
+            return;
+          }
+          toast({
+            description: "Internal server error",
+            variant: "destructive",
+            className: "text-white text-base font-semibold",
+          });
+        }
         if (resRetur.data && resInvoice.data) {
           const invoicePlural =
             invoiceArray.length > 1 ? "Invoices" : "Invoice";
@@ -188,6 +218,21 @@ export default function CreateInvoiceFile() {
         }
       }
     } catch (err) {
+      if (err instanceof Error) {
+        if (err.message) {
+          toast({
+            description: err.message,
+            variant: "destructive",
+            className: "text-white text-base font-semibold",
+          });
+          return;
+        }
+      }
+      toast({
+        description: "Internal server error",
+        variant: "destructive",
+        className: "text-white text-base font-semibold",
+      });
       console.error("Terjadi kesalahan:", err);
     }
   };

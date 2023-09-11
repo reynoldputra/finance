@@ -33,8 +33,8 @@ export default function DetailPenagihan({
                 <Fragment>
                   <p>{d.caraBayarId}</p>
                   <p>{dmyDate(d.caraBayar.tanggal)}</p>
-                  <p>{d.caraBayar.metode.jenis}</p>
                   <p>{d.jumlah.toString()}</p>
+                  <p>{d.caraBayar.metode.jenis}</p>
                 </Fragment>
               ))}
             </div>

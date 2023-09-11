@@ -56,7 +56,6 @@ export function AddPenagihanForm({
 
   useEffect(() => {
     if (customers.data) {
-      console.log(customers.data)
       const initValue: TManyPenagihanInput[] = selectedRows.map((r) => {
         const customerData = customers.data ?? [];
         const customer = customerData.find(

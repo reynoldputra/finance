@@ -9,6 +9,7 @@ export const caraBayarLama = z.object({
 export const distribusiPembayaran = z.object({
   penagihanId: z.string(),
   total: z.coerce.number(),
+  lunas: z.boolean()
 });
 export const updateDistribusiPembayaran = z.object({
   penagihanId: z.string(),
@@ -17,7 +18,7 @@ export const updateDistribusiPembayaran = z.object({
 
 export const createPembayaranWithCarabayarInput = z.object({
   carabayar: createCaraBayarInput,
-  distribusi: z.array(updateDistribusiPembayaran),
+  distribusi: z.array(distribusiPembayaran),
 });
 
 export const distribusiLama = z.object({
@@ -27,7 +28,7 @@ export const distribusiLama = z.object({
 
 export const updatePemabayaranWithCarabayarInput = z.object({
   carabayar: updateCaraBayarInput,
-  distribusiBaru: z.array(distribusiPembayaran),
+  distribusiBaru: z.array(updateDistribusiPembayaran),
   distribusiLama: z.array(distribusiLama),
 });
 

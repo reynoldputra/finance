@@ -17,7 +17,7 @@ export function dateBetweenFilterFn<T>(row: Row<T>, id: string, filterValues: un
   let sd = (filterValues as number[])?.[0];
   let ed = (filterValues as number[])?.[1];
   const val = row.getValue(id)
-  console.log(sd, ed, (val as Date).getTime())
+  // console.log(sd, ed, (val as Date).getTime())
   if (!val) return false
   if (sd) {
     var time = (val as Date).getTime()

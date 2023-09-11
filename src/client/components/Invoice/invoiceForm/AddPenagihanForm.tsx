@@ -27,8 +27,8 @@ export function AddPenagihanForm({
   const { toast } = useToast();
   const [kolektorOptions, setKolektorOptions] = useState<ComboboxItem[]>([]);
 
-  const selectedRows = table.getSelectedRowModel().rows;
-
+  const selectedRows = table.getGroupedSelectedRowModel().rows;
+  
   const customers = trpc.customer.customerTable.useQuery();
   const kolektors = trpc.kolektor.getAllKolektor.useQuery();
   const kolektorsQuery = kolektors.data?.data ?? [];

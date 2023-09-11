@@ -17,10 +17,10 @@ import { dmyDate } from "@client/lib/dmyDate";
 import LoadingOverlay from "react-loading-overlay-ts";
 import { Checkbox } from "@client/components/ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
+import BarLoader from "react-spinners/BarLoader";
 
 export default function CreateInvoiceFile() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isActive, setActive] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [returArray, setReturArray] = useState<TInputReturFileArray>([]);
   const [invoiceArray, setInvoiceArray] = useState<TInputInvoiceFileArray>([]);
@@ -32,10 +32,6 @@ export default function CreateInvoiceFile() {
   }>({});
   const [ignoreToleransi, setIgnoreToleransi] = useState<Boolean>(false);
   const { toast } = useToast();
-
-  const handleButtonClicked = useCallback(() => {
-    setActive((value) => !value);
-  }, []);
 
   const { data: allInvoiceData } = trpc.invoice.getInvoices.useQuery();
   const allInvoice = allInvoiceData?.data ?? [];
@@ -137,6 +133,8 @@ export default function CreateInvoiceFile() {
   const createReturMutation = trpc.retur.createReturFromFile.useMutation();
   const createInvoiceMutation =
     trpc.invoice.createInvoiceFromFile.useMutation();
+  const returLoading = createReturMutation.isLoading;
+  const invoiceLoading = createInvoiceMutation.isLoading;
 
   const handleConfirmSubmission = async () => {
     try {
@@ -243,12 +241,6 @@ export default function CreateInvoiceFile() {
       onOpenChange={handleOpenChange}
       buttonTitle="New Invoice File"
     >
-      <LoadingOverlay
-        active={isActive}
-        className=""
-        spinner
-        text="Submitting...."
-      />
       <div className="flex flex-col gap-y-3 m-2 mt-0">
         <span className="font-semibold text-xl">Input Invoice By File</span>
         <Input
@@ -348,7 +340,7 @@ export default function CreateInvoiceFile() {
                   />
                   <label htmlFor="ignore">Ignore highlight error</label>
                 </div>
-                <div className="flex gap-x-5 mt-2">
+                <div className="flex items-center gap-x-5 mt-2">
                   <Button
                     className="w-36"
                     variant={"outline"}
@@ -372,6 +364,13 @@ export default function CreateInvoiceFile() {
                   >
                     Confirm
                   </Button>
+                </div>
+                <div className="flex ml-20">
+                  <BarLoader
+                    width={150}
+                    loading={returLoading || invoiceLoading}
+                    color="#1479FF"
+                  />
                 </div>
               </>
             )}

@@ -24,6 +24,7 @@ import { Checkbox } from "@client/components/ui/checkbox";
 import { cn } from "@client/lib/cn";
 import { Textarea } from "@client/components/ui/textarea";
 import { CheckedState } from "@radix-ui/react-checkbox";
+import ComboboxNew from "@client/components/form/ComboboxNew";
 
 interface IDistribusi {
   penagihanId: string;
@@ -321,10 +322,13 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <p className="text-base font-bold">Cara bayar</p>
         <div className="space-y-2">
-          <Combobox title="Nama Customer" items={customer} onChange={(v) => setCurrentCust(v)} />
+        <p className="text-base mb-2 font-semibold">Nama Customer</p>
+          <ComboboxNew items={customer} onChange={(val) => {
+            setCurrentCust(val)
+          }} />
         </div>
         <div>
-          <p className="text-base mb-2">Metode</p>
+          <p className="text-base mb-2 font-semibold">Metode</p>
           <div className="flex gap-2">
             <RadioGroup defaultValue="1" onValueChange={(v) => setMetode(parseInt(v))}>
               <div className="flex items-center space-x-2">

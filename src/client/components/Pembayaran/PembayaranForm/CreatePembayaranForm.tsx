@@ -62,12 +62,15 @@ export function PembayaranForm({ setOpen }: ModalFormProps) {
   const metodePembayaranQuery = trpc.pembayaran.getMetodePembayaran.useQuery();
   const metodePembayaranData = metodePembayaranQuery.data?.data;
 
+  const today = new Date()
+  today.setHours(0,0,0,0)
+
   const form = useForm<TCreatePembayaranInput>({
     resolver: zodResolver(createPembayaranWithCarabayarInput),
     defaultValues: {
       carabayar: {
         pembayaran: {},
-        tanggal: new Date(),
+        tanggal: today,
       },
     },
   });

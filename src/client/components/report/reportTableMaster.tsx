@@ -34,7 +34,7 @@ export default function ReportTableMaster() {
     let finalResult: (string | number | boolean)[][] = []
 
     queryResult.forEach(q => {
-      let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.tandaTerima, idr(q.invoice.total), idr(q.sisa)]
+      let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.tandaTerima ? "TT" : "", idr(q.invoice.total), idr(q.sisa)]
       q.distribusi.forEach((v) => {
         if (v.caraBayar.metodePembayaranId == 1) {
           data.push([...template, idr(v.jumlah), "", "", "", "", "", "", "", toPascalCase(q.status)])
@@ -49,7 +49,7 @@ export default function ReportTableMaster() {
           data.push([...template, "", "", "", "", "", dmyDate(v.caraBayar.tanggal), Number(v.jumlah), "", toPascalCase(q.status)])
           return
         }
-        data.push([...template, "", "", "", "", "", "", "", "TRUE", ""])
+        data.push([...template, "", "", "", "", "", "", "", "TT", ""])
       })
     })
 

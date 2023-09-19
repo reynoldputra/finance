@@ -55,6 +55,9 @@ export function AddPenagihanForm({
   const formWatch = form.watch();
 
   useEffect(() => {
+    const today = new Date()
+    today.setHours(0,0,0,0)
+
     if (customers.data) {
       const initValue: TManyPenagihanInput[] = selectedRows.map((r) => {
         const customerData = customers.data ?? [];
@@ -64,7 +67,7 @@ export function AddPenagihanForm({
         return {
           invoiceId: r.original.id,
           kolektorId: customer?.kolektorId ?? "",
-          tanggalTagihan: new Date(),
+          tanggalTagihan: today,
           status: r.original.status,
         };
       });

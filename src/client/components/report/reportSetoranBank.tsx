@@ -24,7 +24,8 @@ export default function ReportSetoranBank() {
     let dateSplit = dateStr.split(" ")
     let month = dateSplit[1].toUpperCase()
     let finaldatestr = dateSplit[0] + ` ${month} ` + dateSplit[2] 
-    console.log(finaldatestr)
+
+    console.log(tanggalPembayaran.toISOString(), tanggalPenagihan.toISOString())
 
     await query.refetch()
 

@@ -84,7 +84,6 @@ model TandaTerimaInvoice {
 model Retur {
   id               String   @id @default(cuid())
   noRetur          String
-  transaksiId      String   @default(cuid())
   total            Float
   tanggalTransaksi DateTime @map("tanggal_transaksi")
   type             String   @default("Retur")

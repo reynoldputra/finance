@@ -1,16 +1,8 @@
 import { MainTrpc } from "@server/trpc";
 import { z } from "zod";
 import { returService } from "./returService";
-import {
-  TCreateReturInput,
-  TInputReturFileArray,
-  TUpdateReturInput,
-  createReturInput,
-  inputReturFileArray,
-  updateReturInput,
-} from "./returSchema";
+import { createReturInvoiceInput, inputReturFileArray, TCreateReturInvoiceInput, TInputReturFileArray } from "./returSchema";
 import { Prisma } from "../../../generated/client";
-import { PrismaClientValidationError } from "../../../generated/client/runtime";
 
 const returTrpc = new MainTrpc();
 
@@ -48,14 +40,16 @@ export const returRouter = returTrpc.router({
         data: res,
       };
     } catch (err) {
+      console.log(err)
       return {
         status: false,
       };
     }
   }),
+
   createRetur: returTrpc.publicProcedure
-    .input(createReturInput)
-    .mutation(async ({ input }: { input: TCreateReturInput }) => {
+    .input(createReturInvoiceInput)
+    .mutation(async ({ input }: { input: TCreateReturInvoiceInput }) => {
       try {
         const res = await returService.createRetur(input);
         return {
@@ -84,8 +78,8 @@ export const returRouter = returTrpc.router({
       }
     }),
   updateRetur: returTrpc.publicProcedure
-    .input(updateReturInput)
-    .mutation(async ({ input }: { input: TUpdateReturInput }) => {
+    .input(createReturInvoiceInput)
+    .mutation(async ({ input }: { input: TCreateReturInvoiceInput }) => {
       try {
         const res = await returService.updateRetur(input);
         return {

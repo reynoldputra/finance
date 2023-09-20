@@ -1,10 +1,8 @@
-import { Prisma, Retur } from "../../../generated/client";
+import { Retur } from "../../../generated/client";
 import { prisma } from "../../prisma";
 import {
-  TCreateReturInput,
+  TCreateReturInvoiceInput,
   TInputReturFileArray,
-  TInputReturFileObject,
-  TUpdateReturInput,
 } from "./returSchema";
 
 export class returService {
@@ -20,7 +18,6 @@ export class returService {
         if (invoice) {
           const retur = await tx.retur.create({
             data: {
-              transaksiId,
               noRetur,
               total,
               tanggalTransaksi,
@@ -39,54 +36,107 @@ export class returService {
   }
 
   public static async getAllRetur() {
-    const res = await prisma.retur.findMany();
-    const convertedReturs = res.map(retur => ({
-      ...retur,
-      total: Number(retur.total)
-    }));
-    return convertedReturs;
+    const res = await prisma.retur.findMany({
+      include: {
+        invoice: true
+      }
+    });
+
+    console.log(res)
+
+    interface parsedRetur {
+      total: number;
+      id: string;
+      noRetur: string;
+      tanggalTransaksi: Date;
+      type: string;
+      createdAt: Date;
+      updatedAt: Date;
+      invoice: {
+        transaksiId: string,
+        total: number
+      }[]
+    }
+
+    const parsed: parsedRetur[] = []
+
+    for (let returId in res) {
+      const retur = res[returId]
+      const find = parsed.findIndex(v => v.noRetur == retur.noRetur)
+      if (find) {
+        parsed[find].total += retur.total
+        parsed[find].invoice.push({
+          transaksiId: retur.invoice.transaksiId,
+          total: retur.total,
+        })
+      } else {
+        parsed.push({
+          ...retur,
+          invoice: [{
+            transaksiId: retur.invoice.transaksiId,
+            total: retur.total
+          }]
+        })
+      }
+    }
+
+    return parsed;
   }
 
-  public static async createRetur(input: TCreateReturInput) {
-    const { transaksiId, noRetur, tanggalTransaksi, type, total, invoiceId } =
-      input;
-    const res = await prisma.retur.create({
-      data: {
-        transaksiId,
-        noRetur,
-        tanggalTransaksi,
-        type,
-        total,
-        invoiceId,
-      },
-    });
+  public static async createRetur(input: TCreateReturInvoiceInput) {
+    const { noRetur, tanggalTransaksi, type, invoice } = input;
+
+    const res = await prisma.$transaction(async (tx) => {
+      const group: Retur[] = []
+      for (let idx in invoice) {
+        const inv = invoice[idx]
+        const result = await tx.retur.create({
+          data: {
+            tanggalTransaksi,
+            noRetur,
+            type,
+            invoiceId: inv.invoiceId,
+            total: inv.total,
+          }
+        })
+
+        group.push(result)
+      }
+
+      return group
+    })
+
     return res;
   }
 
   public static async deleteRetur(id: string) {
-    const res = await prisma.retur.delete({
-      where: {
-        id,
-      },
-    });
+    const res = await prisma.$transaction(async (tx) => {
+      const returs = await tx.retur.findMany({
+        where: {
+          noRetur: id
+        }
+      })
+
+      const group: Retur[] = []
+      for (let idx in returs) {
+        const res = await tx.retur.delete({
+          where: {
+            id: returs[idx].id
+          },
+        });
+
+        group.push(res)
+
+      }
+
+      return group
+    })
     return res;
   }
 
-  public static async updateRetur(input: TUpdateReturInput) {
-    let updateData: Prisma.ReturUncheckedUpdateInput = {};
-    if (input.transaksiId) updateData.transaksiId = input.transaksiId;
-    if (input.noRetur) updateData.noRetur = input.noRetur;
-    if (input.tanggalTransaksi)
-      updateData.tanggalTransaksi = input.tanggalTransaksi;
-    if (input.total) updateData.total = input.total;
-    if (input.type) updateData.type = input.type;
-    if (input.invoiceId) updateData.invoiceId = input.invoiceId;
-    const result = await prisma.retur.update({
-      where: {
-        id: input.id,
-      },
-      data: updateData,
-    });
+  public static async updateRetur(input: TCreateReturInvoiceInput) {
+    await this.deleteRetur(input.noRetur)
+    const result = this.createRetur(input)
     return result;
   }
 }

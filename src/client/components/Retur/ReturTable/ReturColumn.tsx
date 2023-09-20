@@ -3,9 +3,9 @@ import { TReturSchema } from "./data/schema";
 import { Checkbox } from "@client/components/ui/checkbox";
 import { DataTableColumnHeader } from "@client/components/table/DataTableColumnHeader";
 import { dateBetweenFilterFn } from "@client/components/table/DateFilter";
-import { dmyDate } from "@client/lib/dmyDate";
 import { idr } from "@client/lib/idr";
-import { RowAction } from "./RowAction";
+import { dmyDate } from "@client/lib/dmyDate";
+// import { RowAction } from "./RowAction";
 
 export const ReturColumn: ColumnDef<TReturSchema>[] = [
   {
@@ -64,6 +64,22 @@ export const ReturColumn: ColumnDef<TReturSchema>[] = [
     },
   },
   {
+    accessorKey: "banyakInvoice",
+    id: "Banyak Invoice",
+    header: ({ column, table }) => (
+      <>
+        <DataTableColumnHeader
+          table={table}
+          column={column}
+          title="Banyak Invoice"
+        />
+      </>
+    ),
+    cell: ({ row }) => (
+      <div className="w-[180px]">{row.original.invoice.length}</div>
+    )
+  },
+  {
     accessorKey: "tanggalTransaksi",
     id: "Tanggal Transaksi",
     header: ({ column, table }) => (
@@ -107,8 +123,8 @@ export const ReturColumn: ColumnDef<TReturSchema>[] = [
       return value.includes(row.getValue(id));
     },
   },
-  {
-    id: "actions",
-    cell: ({ row }) => <RowAction row={row} />,
-  },
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => <RowAction row={row} />,
+  // },
 ];

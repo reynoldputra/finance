@@ -8,32 +8,47 @@ import { idr } from "@client/lib/idr"
 import toPascalCase from "@client/lib/pascalCase"
 
 export default function ReportTableMaster() {
-  const [start, setStart] = useState(new Date(2023, 4, 23))
-  const [end, setEnd] = useState(new Date(2023, 4, 23))
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const [start, setStart] = useState(today)
+  const [end, setEnd] = useState(today)
 
   const query = trpc.penagihan.getTableMaster.useQuery({
     start,
     end
   }, {
-    // enabled : false,
-    // refetchOnWindowFocus: false
+    queryKey: ["penagihan.getTableMaster", {start, end}],
+  })
+
+  const queryRetur = trpc.retur.getReturByDate.useQuery({
+    start,
+    end
+  }, {
+    queryKey: ["retur.getReturByDate", {start, end}]
   })
 
   const clickHandle = async () => {
-    const dateStr = start.toLocaleDateString('id', { day: '2-digit', month: 'long', year: 'numeric' })
-    let dateSplit = dateStr.split(" ")
-    let month = dateSplit[1].toUpperCase()
-    let finaldatestr = dateSplit[0] + ` ${month} ` + dateSplit[2]
-    console.log(finaldatestr)
+    start.setHours(0,0,0,0)
+    end.setHours(0,0,0,0)
 
     await query.refetch()
+    await queryRetur.refetch()
 
     const queryResult = query.data?.data ?? []
+    const returData = queryRetur.data?.data ?? []
+    console.log(queryResult)
+    console.log(returData)
 
     let data: (string | number | boolean)[][] = []
     let finalResult: (string | number | boolean)[][] = []
+    returData.forEach(f => {
+      data.push([
+        dmyDate(f.tanggalTransaksi), f.kolektor, "", f.customerName, "", f.type, f.noRetur, f.total, "", "", "", "", "", "", "", "", "", "", "", "", f.keterangan
+      ])
+    })
 
     queryResult.forEach(q => {
+
       let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.tandaTerima ? "TT" : "", idr(q.invoice.total), idr(q.sisa)]
       q.distribusi.forEach((v) => {
         if (v.caraBayar.metodePembayaranId == 1) {

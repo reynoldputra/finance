@@ -8,7 +8,7 @@ import { idr } from "@client/lib/idr"
 
 export default function ReportPenagihan() {
 
-  const [date, setDate] = useState(new Date(2023, 4, 23))
+  const [date, setDate] = useState(new Date())
 
   const clickHandle = async () => {
     date.setMinutes(0)

@@ -14,6 +14,7 @@ export class returService {
         let invoice = await tx.invoice.findUnique({
           where: { transaksiId: transaksiId },
         });
+        tanggalTransaksi.setHours(0,0,0,0)
         if (invoice) {
           const retur = await tx.retur.create({
             data: {
@@ -32,6 +33,79 @@ export class returService {
       return createdReturs;
     });
     return returs;
+  }
+
+  public static async getReturByDate(start: Date, end : Date) {
+    const res = await prisma.retur.findMany({
+      include: {
+        invoice: {
+          include : {
+            customer : {
+              include : {
+                currentKolektor : true
+              }
+            }
+          }
+        } 
+      },
+      where : {
+        tanggalTransaksi : {
+          gte : start,
+          lte : end
+        }
+      }
+    });
+
+    interface parsedRetur {
+      id: string;
+      noRetur: string;
+      tanggalTransaksi: Date;
+      customerId : string;
+      customerName : string
+      keterangan : string;
+      type: string;
+      total: number;
+      kolektor : string;
+      invoice: {
+        transaksiId: string,
+        invoiceId: string,
+        total: number
+      }[]
+    }
+
+    const parsed: parsedRetur[] = []
+
+    for (let returId in res) {
+      const retur = res[returId]
+      const find = parsed.findIndex(v => v.noRetur == retur.noRetur)
+      if (find != -1) {
+        parsed[find].total += retur.total
+        parsed[find].invoice.push({
+          transaksiId: retur.invoice.transaksiId,
+          invoiceId: retur.invoiceId,
+          total: retur.total,
+        })
+      } else {
+        parsed.push({
+          keterangan : retur.keterangan ?? "",
+          id: retur.id,
+          noRetur: retur.noRetur,
+          tanggalTransaksi: retur.tanggalTransaksi,
+          customerId : retur.invoice.customer.id,
+          customerName : retur.invoice.customer.nama,
+          type: retur.type,
+          total: retur.total,
+          kolektor : retur.invoice.customer.currentKolektor?.nama ?? "",
+          invoice: [{
+            transaksiId: retur.invoice.transaksiId,
+            invoiceId: retur.invoiceId,
+            total: retur.total
+          }]
+        })
+      }
+    }
+
+    return parsed;
   }
 
   public static async getOneRetur(noretur : string) {
@@ -101,6 +175,7 @@ export class returService {
       customerId : string;
       customerName : string
       type: string;
+      keterangan : string;
       total: number;
       invoice: {
         transaksiId: string,
@@ -124,6 +199,7 @@ export class returService {
       } else {
         parsed.push({
           id: retur.id,
+          keterangan : retur.keterangan ?? "",
           noRetur: retur.noRetur,
           tanggalTransaksi: retur.tanggalTransaksi,
           customerId : retur.invoice.customer.id,
@@ -143,8 +219,9 @@ export class returService {
   }
 
   public static async createRetur(input: TCreateReturInvoiceInput) {
-    const { noRetur, tanggalTransaksi, type, invoice } = input;
+    const { noRetur, tanggalTransaksi, type, invoice, keterangan } = input;
 
+    tanggalTransaksi.setHours(0,0,0,0)
     const res = await prisma.$transaction(async (tx) => {
       const group: Retur[] = []
       for (let idx in invoice) {
@@ -156,6 +233,7 @@ export class returService {
             type,
             invoiceId: inv.invoiceId,
             total: inv.total,
+            keterangan : keterangan ?? ""
           }
         })
 

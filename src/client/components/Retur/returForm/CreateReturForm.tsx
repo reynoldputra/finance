@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { Form } from "@client/components/ui/form";
 import { Button } from "@client/components/ui/button";
 import InputForm from "../../form/InputForm/InputForm";
@@ -14,6 +14,10 @@ import {
 import { idr } from "@client/lib/idr";
 import ComboboxInput from "@client/components/form/InputForm/inputs/ComboboxInput";
 import { PlusIcon, Trash2 } from "lucide-react";
+import { Textarea } from "@client/components/ui/textarea";
+import ComboboxNew from "@client/components/form/ComboboxNew";
+import DateInput from "@client/components/form/InputForm/inputs/DateInput";
+import DefaultInput from "@client/components/form/InputForm/inputs/DefaultInput";
 
 interface CreateReturFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -115,37 +119,36 @@ export function CreateReturForm({ setOpen }: CreateReturFormProps) {
 
   return (
     <>
-      <Form {...formcust}>
-        <form>
-          <ComboboxInput name="name" options={customerOption ?? []} title="Customer Name" onChange={(v) => setCustomer(v)} />
-        </form>
-      </Form>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <p>Customer Name</p>
+          <ComboboxNew items={customerOption ?? []} onChange={(v) => setCustomer(v)} />
           <div className="w-60">
-            <InputForm {...register("noRetur")} type="text" title="Nomor Retur" />
+            <DefaultInput name="noRetur" type="text" title="Nomor Retur" />
           </div>
-          <InputForm
+          <DateInput
             {...register("tanggalTransaksi")}
-            type="datepicker"
             title="Tanggal Transaksi"
           />
-          <InputForm
-            {...register("type")}
+          <ComboboxInput
+            name="type"
             title="Tipe"
-            type="combobox"
             options={typeOptions}
+          />
+          <p>Keterangan (opsional)</p>
+          <Textarea
+            {...register("keterangan")}
           />
           <div>
             <p className="mt-4 mb-2">Invoice</p>
             {fields.map((field, idx) => (
-              <div className="flex items-end gap-4">
+              <div className="flex items-end gap-4" key={idx}>
                 <div>
                   <p className="mb-2">Invoice Id</p>
                   <ComboboxInput width={300} name={`invoice.${idx}.invoiceId`} options={invoiceOption} />
                 </div>
-                <InputForm
-                  {...register(`invoice.${idx}.total`)}
+                <DefaultInput
+                  name={`invoice.${idx}.total`}
                   type="number"
                   title="Total"
                 />

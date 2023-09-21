@@ -8,8 +8,8 @@ import toPascalCase from "@client/lib/pascalCase"
 import { dmyDate } from "@client/lib/dmyDate"
 
 export default function ReportSetoranBank() {
-  const [tanggalPembayaran, setTanggalPembayaran] = useState(new Date(2023, 4, 23))
-  const [tanggalPenagihan, setTanggalPenagihan] = useState(new Date(2023, 4, 23))
+  const [tanggalPembayaran, setTanggalPembayaran] = useState(new Date())
+  const [tanggalPenagihan, setTanggalPenagihan] = useState(new Date())
 
   const query = trpc.carabayar.getReportSetoranBank.useQuery({
     tanggalPenagihan,

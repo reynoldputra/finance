@@ -16,6 +16,7 @@ import { Row } from "@tanstack/react-table";
 import ComboboxInput from "@client/components/form/InputForm/inputs/ComboboxInput";
 import { PlusIcon, Trash2 } from "lucide-react";
 import { TReturSchema } from "../ReturTable/data/schema";
+import { Textarea } from "@client/components/ui/textarea";
 
 interface CreateReturFormProps<TData> {
   row: Row<TData>;
@@ -149,6 +150,10 @@ export function UpdateReturForm({ setOpen, row }: CreateReturFormProps<TReturSch
             title="Tipe"
             type="combobox"
             options={typeOptions}
+          />
+          <p>Keterangan (opsional)</p>
+          <Textarea
+            {...register("keterangan")}
           />
           <div>
             <p className="mt-4 mb-2">Invoice</p>

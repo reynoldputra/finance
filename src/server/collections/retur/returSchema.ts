@@ -11,6 +11,7 @@ export const inputReturFileObject = z.object({
 export const inputReturFileArray = z.array(inputReturFileObject);
 
 export const createReturInvoiceInput = z.object({
+  keterangan: z.string().optional(),
   noRetur: z.string(),
   tanggalTransaksi: z.date(),
   type: z.string(),

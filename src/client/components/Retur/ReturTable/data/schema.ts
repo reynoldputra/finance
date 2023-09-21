@@ -5,13 +5,14 @@ export const returSchema = z.object({
   noRetur: z.string(),
   tanggalTransaksi: z.date(),
   type: z.string(),
+  keterangan: z.string(),
   total: z.number(),
   customerId: z.string(),
   customerName: z.string(),
-  invoice : z.array(z.object({
-    transaksiId : z.string(),
+  invoice: z.array(z.object({
+    transaksiId: z.string(),
     invoiceId: z.string(),
-    total : z.number(),
+    total: z.number(),
   }))
 });
 

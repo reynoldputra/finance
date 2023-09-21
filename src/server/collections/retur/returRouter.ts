@@ -17,18 +17,18 @@ export const returRouter = returTrpc.router({
           data: res,
         };
       } catch (err) {
-        if(err instanceof Prisma.PrismaClientKnownRequestError) {
-          if(err.code == "P2002") {
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+          if (err.code == "P2002") {
             return {
-              status : false,
-              message : "Unique constraint violation"
+              status: false,
+              message: "Unique constraint violation"
             }
           }
         }
-          
+
         return {
           status: false,
-          message : "Internal server error",
+          message: "Internal server error",
         };
       }
     }),
@@ -46,22 +46,41 @@ export const returRouter = returTrpc.router({
       };
     }
   }),
+  getReturByDate: returTrpc.publicProcedure
+    .input(z.object({
+      start: z.date(),
+      end: z.date()
+    }))
+    .query(async ({ input: { start, end } }) => {
+      try {
+        const res = await returService.getReturByDate(start, end);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        console.log(err)
+        return {
+          status: false,
+        };
+      }
+    }),
   getRetur: returTrpc.publicProcedure
     .input(z.string())
-    .query(async ({input}) => {
-    try {
-      const res = await returService.getOneRetur(input);
-      return {
-        status: true,
-        data: res,
-      };
-    } catch (err) {
-      console.log(err)
-      return {
-        status: false,
-      };
-    }
-  }),
+    .query(async ({ input }) => {
+      try {
+        const res = await returService.getOneRetur(input);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        console.log(err)
+        return {
+          status: false,
+        };
+      }
+    }),
   createRetur: returTrpc.publicProcedure
     .input(createReturInvoiceInput)
     .mutation(async ({ input }: { input: TCreateReturInvoiceInput }) => {

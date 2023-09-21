@@ -5,7 +5,7 @@ import { DataTableColumnHeader } from "@client/components/table/DataTableColumnH
 import { dateBetweenFilterFn } from "@client/components/table/DateFilter";
 import { idr } from "@client/lib/idr";
 import { dmyDate } from "@client/lib/dmyDate";
-// import { RowAction } from "./RowAction";
+import { RowAction } from "./RowAction";
 
 export const ReturColumn: ColumnDef<TReturSchema>[] = [
   {
@@ -45,23 +45,20 @@ export const ReturColumn: ColumnDef<TReturSchema>[] = [
     },
   },
   {
-    accessorKey: "transaksiId",
-    id: "Id Transaksi",
+    accessorKey: "customerName",
+    id: "Customer Name",
     header: ({ column, table }) => (
       <>
         <DataTableColumnHeader
           table={table}
           column={column}
-          title="Id Transaksi"
+          title="Customer Name"
         />
       </>
     ),
     cell: ({ row }) => (
-      <div className="w-[180px]">{row.getValue("Id Transaksi")}</div>
+      <div className="w-[180px]">{row.getValue("Customer Name")}</div>
     ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
   },
   {
     accessorKey: "banyakInvoice",
@@ -123,8 +120,8 @@ export const ReturColumn: ColumnDef<TReturSchema>[] = [
       return value.includes(row.getValue(id));
     },
   },
-  // {
-  //   id: "actions",
-  //   cell: ({ row }) => <RowAction row={row} />,
-  // },
+  {
+    id: "actions",
+    cell: ({ row }) => <RowAction row={row} />,
+  },
 ];

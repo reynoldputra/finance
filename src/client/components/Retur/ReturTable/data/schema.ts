@@ -6,8 +6,11 @@ export const returSchema = z.object({
   tanggalTransaksi: z.date(),
   type: z.string(),
   total: z.number(),
+  customerId: z.string(),
+  customerName: z.string(),
   invoice : z.array(z.object({
-    transaksiId: z.string(),
+    transaksiId : z.string(),
+    invoiceId: z.string(),
     total : z.number(),
   }))
 });

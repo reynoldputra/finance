@@ -12,10 +12,13 @@ import {
   TCreateReturInvoiceInput
 } from "@server/collections/retur/returSchema";
 import { idr } from "@client/lib/idr";
+import { Row } from "@tanstack/react-table";
 import ComboboxInput from "@client/components/form/InputForm/inputs/ComboboxInput";
 import { PlusIcon, Trash2 } from "lucide-react";
+import { TReturSchema } from "../ReturTable/data/schema";
 
-interface CreateReturFormProps {
+interface CreateReturFormProps<TData> {
+  row: Row<TData>;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -25,17 +28,32 @@ const typeOptions: ComboboxItem[] = [
   { title: "Retur Batal", value: "Retur Batal" },
 ];
 
-export function CreateReturForm({ setOpen }: CreateReturFormProps) {
+export function UpdateReturForm({ setOpen, row }: CreateReturFormProps<TReturSchema>) {
   const { toast } = useToast();
   const [invoiceOption, setInvoiceOption] = useState<ComboboxItem[]>([]);
   const [customerOption, setCustomerOption] = useState<ComboboxItem[]>([]);
-  const [customer, setCustomer] = useState("")
+  const [customer, setCustomer] = useState(row.original.customerId)
 
+  const returData = row.original
+  const oldInv = returData.invoice.map(v => ({
+    invoiceId : v.invoiceId,
+    total : v.total
+  }))
   const form = useForm<TCreateReturInvoiceInput>({
     resolver: zodResolver(createReturInvoiceInput),
+    defaultValues : {
+      type : returData.type,
+      tanggalTransaksi : returData.tanggalTransaksi,
+      noRetur : returData.noRetur,
+      invoice : oldInv
+    }
   });
 
-  const formcust = useForm<{ name: string }>();
+  const formcust = useForm<{ name: string }>({
+    defaultValues : {
+      name : row.original.customerId
+    }
+  });
 
   const resCustomer = trpc.customer.customerOption.useQuery();
   const resultCustomer = resCustomer.data ?? []
@@ -47,19 +65,15 @@ export function CreateReturForm({ setOpen }: CreateReturFormProps) {
   useEffect(() => {
     let invoices: ComboboxItem[] = []
     if (result) {
-      console.log(customer)
-      console.log(result)
       result.forEach(item => {
         if (item.status != "LUNAS" && item.customerId == customer) {
-          console.log("test")
           invoices.push({
             title: item.transaksiId + ` (${idr(item.sisa)})`,
             value: item.id,
           })
         }
       })
-    }
-    console.log(invoices)
+    } 
     setInvoiceOption(invoices)
   }, [res.status, customer])
 
@@ -74,15 +88,15 @@ export function CreateReturForm({ setOpen }: CreateReturFormProps) {
   }, [resCustomer.status])
 
 
-  const createReturMutation = trpc.retur.createRetur.useMutation();
+  const updateRetur = trpc.retur.updateRetur.useMutation();
   const utils = trpc.useContext();
 
   async function onSubmit(values: TCreateReturInvoiceInput) {
     try {
-      const { data } = await createReturMutation.mutateAsync(values);
+      const { data } = await updateRetur.mutateAsync(values);
       if (data) {
         toast({
-          description: `Retur successfully created`,
+          description: `Retur successfully updated`,
           variant: "success",
           className: "text-white text-base font-semibold",
         });

@@ -45,7 +45,8 @@ export class InvoiceService {
       }, 0);
 
       const totalRetur = inv.retur.reduce((tot, cur) => {
-        return tot + Number(cur.total);
+        const total = cur.type != "Retur Tarik Barang" ? cur.total : 0
+        return tot + Number(total);
       }, 0);
 
       const sisa = Number(inv.total) - totalPembayaran - totalRetur;
@@ -92,7 +93,8 @@ export class InvoiceService {
     }, 0);
 
     const totalRetur = res.retur.reduce((tot, cur) => {
-      return tot + Number(cur.total);
+      const total = cur.type != "Retur Tarik Barang" ? cur.total : 0
+      return tot + Number(total);
     }, 0);
 
     const sisa = Number(res.total) - totalPembayaran - totalRetur;

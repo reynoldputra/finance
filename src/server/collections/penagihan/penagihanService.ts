@@ -551,7 +551,8 @@ export class PenagihanService {
 
 
     const totalRetur = invoice.retur.reduce((tot, retur) => {
-      return (tot += Number(retur.total));
+      const total = retur.type != "Retur Tarik Barang" ? retur.total : 0
+      return (tot += Number(total));
     }, 0);
 
 

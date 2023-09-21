@@ -7,6 +7,7 @@ import { trpc } from "@client/lib/trpc";
 import { TReturSchema } from "./data/schema";
 import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
 import { UpdateReturForm } from "../returForm/UpdateReturForm";
+import DetailRetur from "./DetailRetur";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
@@ -39,6 +40,9 @@ export function RowAction({ row }: RowActionsProps<TReturSchema>) {
   return (
     <>
       <DataTableRowActions>
+        <ModalDropdownItem triggerChildren="Detail">
+          <DetailRetur invoice={row.original.invoice} />
+        </ModalDropdownItem>
         <ModalDropdownItem
           triggerChildren="Edit"
           open={openEdit}
@@ -56,19 +60,19 @@ export function RowAction({ row }: RowActionsProps<TReturSchema>) {
                 undone. This will permanently delete the
                 <span className="font-semibold">
                   {" "}
-                  "{row.original.transaksiId}"{" "}
+                  "{row.original.noRetur}"{" "}
                 </span>
                 Retur.
               </span>
             </div>
             <div className="flex flex-col text-lg mt-2">
               <span className=" text-base font-semibold">
-                Please type Retur's ID Transaksi "{row.original.transaksiId}" to
+                Please type Retur's ID Transaksi "{row.original.noRetur}" to
                 confirm the delete.
               </span>
               <ConfirmDeleteForm
                 handleDelete={handleDelete}
-                currName={row.original.transaksiId}
+                currName={row.original.noRetur}
               />
             </div>
           </div>

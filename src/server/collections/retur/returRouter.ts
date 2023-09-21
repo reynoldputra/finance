@@ -46,7 +46,22 @@ export const returRouter = returTrpc.router({
       };
     }
   }),
-
+  getRetur: returTrpc.publicProcedure
+    .input(z.string())
+    .query(async ({input}) => {
+    try {
+      const res = await returService.getOneRetur(input);
+      return {
+        status: true,
+        data: res,
+      };
+    } catch (err) {
+      console.log(err)
+      return {
+        status: false,
+      };
+    }
+  }),
   createRetur: returTrpc.publicProcedure
     .input(createReturInvoiceInput)
     .mutation(async ({ input }: { input: TCreateReturInvoiceInput }) => {

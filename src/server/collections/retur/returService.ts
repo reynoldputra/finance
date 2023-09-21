@@ -10,8 +10,7 @@ export class returService {
     const returs = await prisma.$transaction(async (tx) => {
       const createdReturs: Retur[] = [];
       for (const transaction of transactions) {
-        const { transaksiId, noRetur, tanggalTransaksi, total, type } =
-          transaction;
+        const { transaksiId, noRetur, tanggalTransaksi, total, type } = transaction;
         let invoice = await tx.invoice.findUnique({
           where: { transaksiId: transaksiId },
         });
@@ -35,25 +34,77 @@ export class returService {
     return returs;
   }
 
-  public static async getAllRetur() {
+  public static async getOneRetur(noretur : string) {
     const res = await prisma.retur.findMany({
       include: {
         invoice: true
+      },
+      where : {
+        noRetur : noretur
       }
     });
 
-    console.log(res)
-
     interface parsedRetur {
-      total: number;
       id: string;
       noRetur: string;
       tanggalTransaksi: Date;
       type: string;
+      total: number;
       createdAt: Date;
       updatedAt: Date;
       invoice: {
+        invoiceId : string,
         transaksiId: string,
+        total: number
+      }[]
+    }
+
+    const parsed: parsedRetur = {
+      id: res[0].id,
+      noRetur: res[0].id,
+      tanggalTransaksi: res[0].tanggalTransaksi,
+      type: res[0].id,
+      total: 0,
+      createdAt: res[0].createdAt,
+      updatedAt: res[0].updatedAt,
+      invoice : []
+    }
+
+    for (let id in res) {
+      const inv = res[id]
+      parsed.total += inv.total
+      parsed.invoice.push({
+        invoiceId : inv.invoiceId,
+        transaksiId : inv.invoice.transaksiId,
+        total : inv.total
+      })
+    }
+
+    return parsed;
+  }
+
+  public static async getAllRetur() {
+    const res = await prisma.retur.findMany({
+      include: {
+        invoice: {
+          include : {
+            customer : true
+          }
+        } 
+      }
+    });
+
+    interface parsedRetur {
+      id: string;
+      noRetur: string;
+      tanggalTransaksi: Date;
+      customerId : string;
+      customerName : string
+      type: string;
+      total: number;
+      invoice: {
+        transaksiId: string,
+        invoiceId: string,
         total: number
       }[]
     }
@@ -63,17 +114,25 @@ export class returService {
     for (let returId in res) {
       const retur = res[returId]
       const find = parsed.findIndex(v => v.noRetur == retur.noRetur)
-      if (find) {
+      if (find != -1) {
         parsed[find].total += retur.total
         parsed[find].invoice.push({
           transaksiId: retur.invoice.transaksiId,
+          invoiceId: retur.invoiceId,
           total: retur.total,
         })
       } else {
         parsed.push({
-          ...retur,
+          id: retur.id,
+          noRetur: retur.noRetur,
+          tanggalTransaksi: retur.tanggalTransaksi,
+          customerId : retur.invoice.customer.id,
+          customerName : retur.invoice.customer.nama,
+          type: retur.type,
+          total: retur.total,
           invoice: [{
             transaksiId: retur.invoice.transaksiId,
+            invoiceId: retur.invoiceId,
             total: retur.total
           }]
         })

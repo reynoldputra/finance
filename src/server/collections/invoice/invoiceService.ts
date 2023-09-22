@@ -174,7 +174,12 @@ export class InvoiceService {
         createdInvoices.push(invoice);
       }
       return createdInvoices;
-    });
+    },
+    {
+      maxWait: 10000, // default: 2000
+      timeout: 20000, // default: 5000
+    }
+  );
     return invoices;
   }
 }

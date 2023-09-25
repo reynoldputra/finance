@@ -8,6 +8,7 @@ import {
 
 export class InvoiceService {
   public static async createInvoice(invoice: TCreateInvoiceInput) {
+    invoice.tanggalTransaksi.setHours(0,0,0,0)
     const res = await prisma.invoice.create({
       data: {
         transaksiId: invoice.transaksiId,
@@ -160,6 +161,8 @@ export class InvoiceService {
             data: { nama: namaCustomer },
           });
         }
+
+        tanggalTransaksi.setHours(0,0,0,0)
 
         const invoice = await tx.invoice.create({
           data: {

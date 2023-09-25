@@ -111,6 +111,7 @@ export class PenagihanService {
 
     return parsed;
   }
+
   static async getTableMaster(start: Date, end?: Date) {
     const result = await prisma.penagihan.findMany({
       where: {
@@ -555,6 +556,7 @@ export class PenagihanService {
       return (tot += Number(total));
     }, 0);
 
+    input.tanggalTagihan.setHours(0,0,0,0)
 
     const result = await prisma.penagihan.create({
       data: {

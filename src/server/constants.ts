@@ -11,7 +11,7 @@ export const dbUrl = isDev ? process.env.DATABASE_URL! : "file:" + dbPath;
 process.env.DATABASE_URL = dbUrl;
 
 // This needs to be updated every time you create a migration!
-export const latestMigration = "20230904124546_change_bigint_to_float";
+export const latestMigration = "20230921095844_add_keterangan_in_retur";
 export const platformToExecutables: any = {
   win32: {
     migrationEngine: 'node_modules/@prisma/engines/migration-engine-windows.exe',

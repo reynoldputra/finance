@@ -13,22 +13,7 @@ export class PenagihanService {
         invoice: {
           include: {
             customer: true,
-            retur: true,
-            penagihan: {
-              include: {
-                distribusiPembayaran: {
-                  include: {
-                    caraBayar: {
-                      include: {
-                        giro: true,
-                        transfer: true,
-                        metode: true,
-                      },
-                    },
-                  },
-                },
-              }
-            }
+            retur: true
           },
         },
         kolektor: true,
@@ -124,21 +109,7 @@ export class PenagihanService {
         invoice: {
           include: {
             customer: true,
-            penagihan: {
-              include: {
-                distribusiPembayaran: {
-                  include: {
-                    caraBayar: {
-                      include: {
-                        giro: true,
-                        transfer: true,
-                        metode: true,
-                      },
-                    },
-                  },
-                },
-              }
-            }
+            penagihan: true
           },
         },
         kolektor: true,
@@ -175,6 +146,16 @@ export class PenagihanService {
         if (d.caraBayar.metodePembayaranId == 3) transfer++;
       });
 
+      if(d.status == "CICILAN") {
+        d.invoice.penagihan.sort((a,b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
+        
+        const idx = d.invoice.penagihan.findIndex((val) => val.id == d.id)
+
+        if(idx) {
+          d.status = "CICILAN Ke-" + (idx+1)
+        }
+      }
+
       parsed.push({
         distribusi: d.distribusiPembayaran,
         invoice: d.invoice,
@@ -195,7 +176,6 @@ export class PenagihanService {
         transfer,
         giro
       });
-
     }
 
     parsed.sort((a, b) => {
@@ -206,21 +186,6 @@ export class PenagihanService {
       }
 
       return a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime();
-    });
-
-    let currentInvoiceId: string | null = null;
-    let cicilanCount = 1;
-
-    parsed.forEach((data) => {
-      if (data.transaksiId !== currentInvoiceId) {
-        currentInvoiceId = data.transaksiId;
-        cicilanCount = 1;
-      }
-
-      if (data.status === "CICILAN") {
-        data.status = `CICILAN ke-${cicilanCount}`;
-        cicilanCount++;
-      }
     });
 
     return parsed;

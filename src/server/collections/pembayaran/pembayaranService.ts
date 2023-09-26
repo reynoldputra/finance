@@ -3,7 +3,7 @@ import { prisma } from "@server/prisma";
 import { CaraBayarService } from "../caraBayar/caraBayarService";
 import { InvoiceService } from "../invoice/invoiceService";
 import { PenagihanService } from "../penagihan/penagihanService";
-import { TCaraBayarLama, TCreatePembayaranInput, TUpdatePembayaranInput } from "./pembayaranSchema";
+import { TCreatePembayaranInput, TUpdatePembayaranInput } from "./pembayaranSchema";
 
 export class PembayaranService {
   static async getPembayaranByPenagihan(penagihanId: string) {

@@ -48,7 +48,6 @@ export default function ReportTableMaster() {
     })
 
     queryResult.forEach(q => {
-
       let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.tandaTerima ? "TT" : "", idr(q.invoice.total), idr(q.sisa)]
       q.distribusi.forEach((v) => {
         if (v.caraBayar.metodePembayaranId == 1) {
@@ -67,6 +66,7 @@ export default function ReportTableMaster() {
         data.push([...template, "", "", "", "", "", "", "", "TT", ""])
       })
     })
+    console.log(data)
 
     data = data.sort((a, b) => {
       return (
@@ -188,4 +188,3 @@ export default function ReportTableMaster() {
     </div>
   )
 }
-

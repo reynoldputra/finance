@@ -120,6 +120,7 @@ export class PenagihanService {
                 giro: true,
                 transfer: true,
                 metode: true,
+                distribusiPembayaran : true
               },
             },
           },
@@ -140,21 +141,27 @@ export class PenagihanService {
       let transfer = 0;
       let giro = 0;
 
-      d.distribusiPembayaran.forEach((d) => {
-        if (d.caraBayar.metodePembayaranId == 1) cash++;
-        if (d.caraBayar.metodePembayaranId == 2) giro++;
-        if (d.caraBayar.metodePembayaranId == 3) transfer++;
-      });
+      let keterangan = ""
+
+      if(d.status == "WAITING") continue
 
       if(d.status == "CICILAN") {
         d.invoice.penagihan.sort((a,b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
         
         const idx = d.invoice.penagihan.findIndex((val) => val.id == d.id)
 
-        if(idx) {
+        if(idx != -1) {
           d.status = "CICILAN Ke-" + (idx+1)
         }
       }
+
+      if(d.status == "LUNAS" || d.status == "PELUNASAN") {
+        const cicilan = d.sisa - pembayaranBaru
+        if(cicilan < 0) keterangan += ", Kurang " + (Math.abs(cicilan)).toFixed()
+        if(cicilan > 0) keterangan += ", Lebih " + (Math.abs(cicilan)).toFixed()
+      }
+
+      d.status += keterangan
 
       parsed.push({
         distribusi: d.distribusiPembayaran,

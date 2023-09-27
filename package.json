@@ -16,6 +16,7 @@
     "generate": "npx prisma generate",
     "db:push": "npx prisma db push",
     "db:seed": "npx ts-node ./prisma/seed/seed.ts",
+    "db:formatdate": "npx ts-node ./prisma/seed/dateFormat.ts",
     "db:test": "npx ts-node --transpile-only --compiler-options '{\"module\":\"commonjs\"}' ./prisma/test/test.ts",
     "migrate:dev": "npx prisma migrate dev",
     "dist": "npm run build && electron-builder",

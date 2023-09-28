@@ -4,7 +4,6 @@ import { trpc } from "@client/lib/trpc"
 import { useState } from "react"
 import { DatePicker } from "../form/DatePicker"
 import { dmyDate } from "@client/lib/dmyDate"
-import { idr } from "@client/lib/idr"
 import toPascalCase from "@client/lib/pascalCase"
 
 export default function ReportTableMaster() {
@@ -40,7 +39,6 @@ export default function ReportTableMaster() {
     console.log(returData)
 
     let data: (string | number | boolean)[][] = []
-    let finalResult: (string | number | boolean)[][] = []
     returData.forEach(f => {
       data.push([
         dmyDate(f.tanggalTransaksi), f.kolektor, "", f.customerName, "", f.type, f.noRetur, f.total, "", "", "", "", "", "", "", "", "", "", "", "", f.keterangan
@@ -48,10 +46,10 @@ export default function ReportTableMaster() {
     })
 
     queryResult.forEach(q => {
-      let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.tandaTerima ? "TT" : "", idr(q.invoice.total), idr(q.sisa)]
+      let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.tandaTerima ? "TT" : "", q.invoice.total, q.sisa]
       q.distribusi.forEach((v) => {
         if (v.caraBayar.metodePembayaranId == 1) {
-          data.push([...template, idr(v.jumlah), "", "", "", "", "", "", "", toPascalCase(q.status)])
+          data.push([...template, v.jumlah, "", "", "", "", "", "", "", toPascalCase(q.status)])
           return
         }
         if (v.caraBayar.giro) {
@@ -77,45 +75,6 @@ export default function ReportTableMaster() {
       )
     })
 
-    // let currentKolektor = ""
-    // let currentIdTransaksi = ""
-
-    // data.forEach(d => {
-    //   let space = false
-    //   if (currentKolektor == d[1]) {
-    //     space = true
-    //     d = d.map((v, idx) => {
-    //       if (idx <= 4) {
-    //         return ""
-    //       } else {
-    //         return v
-    //       }
-    //     })
-    //   }
-
-
-    //   if (currentIdTransaksi == d[5]) {
-    //     d = d.map((v, idx) => {
-    //       if (idx <= 7) {
-    //         return ""
-    //       } else {
-    //         return v
-    //       }
-    //     })
-    //   }
-
-    //   finalResult.push(d)
-
-    //   if (space) {
-    //     finalResult.push([""])
-    //   }
-
-    //   currentKolektor = d[1] as string
-    //   currentIdTransaksi = d[5] as string
-    // })
-
-    console.log(data)
-    console.log(finalResult)
     const header = [
       // ["SAP TRANSAKSI INCOMING BANK BCA"],
       // [""],

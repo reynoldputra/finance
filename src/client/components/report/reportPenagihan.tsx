@@ -4,7 +4,6 @@ import { trpc } from "@client/lib/trpc"
 import { useState } from "react"
 import { DatePicker } from "../form/DatePicker"
 import { dmyDate } from "@client/lib/dmyDate"
-import { idr } from "@client/lib/idr"
 
 export default function ReportPenagihan() {
 
@@ -23,28 +22,28 @@ export default function ReportPenagihan() {
       return [
         dmyDate(q.tanggalTagihan),
         q.namaKolektor,
-        q.sales,
         q.namaCustomer,
+        q.sales,
         dmyDate(q.tanggalTransaksi),
         q.transaksiId,
-        "Rp " + idr(q.totalTagihan),
-        "Rp " + idr(q.sisa),
+        q.totalTagihan,
+        q.sisa,
       ]
     })
 
-    data = data.sort((a,b) => (a[1] as string).localeCompare(b[1] as string) || (a[3] as string).localeCompare(b[3] as string))
+    data = data.sort((a,b) => (a[1] as string).localeCompare(b[1] as string) || (a[2] as string).localeCompare(b[2] as string))
 
     printExcel(data)
   }
 
-  const printExcel = (value : (string | number)[][]) => {
+  const printExcel = (value : (string | number | boolean)[][]) => {
     const header = [
       // ["SAP TRANSAKSI INCOMING BANK BCA"],
       // [""],
       // ["PT. SENTRAL AUTO PRATAMA"],
       // ["Date: 31 Mei 2023"],
       // [""],
-      ["Tanggal Tagihan", "Nama Kolektor", "Nama Sales", "Customer Name", "Tanggal Transaksi", "ID Transaksi", "Total Tagihan", "Sisa Tagihan"],
+      ["Tanggal Tagihan", "Nama Kolektor", "Customer Name", "Nama Sales", "Tanggal Transaksi", "ID Transaksi", "Total Tagihan", "Sisa Tagihan"],
       ...value
     ]
 

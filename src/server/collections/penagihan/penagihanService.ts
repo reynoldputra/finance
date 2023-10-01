@@ -156,11 +156,11 @@ export class PenagihanService {
       }
 
       if(d.status == "LUNAS" || d.status == "PELUNASAN") {
-        const cicilan = d.sisa - pembayaranBaru
-        if(cicilan < 0) keterangan += ", Kurang " + (Math.abs(cicilan)).toFixed()
-        if(cicilan > 0) keterangan += ", Lebih " + (Math.abs(cicilan)).toFixed()
-      }
+        const selisih = d.sisa - pembayaranBaru
+        if(selisih < 0) keterangan += ", Lebih " + (Math.abs(selisih)).toFixed()
+        if(selisih > 0) keterangan += ", Kurang " + (Math.abs(selisih)).toFixed()
 
+      }
       d.status += keterangan
 
       parsed.push({

@@ -6,14 +6,19 @@ import { DatePicker } from "../form/DatePicker"
 import { dmyDate } from "@client/lib/dmyDate"
 
 export default function ReportPenagihan() {
+  const day = new Date()
+  day.setHours(0,0,0,0)
+  const [date, setDate] = useState(day)
 
-  const [date, setDate] = useState(new Date())
+  const query = trpc.penagihan.getPenagihanByDate.useQuery(date, {
+    // enabled : false,
+    // refetchOnWindowFocus: false
+  })
 
   const clickHandle = async () => {
-    date.setMinutes(0)
-    date.setHours(0)
-    date.setSeconds(0)
-    date.setMilliseconds(0)
+    const day = date
+    day.setHours(0,0,0,0)
+    setDate(day)
     await query.refetch()
     console.log(date.toISOString())
     // console.log(query.data?.data)
@@ -113,10 +118,6 @@ export default function ReportPenagihan() {
 
   }
 
-  const query = trpc.penagihan.getPenagihanByDate.useQuery(date, {
-    // enabled : false,
-    // refetchOnWindowFocus: false
-  })
 
   return (
     <div className="mt-12">

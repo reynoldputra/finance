@@ -46,7 +46,7 @@ export default function ReportTableMaster() {
     })
 
     queryResult.forEach(q => {
-      let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.tandaTerima ? "TT" : "", q.invoice.total, q.sisa]
+      let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.tandaTerima ? "TT" : "", q.invoice.total, q.sisa === q.invoice.total ? "" : q.sisa.toString()]
       q.distribusi.forEach((v) => {
         if (v.caraBayar.metodePembayaranId == 1) {
           data.push([...template, v.jumlah, "", "", "", "", "", "", "", toPascalCase(q.status)])

@@ -16,9 +16,11 @@ export default function ReportPenagihan() {
     date.setMilliseconds(0)
     await query.refetch()
     console.log(date.toISOString())
-    console.log(query.data?.data)
+    // console.log(query.data?.data)
     const queryResult = query.data?.data ?? []
     let data = queryResult.map((q) => {
+      let TT = q.tandaTerima ? "TT" : "";
+      let sisa = q.sisa === q.totalTagihan ? "" : q.sisa.toString();
       return [
         dmyDate(q.tanggalTagihan),
         q.namaKolektor,
@@ -26,8 +28,9 @@ export default function ReportPenagihan() {
         q.sales,
         dmyDate(q.tanggalTransaksi),
         q.transaksiId,
+        TT,
         q.totalTagihan,
-        q.sisa,
+        sisa,
       ]
     })
 
@@ -62,6 +65,7 @@ export default function ReportPenagihan() {
       currentCustomer = temp[2] as string;
     });
 
+    console.log(finalResult)
     printExcel(finalResult)
   }
 
@@ -72,7 +76,8 @@ export default function ReportPenagihan() {
       // ["PT. SENTRAL AUTO PRATAMA"],
       // ["Date: 31 Mei 2023"],
       // [""],
-      ["Tanggal Tagihan", "Nama Kolektor", "Customer Name", "Nama Sales", "Tanggal Transaksi", "ID Transaksi", "Total Tagihan", "Sisa Tagihan"],
+      ["", "", "", "", "", "", "", "", ""],
+      ["Tanggal Tagihan", "Nama Kolektor", "Customer Name", "Nama Sales", "Tanggal Transaksi", "ID Transaksi", "TT", "Total Tagihan", "Sisa Tagihan"],
       ...value
     ]
 
@@ -89,7 +94,7 @@ export default function ReportPenagihan() {
     ]
 
     const sheetOptions = {
-      '!merges': ranges,
+      // '!merges': ranges,
       '!cols': [{ wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }]
     };
 

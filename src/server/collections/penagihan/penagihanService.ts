@@ -59,14 +59,13 @@ export class PenagihanService {
         kolektorId: d.kolektor.id,
         namaCustomer: d.invoice.customer.nama,
         customerId: d.invoice.customer.id,
-        sisa: Number(d.sisa),
+        sisa: Number(d.sisa) - pembayaranBaru,
         tandaTerima: d.tandaTerima ?? false,
         totalPembayaran: pembayaranBaru,
         cash,
         transfer,
         giro,
       });
-
     }
 
     parsed.sort((a, b) => {
@@ -100,9 +99,9 @@ export class PenagihanService {
   static async getTableMaster(start: Date, end?: Date) {
     const result = await prisma.penagihan.findMany({
       where: {
-        tanggalTagihan : {
-          lte : end,
-          gte : start
+        tanggalTagihan: {
+          lte: end,
+          gte: start
         }
       },
       include: {
@@ -120,7 +119,7 @@ export class PenagihanService {
                 giro: true,
                 transfer: true,
                 metode: true,
-                distribusiPembayaran : true
+                distribusiPembayaran: true
               },
             },
           },
@@ -143,22 +142,22 @@ export class PenagihanService {
 
       let keterangan = ""
 
-      if(d.status == "WAITING") continue
+      if (d.status == "WAITING") continue
 
-      if(d.status == "CICILAN") {
-        d.invoice.penagihan.sort((a,b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
-        
+      if (d.status == "CICILAN") {
+        d.invoice.penagihan.sort((a, b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
+
         const idx = d.invoice.penagihan.findIndex((val) => val.id == d.id)
 
-        if(idx != -1) {
-          d.status = "CICILAN Ke-" + (idx+1)
+        if (idx != -1) {
+          d.status = "CICILAN Ke-" + (idx + 1)
         }
       }
 
-      if(d.status == "LUNAS" || d.status == "PELUNASAN") {
+      if (d.status == "LUNAS" || d.status == "PELUNASAN") {
         const selisih = d.sisa - pembayaranBaru
-        if(selisih < 0) keterangan += ", Lebih " + (Math.abs(selisih)).toFixed()
-        if(selisih > 0) keterangan += ", Kurang " + (Math.abs(selisih)).toFixed()
+        if (selisih < 0) keterangan += ", Lebih " + (Math.abs(selisih)).toFixed()
+        if (selisih > 0) keterangan += ", Kurang " + (Math.abs(selisih)).toFixed()
 
       }
       d.status += keterangan
@@ -265,6 +264,35 @@ export class PenagihanService {
         if (d.caraBayar.metodePembayaranId == 3) transfer++;
       });
 
+      let keterangan = ""
+
+      if (d.status == "WAITING") continue
+
+      if (d.status == "CICILAN") {
+        d.invoice.penagihan.sort((a, b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
+
+        const idx = d.invoice.penagihan.findIndex((val) => val.id == d.id)
+
+        if (idx != -1) {
+          keterangan = "CICILAN Ke-" + (idx + 1)
+        }
+      }
+
+      if (d.status == "PELUNASAN") {
+        const selisih = d.sisa - pembayaranBaru
+        keterangan = "PELUNASAN"
+        if (selisih < 0) keterangan = "PELUNASAN, Lebih " + (Math.abs(selisih)).toFixed()
+        if (selisih > 0) keterangan = "PELUNASAN, Kurang " + (Math.abs(selisih)).toFixed()
+      }
+
+      if (d.status == "LUNAS") {
+        const selisih = d.sisa - pembayaranBaru
+        if (selisih < 0) keterangan = "Lebih " + (Math.abs(selisih)).toFixed()
+        if (selisih > 0) keterangan = "Kurang " + (Math.abs(selisih)).toFixed()
+      }
+
+      d.status = keterangan
+
       parsed.push({
         distribusi: d.distribusiPembayaran,
         invoice: d.invoice,
@@ -295,21 +323,6 @@ export class PenagihanService {
       }
 
       return a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime();
-    });
-
-    let currentInvoiceId: string | null = null;
-    let cicilanCount = 1;
-
-    parsed.forEach((data) => {
-      if (data.transaksiId !== currentInvoiceId) {
-        currentInvoiceId = data.transaksiId;
-        cicilanCount = 1;
-      }
-
-      if (data.status === "CICILAN") {
-        data.status = `CICILAN ke-${cicilanCount}`;
-        cicilanCount++;
-      }
     });
 
     return parsed;
@@ -528,7 +541,7 @@ export class PenagihanService {
       return (tot += Number(total));
     }, 0);
 
-    input.tanggalTagihan.setHours(0,0,0,0)
+    input.tanggalTagihan.setHours(0, 0, 0, 0)
 
     const result = await prisma.penagihan.create({
       data: {

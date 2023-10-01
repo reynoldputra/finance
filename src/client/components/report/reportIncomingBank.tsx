@@ -8,8 +8,10 @@ import toPascalCase from "@client/lib/pascalCase"
 import { dmyDate } from "@client/lib/dmyDate"
 
 export default function ReportIncomingBank() {
-  const [tanggalPembayaran, setTanggalPembayaran] = useState(new Date())
-  const [tanggalPenagihan, setTanggalPenagihan] = useState(new Date())
+  const day = new Date()
+  day.setHours(0,0,0,0)
+  const [tanggalPembayaran, setTanggalPembayaran] = useState(day)
+  const [tanggalPenagihan, setTanggalPenagihan] = useState(day)
 
   const query = trpc.carabayar.getReportSetoranBank.useQuery({
     tanggalPenagihan,
@@ -20,6 +22,15 @@ export default function ReportIncomingBank() {
   })
 
   const clickHandle = async () => {
+    const day = tanggalPembayaran
+    day.setHours(0,0,0,0)
+    setTanggalPembayaran(day)
+
+    const day2 = tanggalPenagihan
+    day2.setHours(0,0,0,0)
+    setTanggalPenagihan(day2)
+
+    console.log(tanggalPenagihan.toISOString(), tanggalPembayaran.toISOString())
     const dateStr = tanggalPembayaran.toLocaleDateString('id', { day: '2-digit', month: 'long', year: 'numeric' })
     let dateSplit = dateStr.split(" ")
     let month = dateSplit[1].toUpperCase()

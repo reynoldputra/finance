@@ -27,8 +27,13 @@ export default function ReportTableMaster() {
   })
 
   const clickHandle = async () => {
-    start.setHours(0,0,0,0)
-    end.setHours(0,0,0,0)
+    const newStart = start
+    newStart.setHours(0,0,0,0)
+    setStart(newStart)
+
+    const newEnd = end
+    newEnd.setHours(0,0,0,0)
+    setEnd(newEnd)
 
     await query.refetch()
     await queryRetur.refetch()

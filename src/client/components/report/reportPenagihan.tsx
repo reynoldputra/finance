@@ -32,8 +32,37 @@ export default function ReportPenagihan() {
     })
 
     data = data.sort((a,b) => (a[1] as string).localeCompare(b[1] as string) || (a[2] as string).localeCompare(b[2] as string))
+    
+    let finalResult: (string | number)[][] = [];
+    let currentKolektor = "";
+    let currentCustomer = "";
 
-    printExcel(data)
+    data.forEach((d) => {
+      let space = true;
+      let temp = d
+      if (currentCustomer && currentKolektor && currentKolektor === d[1] && currentCustomer === d[2]) {
+        space = false;
+        d = d.map((v, idx) => {
+          if (idx <= 3) {
+            return ""
+          } else {
+            return v
+          }
+        })
+      }
+
+      if (space) {
+        finalResult.push([""]);
+        finalResult.push(d);
+      } else {
+        finalResult.push(d)
+      }
+
+      currentKolektor = temp[1] as string;
+      currentCustomer = temp[2] as string;
+    });
+
+    printExcel(finalResult)
   }
 
   const printExcel = (value : (string | number | boolean)[][]) => {

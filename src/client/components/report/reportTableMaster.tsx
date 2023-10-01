@@ -75,6 +75,35 @@ export default function ReportTableMaster() {
       )
     })
 
+    let finalResult: (string | number | boolean)[][] = []
+    let currentKolektor = ""
+    let currentCustomer = ""
+
+    data.forEach(d => {
+      let temp = d;
+      let space = true;
+      if(currentKolektor && currentCustomer && currentKolektor == d[1] && currentCustomer == d[3]) {
+        space = false;
+        d = d.map((v, idx) => {
+          if (idx <= 3) {
+            return ""
+          } else {
+            return v
+          }
+        })
+      }
+
+      if(space) {
+        finalResult.push([""])
+        finalResult.push(d)
+      } else {
+        finalResult.push(d)
+      }
+
+      currentKolektor = temp[1] as string;
+      currentCustomer = temp[3] as string;
+    })
+
     const header = [
       // ["SAP TRANSAKSI INCOMING BANK BCA"],
       // [""],
@@ -84,7 +113,7 @@ export default function ReportTableMaster() {
       ["Tanggal Tagihan", "Nama Kolektor", "Nama Sales", "Customer Name", "Tanggal Transaksi", "ID Transaksi", "T/T", "Total Tagihan", "Sisa Tagihan", "Cara Bayar", "", "", "", "", "", "", "", "Ket."],
       ["", "", "", "", "", "", "", "", "Sisa Tagihan", "Cash", "Giro", "", "", "", "Transfer", "", "Nihil"],
       ["", "", "", "", "", "", "", "", "", "", "Bank", "No Giro", "Jatuh Tempo", "Amount", "Tanggal Transfer", "Amount", ""],
-      ...data
+      ...finalResult
     ]
 
     const ranges = [

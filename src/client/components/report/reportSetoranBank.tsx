@@ -36,7 +36,6 @@ export default function ReportSetoranBank() {
     let month = dateSplit[1].toUpperCase()
     let finaldatestr = dateSplit[0] + ` ${month} ` + dateSplit[2] 
 
-    console.log(tanggalPembayaran.toISOString(), tanggalPenagihan.toISOString())
 
     await query.refetch()
 
@@ -65,7 +64,6 @@ export default function ReportSetoranBank() {
     let lengthdata = sortedData.length
 
     sortedData.forEach((value, index) => {
-      console.log(index, sortedData.length-1)
       if(index == lengthdata-1) {
         sortedData.push([
           "", "", "", "Total", "", "Rp " + idr(currentTotal), "", ""

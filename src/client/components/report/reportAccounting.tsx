@@ -66,58 +66,38 @@ export default function ReportAccounting() {
     data = data.sort((a, b) => {
       return (
         (a[1] as string).localeCompare(b[1] as string) ||
+        (a[2] as string).localeCompare(b[1] as string) ||
         (a[3] as string).localeCompare(b[3] as string) ||
-        (a[5] as string).localeCompare(b[5] as string)
+        (a[4] as string).localeCompare(b[4] as string)
       )
     })
 
-    let currentKolektor = ""
-    let currentCustomer = ""
-    let currentIdTransaksi = ""
     let i = 1;
+    let prev : (string | number)[] = []
+    let space = false
 
     data.forEach(d => {
       let temp = d
-      let space = true
 
-      if (currentCustomer && currentKolektor && d[3] == currentCustomer && d[1] == currentKolektor) {
-        space = false
-        d = d.map((v, idx) => {
-          if (idx <= 3) {
-            return ""
-          } else {
-            return v
-          }
-        })
-      }
-
-      if (currentIdTransaksi == d[5]) {
-        space = false
-        d = d.map((v, idx) => {
-          if (idx <= 7) {
-            return ""
-          } else {
-            return v
-          }
-        })
-        d[d.length-1] = ""
-      }
-
-      if (space) {
-        finalResult.push([""])
-        d[0] = i
-        i++
-        finalResult.push(d)
+      if(
+        d[1] == prev[1] &&
+        d[2] == prev[2] &&
+        d[3] == prev[3]
+      ) {
+        temp[1] = ""
+        temp[2] = ""
+        temp[3] = ""
+        finalResult.push(temp)
       } else {
-        d[0] = i
+        if(i != 1) {
+          finalResult.push([""])
+        }
+        temp[0] = i
+        finalResult.push(temp)
         i++
-        finalResult.push(d)
       }
 
-
-      currentKolektor = temp[1] as string
-      currentIdTransaksi = temp[5] as string
-      currentCustomer = temp[3] as string
+      prev = d
     })
 
     console.log(data)

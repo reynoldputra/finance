@@ -80,29 +80,42 @@ export class CaraBayarService {
             invoice : {
               include : {
                 customer : true,
+                penagihan : true
               }
-            }
+            },
+            distribusiPembayaran : true
           }
         }
       }
     })
 
-    const penagihan = await PenagihanService.getAllPenagihan()
-
     const resultWithKet = result.map(r => {
       let ket = ""
-      const p = penagihan.find(i => i.id == r.penagihanId)
-      if(p && p.status != "LUNAS") ket += p.status
-      if(p && (p.status == "LUNAS" || p.status == "PELUNASAN")) {
-        let sisa = Number(p.sisa) - p.totalPembayaran
-        if(sisa < 0) {
-          if(!sisa) ket += ", "
-          ket += "Kurang " + sisa
-        }
-        if(sisa > 0) {
-          if(!sisa) ket += ", "
-          ket += "Lebih " + sisa
-        }
+
+      if(r.penagihan.status == "CICILAN") {
+        const penagihan = r.penagihan.invoice.penagihan
+        penagihan.sort((a,b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
+        const idx = penagihan.findIndex(a => a.id == r.penagihan.id)
+
+        if(idx != -1) ket += "CICILAN Ke-" + (idx+1)
+      }
+
+      if(r.penagihan.status == "PELUNASAN") {
+        const pembayaranBaru = r.penagihan.distribusiPembayaran.reduce((tot, cur) => {
+          return tot += cur.jumlah
+        }, 0)
+        const selisih = r.penagihan.sisa - pembayaranBaru
+        if (selisih < 0) ket += "PELUNASAN, Lebih " + (Math.abs(selisih)).toFixed()
+        if (selisih > 0) ket += "PELUNASAN, Kurang " + (Math.abs(selisih)).toFixed()
+      }
+
+      if(r.penagihan.status == "LUNAS") {
+        const pembayaranBaru = r.penagihan.distribusiPembayaran.reduce((tot, cur) => {
+          return tot += cur.jumlah
+        }, 0)
+        const selisih = r.penagihan.sisa - pembayaranBaru
+        if (selisih < 0) ket += "Lebih " + (Math.abs(selisih)).toFixed()
+        if (selisih > 0) ket += "Kurang " + (Math.abs(selisih)).toFixed()
       }
 
       return {

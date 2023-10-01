@@ -13,7 +13,6 @@ import {
 } from "@server/collections/pembayaran/pembayaranSchema";
 import { Fragment, useEffect, useState } from "react";
 import { dmyDate } from "@client/lib/dmyDate";
-import { Combobox } from "@client/components/form/Combobox";
 import { RadioGroup, RadioGroupItem } from "@client/components/ui/radio-group";
 import { Label } from "@client/components/ui/label";
 import { PlusIcon, RefreshCwIcon, Trash } from "lucide-react";
@@ -44,7 +43,7 @@ interface ModalFormProps {
 }
 
 export function PembayaranForm({ setOpen }: ModalFormProps) {
-  const { toast } = useToast();
+  const {toast} = useToast();
   const [penagihanOption, setPenagihanOption] = useState<ComboboxItem[]>();
   const [currCust, setCurrentCust] = useState("");
   const [customer, setCustomer] = useState<ComboboxItem[]>([])

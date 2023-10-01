@@ -3,7 +3,6 @@ import xlsx from "node-xlsx"
 import { useState } from "react"
 import { DatePicker } from "../form/DatePicker"
 import { trpc } from "@client/lib/trpc"
-import { idr } from "@client/lib/idr"
 import toPascalCase from "@client/lib/pascalCase"
 import { dmyDate } from "@client/lib/dmyDate"
 
@@ -66,20 +65,20 @@ export default function ReportSetoranBank() {
     sortedData.forEach((value, index) => {
       if(index == lengthdata-1) {
         sortedData.push([
-          "", "", "", "Total", "", "Rp " + idr(currentTotal), "", ""
+          "", "", "", "Total", "", currentTotal, "", ""
         ])
         return
       }
       if((prevSalesName && prevSalesName != value[0]) || index+1 == sortedData.length){
         sortedData.splice(index, 0, [
-          "", "", "", "Total", "", "Rp " + idr(currentTotal), "", ""
+          "", "", "", "Total", "", currentTotal, "", ""
         ])
         currentTotal = 0
       }
 
       if(currentTotal + (value[5] as number) > 100000000){
         sortedData.splice(index, 0, [
-          "", "", "", "Total", "", "Rp " + idr(currentTotal), "", ""
+          "", "", "", "Total", "", "Rp " + currentTotal, "", ""
         ])
         currentTotal = 0
       } else {
@@ -89,8 +88,8 @@ export default function ReportSetoranBank() {
     })
     sortedData.forEach((value) => {
       if(value[0]) {
-        value[4] = "Rp " + idr(value[4] as number)
-        value[5] = "Rp " + idr(value[5] as number)
+        value[4] = value[4] as number
+        value[5] = value[5] as number
       }
     })
 

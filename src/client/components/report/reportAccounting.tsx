@@ -3,7 +3,6 @@ import xlsx from "node-xlsx"
 import { useState } from "react"
 import { DatePicker } from "../form/DatePicker"
 import { trpc } from "@client/lib/trpc"
-import { idr } from "@client/lib/idr"
 import toPascalCase from "@client/lib/pascalCase"
 import { dmyDate } from "@client/lib/dmyDate"
 
@@ -47,18 +46,18 @@ export default function ReportAccounting() {
 
     for(let idx in queryResult) {
       let q = queryResult[idx]
-      let template = ["", q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, idr(q.invoice.total), idr(q.sisa)]
+      let template = ["", q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.invoice.total, q.sisa]
       console.log(template)
       q.distribusi.forEach((v) => {
         const sisa = v.jumlah - q.sisa
         const ketsisa = sisa > 0 ? `, Lebih ${sisa}` : (sisa < 0 ? `, Kurang ${sisa}` : "")
         const ket = (q.status == "LUNAS" || q.status == "PELUNASAN") ? ketsisa : ""
         if (v.caraBayar.metodePembayaranId == 1) {
-          data.push([...template, idr(v.jumlah), "", "", "", "", toPascalCase(q.status + ket)])
+          data.push([...template, v.jumlah, "", "", "", "", toPascalCase(q.status + ket)])
         }
         if (v.caraBayar.giro) {
           const giro = v.caraBayar.giro
-          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), idr(v.jumlah), toPascalCase(q.status + ket)])
+          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), v.jumlah, toPascalCase(q.status + ket)])
         }
       })
     }
@@ -74,7 +73,6 @@ export default function ReportAccounting() {
 
     let i = 1;
     let prev : (string | number)[] = []
-    let space = false
 
     data.forEach(d => {
       let temp = d

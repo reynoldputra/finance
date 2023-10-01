@@ -3,7 +3,6 @@ import xlsx from "node-xlsx"
 import { useState } from "react"
 import { DatePicker } from "../form/DatePicker"
 import { trpc } from "@client/lib/trpc"
-import { idr } from "@client/lib/idr"
 import toPascalCase from "@client/lib/pascalCase"
 import { dmyDate } from "@client/lib/dmyDate"
 
@@ -74,7 +73,7 @@ export default function ReportIncomingBank() {
       }
 
       if ((prevSalesName && prevSalesName != value[0]) || index + 1 == sortedData.length) {
-        finalData[setoranIdx][9] = "Rp " + idr(currentTotal)
+        finalData[setoranIdx][9] = currentTotal
         finalData.push([currentSetoran, "SETORAN TUNAI", "", "", "", "", "", "", ""])
         currentSetoran += 1
         currentTotal = 0
@@ -82,7 +81,7 @@ export default function ReportIncomingBank() {
       }
 
       if (currentTotal + (value[5] as number) > 100000000) {
-        finalData[setoranIdx][9] = "Rp " + idr(currentTotal)
+        finalData[setoranIdx][9] = currentTotal
         finalData.push([currentSetoran, "SETORAN TUNAI", "", "", "", "", "", "", ""])
         currentSetoran += 1
         currentTotal = 0
@@ -93,7 +92,7 @@ export default function ReportIncomingBank() {
 
       finalData.push(["", value[1], value[6] ? "Ket:" + value[6] : "", ""])
       finalData.push(["", "Inv " + value[3], "", ""])
-      finalData.push(["", "Rp " + idr(value[5]), "", ""])
+      finalData.push(["", "Rp " + value[5], "", ""])
       finalData.push(["", "", "", ""])
       prevSalesName = value[0] as string
     })

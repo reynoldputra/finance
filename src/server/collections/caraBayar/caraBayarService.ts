@@ -1,6 +1,5 @@
 import { Prisma } from "@server/../generated/client";
 import { prisma } from "@server/prisma";
-import { PenagihanService } from "../penagihan/penagihanService";
 import { TCreateCaraBayarInput, TUpdateCaraBayarInput } from "./caraBayarSchema";
 
 export class CaraBayarService {
@@ -179,6 +178,7 @@ export class CaraBayarService {
   }
 
   static async updateCaraBayar(input: TUpdateCaraBayarInput, prismaCtx?: Prisma.TransactionClient) {
+    console.log(input)
     const prismaClient = prismaCtx ?? prisma
     let updateCaraBayar: Prisma.CaraBayarUncheckedUpdateInput = {};
 
@@ -221,6 +221,14 @@ export class CaraBayarService {
 
       if (input.tandaTerima) {
         updateCaraBayar.tandaTerima = input.tandaTerima;
+      }
+
+      if (input.tanggal) {
+        updateCaraBayar.tanggal = input.tanggal;
+      }
+
+      if (input.keterangan) {
+        updateCaraBayar.keterangan = input.keterangan;
       }
 
       console.log(updateCaraBayar)

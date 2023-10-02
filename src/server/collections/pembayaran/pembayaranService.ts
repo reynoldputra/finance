@@ -123,6 +123,7 @@ export class PembayaranService {
           caraBayarId: carabayar.id
         }
       })
+
       let distribusiBaru: DistribusiPembayaran[] = []
       let distribusiUpdated: DistribusiPembayaran[] = []
       let distribusiDeleted: DistribusiPembayaran[] = []

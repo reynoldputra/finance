@@ -1,6 +1,5 @@
 import { Row } from "@tanstack/react-table";
 import { DataTableRowActions } from "@client/components/table/DataTableRowActions";
-import ModalDropdownItem from "@client/components/modal/ModalDropdownItem";
 import { useState } from "react";
 import { toast } from "@client/components/ui/use-toast";
 import { trpc } from "@client/lib/trpc";
@@ -8,7 +7,7 @@ import { TPembayaranSchema } from "./data/schema";
 import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
 import DetailDistribusi from "./DetailDistribusi";
 import { UpdatePembayaranForm } from "../PembayaranForm/UpdatePembayaranForm";
-// import { UpdatePembayaranModal } from "../PembayaranForm/UpdatePembayaranForm";
+import ModalDropdownItem from "@client/components/modal/ModalDropdownItem";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;

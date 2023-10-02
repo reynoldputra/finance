@@ -86,11 +86,14 @@ export class PembayaranService {
 
         let status = ""
 
+        console.log(distribusi.lunas)
+        console.log(totalDistirbusi, detailPenagihan.sisa)
+
         if (distribusi.lunas) {
           if (invoice.penagihan.length > 1) status = "PELUNASAN"
           else status = "LUNAS"
         } else {
-          if (totalDistirbusi < invoice.sisa) status = "CICILAN"
+          if (totalDistirbusi < detailPenagihan.sisa) status = "CICILAN"
           else {
             if (invoice.penagihan.length > 1) status = "PELUNASAN"
             else status = "LUNAS"

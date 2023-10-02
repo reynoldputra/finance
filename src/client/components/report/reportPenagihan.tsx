@@ -25,7 +25,7 @@ export default function ReportPenagihan() {
     const queryResult = query.data?.data ?? []
     let data = queryResult.map((q) => {
       let TT = q.tandaTerima ? "TT" : "";
-      let sisa = q.sisa === q.totalTagihan ? "" : q.sisa.toFixed().toString();
+      let sisa = q.sisa === q.totalTagihan ? "" : q.sisa;
       return [
         dmyDate(q.tanggalTagihan),
         q.namaKolektor,

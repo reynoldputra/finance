@@ -5,6 +5,7 @@ import { DatePicker } from "../form/DatePicker"
 import { trpc } from "@client/lib/trpc"
 import toPascalCase from "@client/lib/pascalCase"
 import { dmyDate } from "@client/lib/dmyDate"
+import { number } from "yargs"
 
 export default function ReportAccounting() {
   const day = new Date()
@@ -46,8 +47,8 @@ export default function ReportAccounting() {
 
     for(let idx in queryResult) {
       let q = queryResult[idx]
-      let template = ["", q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.invoice.total, q.sisa]
-      console.log(template)
+      let sisa = q.sisa === q.invoice.total ? "" : q.sisa;
+      let template = ["", q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.invoice.total, sisa]
       q.distribusi.forEach((v) => {
         const sisa = v.jumlah - q.sisa
         const ketsisa = sisa > 0 ? `, Lebih ${sisa}` : (sisa < 0 ? `, Kurang ${sisa}` : "")
@@ -132,7 +133,22 @@ export default function ReportAccounting() {
 
     const sheetOptions = {
       '!merges': ranges,
-      '!cols': [{ wch: 5 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }]
+      '!cols': [
+        { wch: 5 }, // No
+        { wch: 10 }, // Nama Kolektor
+        { wch: 10 }, // Nama Sales
+        { wch: 15 }, // Customer Name
+        { wch: 15 }, // Tanggal Transaksi
+        { wch: 10 }, // Id Transaksi
+        { wch: 15 }, // Total Tagihan
+        { wch: 15, type: 'number' }, // Sisa Tagihan
+        { wch: 15 }, // Cara Bayar
+        { wch: 15 }, // Cash
+        { wch: 15 }, // Giro
+        { wch: 15 }, // Bank
+        { wch: 15 }, // No. Giro
+        { wch: 15 }, // Jatuh Tempo
+        { wch: 15 }]
     };
 
     const titlePenagihan = dmyDate(tanggalPenagihan, "-")

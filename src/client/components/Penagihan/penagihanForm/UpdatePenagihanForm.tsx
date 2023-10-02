@@ -30,6 +30,7 @@ const statusOptions: StatusOption[] = [
   { title: "WAITING", value: "WAITING" },
   { title: "CICILAN", value: "CICILAN" },
   { title: "LUNAS", value: "LUNAS" },
+  { title: "PELUNASAN", value: "PELUNASAN" },
 ];
 
 export function UpdatePenagihanForm({

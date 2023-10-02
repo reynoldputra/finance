@@ -69,7 +69,7 @@ export default function ReportAccounting() {
         (a[1] as string).localeCompare(b[1] as string) ||
         (a[2] as string).localeCompare(b[1] as string) ||
         (a[3] as string).localeCompare(b[3] as string) ||
-        (a[4] as string).localeCompare(b[4] as string)
+        (a[10] as string).localeCompare(b[10] as string)
       )
     })
 
@@ -78,6 +78,12 @@ export default function ReportAccounting() {
 
     data.forEach(d => {
       let temp = d
+
+      if(prev[10] == d[10]){
+        temp[9] = ""
+        temp[10] = ""
+        temp[11] = ""
+      }
 
       if(
         d[1] == prev[1] &&
@@ -97,7 +103,6 @@ export default function ReportAccounting() {
         i++
         prev = d
       }
-
     })
 
     console.log(data)

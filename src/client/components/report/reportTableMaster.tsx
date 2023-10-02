@@ -113,6 +113,15 @@ export default function ReportTableMaster() {
       currentCustomer = temp[3] as string;
     })
 
+    let prev :(string | number)[] = []
+    data.forEach((d, idx) => {
+      if(d[11] == prev[11]) {
+        data[idx][10] = ""
+        data[idx][11] = ""
+        data[idx][12] = ""
+      }
+    })
+
     const header = [
       // ["SAP TRANSAKSI INCOMING BANK BCA"],
       // [""],

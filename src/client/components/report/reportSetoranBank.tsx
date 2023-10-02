@@ -46,7 +46,7 @@ export default function ReportSetoranBank() {
       return [
         q.penagihan.invoice.namaSales,
         q.penagihan.invoice.customer.nama,
-        q.caraBayar.tanggal,
+        dmyDate(q.caraBayar.tanggal),
         q.penagihan.invoice.transaksiId,
         Number(q.penagihan.invoice.total),
         Number(q.jumlah),
@@ -60,40 +60,56 @@ export default function ReportSetoranBank() {
 
     let currentTotal = 0
     let prevSalesName = ""
+    let prevCustName = ""
     let lengthdata = sortedData.length
+    const newData : (string | number)[][] = []
 
     sortedData.forEach((value, index) => {
-      if(index == lengthdata-1) {
-        sortedData.push([
-          "", "", "", "Total", "", currentTotal, "", ""
-        ])
+      if(index != 0 && prevCustName != value[1] && prevSalesName == value[0] ) {
+        newData.push([""])
+      }
+
+
+      if(currentTotal + (value[5] as number) > 100000000) {
+        newData.push(["", "", "", "Total", "", currentTotal, "", ""])
+        newData.push([""])
+        newData.push([""])
+        currentTotal = value[5] as number
+        prevSalesName = value[0] as string
+        prevCustName = value[1] as string
+        newData.push(value)
         return
       }
-      if((prevSalesName && prevSalesName != value[0]) || index+1 == sortedData.length){
-        sortedData.splice(index, 0, [
+
+      if((prevSalesName && prevSalesName != value[0])) {
+        newData.push(["", "", "", "Total", "", currentTotal, "", ""])
+        newData.push([""])
+        newData.push([""])
+        currentTotal = 0
+      }
+
+      currentTotal += (value[5] as number)
+
+      if(prevSalesName && prevCustName && index != 0 && prevSalesName == value[0] && prevCustName == value[1]) {
+        prevSalesName = value[0] as string
+        prevCustName = value[1] as string
+        value[0] = ""
+        value[1] = ""
+        newData.push(value)
+      } else {
+        prevSalesName = value[0] as string
+        prevCustName = value[1] as string
+        newData.push(value)
+      }
+      
+      if(index == lengthdata-1) {
+        newData.push([
           "", "", "", "Total", "", currentTotal, "", ""
         ])
-        currentTotal = 0
-      }
-
-      if(currentTotal + (value[5] as number) > 100000000){
-        sortedData.splice(index, 0, [
-          "", "", "", "Total", "", "Rp " + currentTotal, "", ""
-        ])
-        currentTotal = 0
-      } else {
-        currentTotal += (value[5] as number)
-      }
-      prevSalesName = value[0] as string
-    })
-    sortedData.forEach((value) => {
-      if(value[0]) {
-        value[4] = value[4] as number
-        value[5] = value[5] as number
       }
     })
 
-    console.log(sortedData)
+    console.log(newData)
 
     const titlePenagihan = dmyDate(tanggalPenagihan, "-")
     const titlePembayaran = dmyDate(tanggalPembayaran, "-")
@@ -106,7 +122,8 @@ export default function ReportSetoranBank() {
       [""],
       ["Nama Sales", "Customer Name", "Tgl Transaksi", "ID Transaksi", "Total Tagihan", "Cara bayar", "Ket"],
       ["", "", "", "", "", "Cash"],
-      ...data
+      [""],
+      ...newData
     ]
 
     const ranges = [

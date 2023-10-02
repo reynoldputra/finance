@@ -45,7 +45,7 @@ const ModalDropdownItem = React.forwardRef<HTMLDivElement, IModalItemProps>(
               )}
             </DialogHeader>
             <hr />
-          <ScrollArea className="max-h-[800px] pr-3">
+          <div className="max-h-[800px] pr-3 overflow-y-auto">
             {children}
             <Dialog.Close
               asChild
@@ -55,7 +55,7 @@ const ModalDropdownItem = React.forwardRef<HTMLDivElement, IModalItemProps>(
                 <Cross2Icon />
               </button>
             </Dialog.Close>
-          </ScrollArea>
+          </div>
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>

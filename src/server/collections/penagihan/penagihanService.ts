@@ -204,7 +204,17 @@ export class PenagihanService {
         distribusiPembayaran: {
           some: {
             caraBayar: {
-              tanggal: tanggalPembayaran
+              AND : [
+              {
+                tanggal: tanggalPembayaran,
+              },
+              {
+                OR : [
+                  {metodePembayaranId : 1},
+                  {metodePembayaranId : 2},
+                ]
+              }
+            ]
             }
           }
         }
@@ -283,6 +293,7 @@ export class PenagihanService {
         keterangan = "PELUNASAN"
         if (selisih < 0) keterangan = "PELUNASAN, Lebih " + (Math.abs(selisih)).toFixed()
         if (selisih > 0) keterangan = "PELUNASAN, Kurang " + (Math.abs(selisih)).toFixed()
+        if (selisih == 0) keterangan = "PELUNASAN"
       }
 
       if (d.status == "LUNAS") {

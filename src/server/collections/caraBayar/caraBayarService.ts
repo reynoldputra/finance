@@ -63,13 +63,11 @@ export class CaraBayarService {
     const result = await prisma.distribusiPembayaran.findMany({
       where : {
         caraBayar : {
-          tanggal : tanggalPembayaran
+          tanggal : tanggalPembayaran,
+          metodePembayaranId : 1
         },
         penagihan : {
           tanggalTagihan : tanggalPenagihan,
-          invoice : {
-            type : "Cash"
-          }
         }
       },
       include : {
@@ -97,7 +95,7 @@ export class CaraBayarService {
         penagihan.sort((a,b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
         const idx = penagihan.findIndex(a => a.id == r.penagihan.id)
 
-        if(idx != -1) ket += "CICILAN Ke-" + (idx+1)
+        if(idx != -1) ket = "CICILAN Ke-" + (idx+1)
       }
 
       if(r.penagihan.status == "PELUNASAN") {
@@ -105,8 +103,9 @@ export class CaraBayarService {
           return tot += cur.jumlah
         }, 0)
         const selisih = r.penagihan.sisa - pembayaranBaru
-        if (selisih < 0) ket += "PELUNASAN, Lebih " + (Math.abs(selisih)).toFixed()
-        if (selisih > 0) ket += "PELUNASAN, Kurang " + (Math.abs(selisih)).toFixed()
+        if (selisih > 0) ket = "PELUNASAN, Kurang " + (Math.abs(selisih)).toFixed()
+        if (selisih < 0) ket = "PELUNASAN, Lebih " + (Math.abs(selisih)).toFixed()
+        if(selisih == 0) ket = "PELUNASAN"
       }
 
       if(r.penagihan.status == "LUNAS") {
@@ -223,6 +222,8 @@ export class CaraBayarService {
       if (input.tandaTerima) {
         updateCaraBayar.tandaTerima = input.tandaTerima;
       }
+
+      console.log(updateCaraBayar)
 
       const result = await prismaClient.caraBayar.update({
         where: {

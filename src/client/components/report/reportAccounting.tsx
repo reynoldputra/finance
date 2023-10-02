@@ -93,9 +93,9 @@ export default function ReportAccounting() {
         temp[0] = i
         finalResult.push(temp)
         i++
+        prev = d
       }
 
-      prev = d
     })
 
     console.log(data)

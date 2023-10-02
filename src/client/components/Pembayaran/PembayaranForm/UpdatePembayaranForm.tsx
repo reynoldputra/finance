@@ -165,6 +165,7 @@ export function UpdatePembayaranForm({ setOpen, carabayarId }: ModalFormProps) {
         setOpen(false);
         utils.carabayar.invalidate();
         utils.penagihan.invalidate();
+        utils.pembayaran.invalidate();
       }
     } catch (err) {
       console.error("Terjadi kesalahan:", err);

@@ -51,22 +51,25 @@ export default function ReportTableMaster() {
     })
 
     queryResult.forEach(q => {
-      let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, q.tandaTerima ? "TT" : "", q.invoice.total, q.sisa === q.invoice.total ? "" : q.sisa.toString()]
+      let TT = q.tandaTerima ? "TT" : "";
+      let sisa = q.sisa === q.invoice.total ? "" : q.sisa;
+      let nihil = q.status === "NIHIL" ? "v" : ""
+      let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, TT, q.invoice.total, sisa]
       q.distribusi.forEach((v) => {
         if (v.caraBayar.metodePembayaranId == 1) {
-          data.push([...template, v.jumlah, "", "", "", "", "", "", "", toPascalCase(q.status)])
+          data.push([...template, v.jumlah, "", "", "", "", "", "", nihil, toPascalCase(q.status)])
           return
         }
         if (v.caraBayar.giro) {
           const giro = v.caraBayar.giro
-          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), Number(v.caraBayar.total), "", "", "", toPascalCase(q.status)])
+          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), Number(v.caraBayar.total), "", "", nihil, toPascalCase(q.status)])
           return
         }
         if (v.caraBayar.transfer) {
-          data.push([...template, "", "", "", "", "", dmyDate(v.caraBayar.tanggal), Number(v.jumlah), "", toPascalCase(q.status)])
+          data.push([...template, "", "", "", "", "", dmyDate(v.caraBayar.tanggal), Number(v.jumlah), nihil, toPascalCase(q.status)])
           return
         }
-        data.push([...template, "", "", "", "", "", "", "", "TT", ""])
+        data.push([...template, "", "", "", "", "", "", "", nihil, ""])
       })
     })
     console.log(data)

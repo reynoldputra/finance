@@ -5,6 +5,7 @@ import { DatePicker } from "../form/DatePicker"
 import { trpc } from "@client/lib/trpc"
 import toPascalCase from "@client/lib/pascalCase"
 import { dmyDate } from "@client/lib/dmyDate"
+import { roundDecimal } from "@client/lib/roundDecimal"
 
 export default function ReportSetoranBank() {
   const day = new Date()
@@ -48,8 +49,8 @@ export default function ReportSetoranBank() {
         q.penagihan.invoice.customer.nama,
         q.caraBayar.tanggal,
         q.penagihan.invoice.transaksiId,
-        Number(q.penagihan.invoice.total),
-        Number(q.jumlah),
+        roundDecimal(Number(q.penagihan.invoice.total)),
+        roundDecimal(Number(q.jumlah)),
         toPascalCase(q.keterangan)
       ]
     })

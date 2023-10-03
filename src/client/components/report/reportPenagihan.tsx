@@ -4,6 +4,7 @@ import { trpc } from "@client/lib/trpc"
 import { useState } from "react"
 import { DatePicker } from "../form/DatePicker"
 import { dmyDate } from "@client/lib/dmyDate"
+import { roundDecimal } from "@client/lib/roundDecimal"
 
 export default function ReportPenagihan() {
   const day = new Date()
@@ -34,8 +35,8 @@ export default function ReportPenagihan() {
         dmyDate(q.tanggalTransaksi),
         q.transaksiId,
         TT,
-        q.totalTagihan,
-        sisa,
+        roundDecimal(q.totalTagihan),
+        roundDecimal(sisa),
       ]
     })
 

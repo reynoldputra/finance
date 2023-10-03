@@ -5,6 +5,7 @@ import { useState } from "react"
 import { DatePicker } from "../form/DatePicker"
 import { dmyDate } from "@client/lib/dmyDate"
 import toPascalCase from "@client/lib/pascalCase"
+import { roundDecimal } from "@client/lib/roundDecimal"
 
 export default function ReportTableMaster() {
   const today = new Date()
@@ -54,19 +55,19 @@ export default function ReportTableMaster() {
       let TT = q.tandaTerima ? "TT" : "";
       let sisa = q.sisa === q.invoice.total ? "" : q.sisa;
       let nihil = q.status === "NIHIL" ? "v" : ""
-      let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, TT, q.invoice.total, sisa]
+      let template = [dmyDate(q.tanggalTagihan), q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, TT, roundDecimal(q.invoice.total), roundDecimal(sisa)]
       q.distribusi.forEach((v) => {
         if (v.caraBayar.metodePembayaranId == 1) {
-          data.push([...template, v.jumlah, "", "", "", "", "", "", nihil, toPascalCase(q.status)])
+          data.push([...template, roundDecimal(v.jumlah), "", "", "", "", "", "", nihil, toPascalCase(q.status)])
           return
         }
         if (v.caraBayar.giro) {
           const giro = v.caraBayar.giro
-          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), Number(v.caraBayar.total), "", "", nihil, toPascalCase(q.status)])
+          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), roundDecimal(Number(v.caraBayar.total)), "", "", nihil, toPascalCase(q.status)])
           return
         }
         if (v.caraBayar.transfer) {
-          data.push([...template, "", "", "", "", "", dmyDate(v.caraBayar.tanggal), Number(v.jumlah), nihil, toPascalCase(q.status)])
+          data.push([...template, "", "", "", "", "", dmyDate(v.caraBayar.tanggal), roundDecimal(Number(v.jumlah)), nihil, toPascalCase(q.status)])
           return
         }
         data.push([...template, "", "", "", "", "", "", "", nihil, ""])

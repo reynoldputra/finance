@@ -8,6 +8,7 @@ import { TReturSchema } from "./data/schema";
 import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
 import { UpdateReturForm } from "../returForm/UpdateReturForm";
 import DetailRetur from "./DetailRetur";
+import { Button } from "@client/components/ui/button";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
@@ -15,6 +16,11 @@ interface RowActionsProps<TData> {
 
 export function RowAction({ row }: RowActionsProps<TReturSchema>) {
   const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+
+  const handleCloseDelete = () => {
+    setOpenDelete(!openDelete);
+  };
 
   const deleteReturMutation = trpc.retur.deleteRetur.useMutation();
   const utils = trpc.useContext();
@@ -28,6 +34,7 @@ export function RowAction({ row }: RowActionsProps<TReturSchema>) {
         className: "text-white text-base font-semibold",
       });
       utils.retur.invalidate();
+      handleCloseDelete();
     } else {
       toast({
         description: `Failed to delete retur, please try again`,
@@ -50,7 +57,11 @@ export function RowAction({ row }: RowActionsProps<TReturSchema>) {
         >
           <UpdateReturForm setOpen={setOpenEdit} row={row} />
         </ModalDropdownItem>
-        <ModalDropdownItem triggerChildren="Delete">
+        <ModalDropdownItem
+          open={openDelete}
+          onOpenChange={setOpenDelete}
+          triggerChildren="Delete"
+        >
           <div className="flex flex-col w-full h-full">
             <div className="flex flex-col">
               <span className="font-bold text-xl">Are you sure ?</span>
@@ -65,15 +76,21 @@ export function RowAction({ row }: RowActionsProps<TReturSchema>) {
                 Retur.
               </span>
             </div>
-            <div className="flex flex-col text-lg mt-2">
-              <span className=" text-base font-semibold">
-                Please type Retur's ID Transaksi "{row.original.noRetur}" to
-                confirm the delete.
-              </span>
-              <ConfirmDeleteForm
-                handleDelete={handleDelete}
-                currName={row.original.noRetur}
-              />
+            <div className="flex text-lg gap-x-3 mt-2">
+              <Button
+                variant={"outline"}
+                onClick={handleCloseDelete}
+                className="text-base font-semibold px-10"
+              >
+                No
+              </Button>
+              <Button
+                variant={"destructive"}
+                onClick={handleDelete}
+                className="text-base font-semibold px-10"
+              >
+                Yes
+              </Button>
             </div>
           </div>
         </ModalDropdownItem>

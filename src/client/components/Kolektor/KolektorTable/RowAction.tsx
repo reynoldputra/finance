@@ -6,6 +6,8 @@ import { useToast } from "@client/components/ui/use-toast";
 import ModalDropdownItem from "@client/components/modal/ModalDropdownItem";
 import EditKolektorForm from "../KolektorForm/EditKolektorForm";
 import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
+import { useState } from "react";
+import { Button } from "@client/components/ui/button";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
@@ -14,6 +16,11 @@ interface RowActionsProps<TData> {
 export function RowAction({ row }: RowActionsProps<TKolektorTable>) {
   const { toast } = useToast();
   const utils = trpc.useContext();
+  const [openDelete, setOpenDelete] = useState(false);
+
+  const handleCloseDelete = () => {
+    setOpenDelete(!openDelete);
+  };
 
   const deleteKolektorMutation = trpc.kolektor.deleteKolektor.useMutation({
     onSuccess: () => {
@@ -32,6 +39,7 @@ export function RowAction({ row }: RowActionsProps<TKolektorTable>) {
           variant: "success",
           className: "text-white text-base font-semibold",
         });
+        handleCloseDelete()
       }
     } catch (error) {
       console.log(error);
@@ -47,7 +55,11 @@ export function RowAction({ row }: RowActionsProps<TKolektorTable>) {
       <ModalDropdownItem triggerChildren="Edit">
         <EditKolektorForm kolektorData={row.original} />
       </ModalDropdownItem>
-      <ModalDropdownItem triggerChildren="Delete">
+      <ModalDropdownItem
+        open={openDelete}
+        onOpenChange={setOpenDelete}
+        triggerChildren="Delete"
+      >
         <div className="flex flex-col w-full h-full">
           <div className="flex flex-col">
             <span className="font-bold text-xl">Are you sure ?</span>
@@ -59,15 +71,21 @@ export function RowAction({ row }: RowActionsProps<TKolektorTable>) {
               kolektor.
             </span>
           </div>
-          <div className="flex flex-col text-lg mt-2">
-            <span className=" text-base font-semibold">
-              Please type kolektr's name "{row.original.nama}" to confirm the
-              delete.{" "}
-            </span>
-            <ConfirmDeleteForm
-              handleDelete={handleDelete}
-              currName={row.original.nama}
-            />
+          <div className="flex text-lg gap-x-3 mt-2">
+            <Button
+              variant={"outline"}
+              onClick={handleCloseDelete}
+              className="text-base font-semibold px-10"
+            >
+              No
+            </Button>
+            <Button
+              variant={"destructive"}
+              onClick={handleDelete}
+              className="text-base font-semibold px-10"
+            >
+              Yes
+            </Button>
           </div>
         </div>
       </ModalDropdownItem>

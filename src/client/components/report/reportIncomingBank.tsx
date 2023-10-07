@@ -47,7 +47,7 @@ export default function ReportIncomingBank() {
       return [
         q.penagihan.invoice.namaSales,
         q.penagihan.invoice.customer.nama,
-        q.caraBayar.tanggal,
+        q.penagihan.invoice.tanggalTransaksi,
         q.penagihan.invoice.transaksiId,
         roundDecimal(Number(q.penagihan.invoice.total)),
         roundDecimal(Number(q.jumlah)),

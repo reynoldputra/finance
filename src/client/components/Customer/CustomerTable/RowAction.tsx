@@ -7,6 +7,7 @@ import ModalDropdownItem from "@client/components/modal/ModalDropdownItem";
 import EditCustomerForm from "../CustomerForm/EditCustomerForm";
 import ConfirmDeleteForm from "@client/components/form/ConfirmDeleteForm";
 import { useState } from "react";
+import { Button } from "@client/components/ui/button";
 
 interface RowActionsProps<TData> {
   row: Row<TData>;
@@ -16,7 +17,11 @@ export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
   const { toast } = useToast();
   const utils = trpc.useContext();
   const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
+  const handleCloseDelete = () => {
+    setOpenDelete(!openDelete);
+  };
   const deleteCustomerMutation = trpc.customer.deleteCustomer.useMutation({
     onSuccess: () => {
       utils.customer.invalidate();
@@ -35,6 +40,7 @@ export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
           className: "text-white text-base font-semibold",
         });
       }
+      handleCloseDelete();
     } catch (error) {
       console.log(error);
       toast({
@@ -65,15 +71,21 @@ export function RowAction({ row }: RowActionsProps<ICustomerTable>) {
               customer.
             </span>
           </div>
-          <div className="flex flex-col text-lg mt-2">
-            <span className=" text-base font-semibold">
-              Please type Customer's name "{row.original.nama}" to confirm the
-              delete.
-            </span>
-            <ConfirmDeleteForm
-              handleDelete={handleDelete}
-              currName={row.original.nama}
-            />
+          <div className="flex text-lg gap-x-3 mt-2">
+            <Button
+              variant={"outline"}
+              onClick={handleCloseDelete}
+              className="text-base font-semibold px-10"
+            >
+              No
+            </Button>
+            <Button
+              variant={"destructive"}
+              onClick={handleDelete}
+              className="text-base font-semibold px-10"
+            >
+              Yes
+            </Button>
           </div>
         </div>
       </ModalDropdownItem>

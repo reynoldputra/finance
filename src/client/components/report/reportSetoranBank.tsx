@@ -47,7 +47,7 @@ export default function ReportSetoranBank() {
       return [
         q.penagihan.invoice.namaSales,
         q.penagihan.invoice.customer.nama,
-        dmyDate(q.caraBayar.tanggal),
+        dmyDate(q.penagihan.invoice.tanggalTransaksi),
         q.penagihan.invoice.transaksiId,
         roundDecimal(Number(q.penagihan.invoice.total)),
         roundDecimal(Number(q.jumlah)),

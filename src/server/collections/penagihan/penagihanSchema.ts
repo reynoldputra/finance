@@ -23,7 +23,10 @@ export const updateTT = z.object({
   value: z.boolean(),
 })
 
+export const changeManyToNihilInput = z.array(z.string());
+
 export type TCreatePenagihanInput = z.infer<typeof createPenagihanInput>;
 export type TUpdatePenagihanInput = z.infer<typeof updatePenagihanInput>;
 export type TUpdateTT = z.infer<typeof updateTT>;
 export type TManyPenagihanInput = z.infer<typeof manyPenagihanInput>
+export type TChangeManyToNihilInput = z.infer<typeof changeManyToNihilInput>

@@ -3,6 +3,9 @@ import useDataTable from "@client/hook/useDataTable";
 import { trpc } from "@client/lib/trpc";
 import CreatePenagihan from "../CreatePenagihan";
 import { PenagihanColumn } from "./PenagihanColumn";
+import { TPenagihanTable } from "./data/schema";
+import { Table } from "@tanstack/react-table";
+import SelectedAction from "./SelectedAction";
 
 export default function PenagihanTable() {
   const data = trpc.penagihan.getAllPenagihan.useQuery().data;
@@ -13,14 +16,15 @@ export default function PenagihanTable() {
 
   return (
     <>
-      <DataTable table={table} columns={PenagihanColumn} toolbar={<Toolbar />} />
+      <DataTable table={table} columns={PenagihanColumn} toolbar={<Toolbar table={table} />} />
     </>
   );
 }
 
-const Toolbar = () => {
+const Toolbar = ({table} : {table: Table<TPenagihanTable>}) => {
   return (
     <>
+      <SelectedAction table={table}/>
       <CreatePenagihan />
     </>
   );

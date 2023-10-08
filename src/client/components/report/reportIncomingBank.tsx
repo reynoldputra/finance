@@ -93,7 +93,7 @@ export default function ReportIncomingBank() {
 
       finalData.push(["", value[1], value[6] ? "Ket:" + value[6] : "", ""])
       finalData.push(["", "Inv " + value[3], "", ""])
-      finalData.push(["", "Rp " + value[5], "", ""])
+      finalData.push(["", value[5], "", ""])
       finalData.push(["", "", "", ""])
       prevSalesName = value[0] as string
     })

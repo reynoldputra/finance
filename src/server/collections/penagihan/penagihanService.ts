@@ -1,6 +1,7 @@
 import { Prisma } from "@server/../generated/client";
 import { prisma } from "../../prisma";
 import {
+  TChangeManyToNihilInput,
   TCreatePenagihanInput,
   TUpdatePenagihanInput,
   TUpdateTT,
@@ -573,6 +574,14 @@ export class PenagihanService {
     });
 
     return result;
+  }
+
+  static async changeManyToNihil(input: TChangeManyToNihilInput) {
+    const res = input.map((i) => {
+      return this.updateStatusToNihil(i);
+    });
+
+    return res;
   }
 
   static async updatePenagihan(input: TUpdatePenagihanInput) {

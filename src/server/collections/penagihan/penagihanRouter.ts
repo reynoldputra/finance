@@ -7,6 +7,8 @@ import {
   TUpdatePenagihanInput,
   updateTT,
   TUpdateTT,
+  changeManyToNihilInput,
+  TChangeManyToNihilInput,
 } from "./penagihanSchema";
 import { PenagihanService } from "./penagihanService";
 
@@ -190,6 +192,21 @@ export const PenagihanRouter = penagihanTrpc.router({
     .mutation(async ({ input: id }) => {
       try {
         const res = await PenagihanService.updateStatusToNihil(id);
+        return {
+          status: true,
+          data: res,
+        };
+      } catch (err) {
+        return {
+          status: false,
+        };
+      }
+    }),
+  changeManyStatusToNihil: penagihanTrpc.publicProcedure
+    .input(changeManyToNihilInput)
+    .mutation(async({input}: {input: TChangeManyToNihilInput}) => {
+      try {
+        const res = await PenagihanService.changeManyToNihil(input);
         return {
           status: true,
           data: res,

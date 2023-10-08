@@ -577,11 +577,18 @@ export class PenagihanService {
   }
 
   static async changeManyToNihil(input: TChangeManyToNihilInput) {
-    const res = input.map((i) => {
-      return this.updateStatusToNihil(i);
-    });
+    const transaction = await prisma.$transaction(input.map((id) => {
+      return prisma.penagihan.update({
+        where: {
+          id,
+        },
+        data: {
+          status: 'NIHIL',
+        },
+      });
+    }));
 
-    return res;
+    return transaction;
   }
 
   static async updatePenagihan(input: TUpdatePenagihanInput) {

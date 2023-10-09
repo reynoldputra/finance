@@ -41,9 +41,10 @@ export default function ReportSetoranBank() {
 
     const queryResult = query.data?.data ?? []
 
-    console.log(queryResult)
+    const cash = queryResult.filter(q => q.penagihan.invoice.type == "Cash")
+    const kredit = queryResult.filter(q => q.penagihan.invoice.type == "KREDIT 30 HARI")
 
-    const data = queryResult.map(q => {
+    const dataCash = cash.map(q => {
       return [
         q.penagihan.invoice.namaSales,
         q.penagihan.invoice.customer.nama,
@@ -55,37 +56,38 @@ export default function ReportSetoranBank() {
       ]
     })
 
-    const sortedData = data.sort((a,b) => {
+    const sortedDataCash = dataCash.sort((a,b) => {
       return (a[0] as string).localeCompare(b[0] as string) || (a[1] as string).localeCompare(b[1] as string)
     })
 
     let currentTotal = 0
     let prevSalesName = ""
     let prevCustName = ""
-    let lengthdata = sortedData.length
-    const newData : (string | number)[][] = []
+    let lengthdata = sortedDataCash.length
+    const newDataCash : (string | number)[][] = []
+    const newDataKredit : (string | number)[][] = []
 
-    sortedData.forEach((value, index) => {
+    sortedDataCash.forEach((value, index) => {
       if(index != 0 && prevCustName != value[1] && prevSalesName == value[0] ) {
-        newData.push([""])
+        newDataCash.push([""])
       }
 
 
       if(currentTotal + (value[5] as number) > 100000000) {
-        newData.push(["", "", "", "Total", "", currentTotal, "", ""])
-        newData.push([""])
-        newData.push([""])
+        newDataCash.push(["", "", "", "Total", "", currentTotal, "", ""])
+        newDataCash.push([""])
+        newDataCash.push([""])
         currentTotal = value[5] as number
         prevSalesName = value[0] as string
         prevCustName = value[1] as string
-        newData.push(value)
+        newDataCash.push(value)
         return
       }
 
       if((prevSalesName && prevSalesName != value[0])) {
-        newData.push(["", "", "", "Total", "", currentTotal, "", ""])
-        newData.push([""])
-        newData.push([""])
+        newDataCash.push(["", "", "", "Total", "", currentTotal, "", ""])
+        newDataCash.push([""])
+        newDataCash.push([""])
         currentTotal = 0
       }
 
@@ -96,21 +98,87 @@ export default function ReportSetoranBank() {
         prevCustName = value[1] as string
         value[0] = ""
         value[1] = ""
-        newData.push(value)
+        newDataCash.push(value)
       } else {
         prevSalesName = value[0] as string
         prevCustName = value[1] as string
-        newData.push(value)
+        newDataCash.push(value)
       }
       
       if(index == lengthdata-1) {
-        newData.push([
+        newDataCash.push([
           "", "", "", "Total", "", currentTotal, "", ""
         ])
       }
     })
 
-    console.log(newData)
+    console.log(newDataCash)
+
+    const dataKredit = kredit.map(q => {
+      return [
+        q.penagihan.invoice.namaSales,
+        q.penagihan.invoice.customer.nama,
+        dmyDate(q.caraBayar.tanggal),
+        q.penagihan.invoice.transaksiId,
+        roundDecimal(Number(q.penagihan.invoice.total)),
+        roundDecimal(Number(q.jumlah)),
+        toPascalCase(q.keterangan)
+      ]
+    })
+
+    const sortedDataKredit = dataKredit.sort((a,b) => {
+      return (a[0] as string).localeCompare(b[0] as string) || (a[1] as string).localeCompare(b[1] as string)
+    })
+
+    currentTotal = 0
+    prevSalesName = ""
+    prevCustName = ""
+    lengthdata = sortedDataKredit.length
+
+    sortedDataKredit.forEach((value, index) => {
+      if(index != 0 && prevCustName != value[1] && prevSalesName == value[0] ) {
+        newDataKredit.push([""])
+      }
+
+
+      if(currentTotal + (value[5] as number) > 100000000) {
+        newDataKredit.push(["", "", "", "Total", "", currentTotal, "", ""])
+        newDataKredit.push([""])
+        newDataKredit.push([""])
+        currentTotal = value[5] as number
+        prevSalesName = value[0] as string
+        prevCustName = value[1] as string
+        newDataKredit.push(value)
+        return
+      }
+
+      if((prevSalesName && prevSalesName != value[0])) {
+        newDataKredit.push(["", "", "", "Total", "", currentTotal, "", ""])
+        newDataKredit.push([""])
+        newDataKredit.push([""])
+        currentTotal = 0
+      }
+
+      currentTotal += (value[5] as number)
+
+      if(prevSalesName && prevCustName && index != 0 && prevSalesName == value[0] && prevCustName == value[1]) {
+        prevSalesName = value[0] as string
+        prevCustName = value[1] as string
+        value[0] = ""
+        value[1] = ""
+        newDataKredit.push(value)
+      } else {
+        prevSalesName = value[0] as string
+        prevCustName = value[1] as string
+        newDataKredit.push(value)
+      }
+      
+      if(index == lengthdata-1) {
+        newDataKredit.push([
+          "", "", "", "Total", "", currentTotal, "", ""
+        ])
+      }
+    })
 
     const titlePenagihan = dmyDate(tanggalPenagihan, "-")
     const titlePembayaran = dmyDate(tanggalPembayaran, "-")
@@ -124,7 +192,16 @@ export default function ReportSetoranBank() {
       ["Nama Sales", "Customer Name", "Tgl Transaksi", "ID Transaksi", "Total Tagihan", "Cara bayar", "Ket"],
       ["", "", "", "", "", "Cash"],
       [""],
-      ...newData
+      [""],
+      ["CASH"],
+      [""],
+      ...newDataCash,
+      [""],
+      [""],
+      [""],
+      ["KREDIT"],
+      [""],
+      ...newDataKredit
     ]
 
     const ranges = [

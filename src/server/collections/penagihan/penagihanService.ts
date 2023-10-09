@@ -1,4 +1,5 @@
 import { Prisma } from "@server/../generated/client";
+import { roundDecimal } from "@server/lib/roundDecimal";
 import { prisma } from "../../prisma";
 import {
   TChangeManyToNihilInput,
@@ -146,9 +147,9 @@ export class PenagihanService {
       if (d.status == "WAITING") continue
 
       if (d.status == "CICILAN") {
-        d.invoice.penagihan.sort((a, b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
-
-        const idx = d.invoice.penagihan.findIndex((val) => val.id == d.id)
+        const penagihan = d.invoice.penagihan.filter(p => p.status == "CICILAN")
+        penagihan.sort((a, b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
+        const idx = penagihan.findIndex((val) => val.id == d.id)
 
         if (idx != -1) {
           d.status = "CICILAN Ke-" + (idx + 1)
@@ -156,12 +157,21 @@ export class PenagihanService {
       }
 
       if (d.status == "LUNAS" || d.status == "PELUNASAN") {
-        const selisih = d.sisa - pembayaranBaru
-        if (selisih < 0) keterangan += ", Lebih " + (Math.abs(selisih)).toFixed()
-        if (selisih > 0) keterangan += ", Kurang " + (Math.abs(selisih)).toFixed()
+        let selisih = d.sisa - pembayaranBaru
+        let selisihStr = roundDecimal(selisih)
+        selisih = Number(selisihStr)
 
+        if(d.status == "LUNAS") {
+          if (selisih > 0) keterangan = "Kurang " + selisihStr
+          if (selisih < 0) keterangan = "Lebih " + selisihStr
+        }
+        if(d.status == "PELUNASAN") {
+          if (selisih > 0) keterangan = "PELUNASAN, Kurang " + selisihStr
+          if (selisih < 0) keterangan = "PELUNASAN, Lebih " + selisihStr
+        }
       }
-      d.status += keterangan
+
+      d.status = keterangan
 
       parsed.push({
         distribusi: d.distribusiPembayaran,
@@ -280,9 +290,9 @@ export class PenagihanService {
       if (d.status == "WAITING") continue
 
       if (d.status == "CICILAN") {
-        d.invoice.penagihan.sort((a, b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
-
-        const idx = d.invoice.penagihan.findIndex((val) => val.id == d.id)
+        const penagihan = d.invoice.penagihan.filter(p => p.status == "CICILAN")
+        penagihan.sort((a, b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
+        const idx = penagihan.findIndex((val) => val.id == d.id)
 
         if (idx != -1) {
           keterangan = "CICILAN Ke-" + (idx + 1)
@@ -290,17 +300,21 @@ export class PenagihanService {
       }
 
       if (d.status == "PELUNASAN") {
-        const selisih = d.sisa - pembayaranBaru
+        let selisih = d.sisa - pembayaranBaru
+        let selisihStr = roundDecimal(selisih)
+        selisih = Number(selisihStr)
         keterangan = "PELUNASAN"
-        if (selisih < 0) keterangan = "PELUNASAN, Lebih " + (Math.abs(selisih)).toFixed()
-        if (selisih > 0) keterangan = "PELUNASAN, Kurang " + (Math.abs(selisih)).toFixed()
+        if (selisih < 0) keterangan = "PELUNASAN, Lebih " + selisihStr
+        if (selisih > 0) keterangan = "PELUNASAN, Kurang " + selisihStr
         if (selisih == 0) keterangan = "PELUNASAN"
       }
 
       if (d.status == "LUNAS") {
-        const selisih = d.sisa - pembayaranBaru
-        if (selisih < 0) keterangan = "Lebih " + (Math.abs(selisih)).toFixed()
-        if (selisih > 0) keterangan = "Kurang " + (Math.abs(selisih)).toFixed()
+        let selisih = d.sisa - pembayaranBaru
+        let selisihStr = roundDecimal(selisih)
+        selisih = Number(selisihStr)
+        if (selisih < 0) keterangan = "Lebih " + selisihStr
+        if (selisih > 0) keterangan = "Kurang " + selisihStr
       }
 
       d.status = keterangan

@@ -87,12 +87,14 @@ export class PembayaranService {
         let status = ""
 
         if (distribusi.lunas) {
-          if (invoice.penagihan.length > 1) status = "PELUNASAN"
+          const penagihanTerbayar = invoice.penagihan.filter(p => p.status == "CICILAN")
+          if (penagihanTerbayar.length > 0) status = "PELUNASAN"
           else status = "LUNAS"
         } else {
           if (totalDistirbusi < detailPenagihan.sisa) status = "CICILAN"
           else {
-            if (invoice.penagihan.length > 1) status = "PELUNASAN"
+            const penagihanTerbayar = invoice.penagihan.filter(p => p.status == "CICILAN")
+            if (penagihanTerbayar.length > 0) status = "PELUNASAN"
             else status = "LUNAS"
           }
         }

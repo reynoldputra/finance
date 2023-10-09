@@ -30,20 +30,19 @@ export default function ReportIncomingBank() {
     day2.setHours(0,0,0,0)
     setTanggalPenagihan(day2)
 
-    console.log(tanggalPenagihan.toISOString(), tanggalPembayaran.toISOString())
     const dateStr = tanggalPembayaran.toLocaleDateString('id', { day: '2-digit', month: 'long', year: 'numeric' })
     let dateSplit = dateStr.split(" ")
     let month = dateSplit[1].toUpperCase()
     let finaldatestr = dateSplit[0] + ` ${month} ` + dateSplit[2]
-    console.log(finaldatestr)
 
     await query.refetch()
 
     const queryResult = query.data?.data ?? []
 
-    console.log(queryResult)
+    const cash = queryResult.filter(q => q.penagihan.invoice.type == "Cash")
+    const kredit = queryResult.filter(q => q.penagihan.invoice.type == "KREDIT 30 HARI")
 
-    const data = queryResult.map(q => {
+    const dataCash = cash.map(q => {
       return [
         q.penagihan.invoice.namaSales,
         q.penagihan.invoice.customer.nama,
@@ -55,7 +54,7 @@ export default function ReportIncomingBank() {
       ]
     })
 
-    const sortedData = data.sort((a, b) => {
+    const sortedDataCash = dataCash.sort((a, b) => {
       return (a[0] as string).localeCompare(b[0] as string) || (a[1] as string).localeCompare(b[1] as string)
     })
 
@@ -64,41 +63,95 @@ export default function ReportIncomingBank() {
     let currentSetoran = 1
     let setoranIdx = 0
 
-    let finalData: (string | number | Date)[][] = []
+    let finalDataCash: (string | number | Date)[][] = []
+    let finalDataKredit: (string | number | Date)[][] = []
 
-    sortedData.forEach((value, index) => {
+    sortedDataCash.forEach((value, index) => {
       if (index == 0) {
-        finalData.push([currentSetoran, "SETORAN TUNAI", "", ""])
+        finalDataCash.push([currentSetoran, "SETORAN TUNAI", "", ""])
         currentSetoran += 1
         setoranIdx = 0
       }
 
-      if ((prevSalesName && prevSalesName != value[0]) || index + 1 == sortedData.length) {
-        finalData[setoranIdx][9] = currentTotal
-        finalData.push([currentSetoran, "SETORAN TUNAI", "", "", "", "", "", "", ""])
+      if ((prevSalesName && prevSalesName != value[0]) || index + 1 == sortedDataCash.length) {
+        finalDataCash[setoranIdx][9] = currentTotal
+        finalDataCash.push([currentSetoran, "SETORAN TUNAI", "", "", "", "", "", "", ""])
         currentSetoran += 1
         currentTotal = 0
-        setoranIdx = finalData.length - 1
+        setoranIdx = finalDataCash.length - 1
       }
 
       if (currentTotal + (value[5] as number) > 100000000) {
-        finalData[setoranIdx][9] = currentTotal
-        finalData.push([currentSetoran, "SETORAN TUNAI", "", "", "", "", "", "", ""])
+        finalDataCash[setoranIdx][9] = currentTotal
+        finalDataCash.push([currentSetoran, "SETORAN TUNAI", "", "", "", "", "", "", ""])
         currentSetoran += 1
         currentTotal = 0
-        setoranIdx = finalData.length - 1
+        setoranIdx = finalDataCash.length - 1
       } else {
         currentTotal += (value[5] as number)
       }
 
-      finalData.push(["", value[1], value[6] ? "Ket:" + value[6] : "", ""])
-      finalData.push(["", "Inv " + value[3], "", ""])
-      finalData.push(["", value[5], "", ""])
-      finalData.push(["", "", "", ""])
+      finalDataCash.push(["", value[1], value[6] ? "Ket:" + value[6] : "", ""])
+      finalDataCash.push(["", "Inv " + value[3], "", ""])
+      finalDataCash.push(["", value[5], "", ""])
+      finalDataCash.push(["", "", "", ""])
       prevSalesName = value[0] as string
     })
 
-    console.log(finalData)
+    console.log(finalDataCash)
+
+    const dataKredit = kredit.map(q => {
+      return [
+        q.penagihan.invoice.namaSales,
+        q.penagihan.invoice.customer.nama,
+        q.caraBayar.tanggal,
+        q.penagihan.invoice.transaksiId,
+        roundDecimal(Number(q.penagihan.invoice.total)),
+        roundDecimal(Number(q.jumlah)),
+        toPascalCase(q.keterangan),
+      ]
+    })
+
+    const sortedDataKredit = dataKredit.sort((a, b) => {
+      return (a[0] as string).localeCompare(b[0] as string) || (a[1] as string).localeCompare(b[1] as string)
+    })
+
+    currentTotal = 0
+    prevSalesName = ""
+    currentSetoran = 1
+    setoranIdx = 0
+
+    sortedDataKredit.forEach((value, index) => {
+      if (index == 0) {
+        finalDataKredit.push([currentSetoran, "SETORAN TUNAI", "", ""])
+        currentSetoran += 1
+        setoranIdx = 0
+      }
+
+      if ((prevSalesName && prevSalesName != value[0]) || index + 1 == sortedDataCash.length) {
+        finalDataKredit[setoranIdx][9] = currentTotal
+        finalDataKredit.push([currentSetoran, "SETORAN TUNAI", "", "", "", "", "", "", ""])
+        currentSetoran += 1
+        currentTotal = 0
+        setoranIdx = finalDataKredit.length - 1
+      }
+
+      if (currentTotal + (value[5] as number) > 100000000) {
+        finalDataKredit[setoranIdx][9] = currentTotal
+        finalDataKredit.push([currentSetoran, "SETORAN TUNAI", "", "", "", "", "", "", ""])
+        currentSetoran += 1
+        currentTotal = 0
+        setoranIdx = finalDataKredit.length - 1
+      } else {
+        currentTotal += (value[5] as number)
+      }
+
+      finalDataKredit.push(["", value[1], value[6] ? "Ket:" + value[6] : "", ""])
+      finalDataKredit.push(["", "Inv " + value[3], "", ""])
+      finalDataKredit.push(["", value[5], "", ""])
+      finalDataKredit.push(["", "", "", ""])
+      prevSalesName = value[0] as string
+    })
 
     const header = [
       ["SAP TRANSAKSI INCOMING BANK BCA"],
@@ -107,7 +160,16 @@ export default function ReportIncomingBank() {
       ["Date: " + finaldatestr],
       [""],
       ["No.", "Toko", "", "Cara Pembayaran/Keterangan", "", "", "", "", "", "Amount"],
-      ...finalData
+      [""],
+      [""],
+      ["Cash"],
+      ...finalDataCash,
+      [""],
+      [""],
+      [""],
+      ["Kredit"],
+      ...finalDataKredit,
+      [""],
     ]
 
     const ranges = [

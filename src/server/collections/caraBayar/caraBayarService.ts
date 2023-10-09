@@ -1,4 +1,5 @@
 import { Prisma } from "@server/../generated/client";
+import { roundDecimal } from "@server/lib/roundDecimal";
 import { prisma } from "@server/prisma";
 import { TCreateCaraBayarInput, TUpdateCaraBayarInput } from "./caraBayarSchema";
 
@@ -90,7 +91,7 @@ export class CaraBayarService {
       let ket = ""
 
       if(r.penagihan.status == "CICILAN") {
-        const penagihan = r.penagihan.invoice.penagihan
+        const penagihan = r.penagihan.invoice.penagihan.filter((p) => p.status == "CICILAN")
         penagihan.sort((a,b) => a.tanggalTagihan.getTime() - b.tanggalTagihan.getTime())
         const idx = penagihan.findIndex(a => a.id == r.penagihan.id)
 
@@ -101,9 +102,11 @@ export class CaraBayarService {
         const pembayaranBaru = r.penagihan.distribusiPembayaran.reduce((tot, cur) => {
           return tot += cur.jumlah
         }, 0)
-        const selisih = r.penagihan.sisa - pembayaranBaru
-        if (selisih > 0) ket = "PELUNASAN, Kurang " + (Math.abs(selisih)).toFixed()
-        if (selisih < 0) ket = "PELUNASAN, Lebih " + (Math.abs(selisih)).toFixed()
+        let selisih = r.penagihan.sisa - pembayaranBaru
+        let selisihStr = roundDecimal(selisih)
+        selisih = Number(selisihStr)
+        if (selisih > 0) ket = "PELUNASAN, Kurang " + selisihStr
+        if (selisih < 0) ket = "PELUNASAN, Lebih " + selisihStr
         if(selisih == 0) ket = "PELUNASAN"
       }
 
@@ -111,9 +114,11 @@ export class CaraBayarService {
         const pembayaranBaru = r.penagihan.distribusiPembayaran.reduce((tot, cur) => {
           return tot += cur.jumlah
         }, 0)
-        const selisih = r.penagihan.sisa - pembayaranBaru
-        if (selisih < 0) ket += "Lebih " + (Math.abs(selisih)).toFixed()
-        if (selisih > 0) ket += "Kurang " + (Math.abs(selisih)).toFixed()
+        let selisih = r.penagihan.sisa - pembayaranBaru
+        let selisihStr = roundDecimal(selisih)
+        selisih = Number(selisihStr)
+        if (selisih < 0) ket += "Lebih " + selisihStr
+        if (selisih > 0) ket += "Kurang " + selisihStr
       }
 
       return {

@@ -9,6 +9,6 @@ export const dmyDate = (date : Date, delimiter: string = "/") => {
 export const parseDmy = (str : string) => {
   const split = str.split("/")
   const dateNumber = split.map(s => parseInt(s))
-  const date = new Date(dateNumber[3], dateNumber[1], dateNumber[0])
+  const date = new Date(dateNumber[2], dateNumber[1], dateNumber[0])
   return date
 }

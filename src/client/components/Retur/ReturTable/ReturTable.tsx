@@ -3,6 +3,7 @@ import useDataTable from "@client/hook/useDataTable";
 import { trpc } from "@client/lib/trpc";
 import { ReturColumn } from "./ReturColumn";
 import CreateRetur from "../CreateRetur";
+import ExportRetur from "./ExportRetur";
 
 export default function ReturTable() {
   const data = trpc.retur.getAllRetur.useQuery().data;
@@ -17,15 +18,24 @@ export default function ReturTable() {
       <DataTable
         columns={ReturColumn}
         table={table}
-        toolbar={<ToolbarRetur />}
+        toolbar={<ToolbarRetur table={table} />}
       />
     </>
   );
 }
 
-const ToolbarRetur = () => {
+import { Table } from "@tanstack/react-table"
+import { TReturSchema } from "./data/schema";
+
+
+interface ToolbarReturExport { 
+  table: Table<TReturSchema>
+}
+
+const ToolbarRetur = ({table} : ToolbarReturExport) => {
   return (
     <>
+      <ExportRetur table={table} />
       <CreateRetur />
     </>
   );

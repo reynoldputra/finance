@@ -13,7 +13,7 @@ export const ReturColumn: ColumnDef<TReturSchema>[] = [
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
         aria-label="Select all"
         className="translate-y-[2px]"
       />
@@ -59,6 +59,9 @@ export const ReturColumn: ColumnDef<TReturSchema>[] = [
     cell: ({ row }) => (
       <div className="w-[180px]">{row.getValue("Customer Name")}</div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "banyakInvoice",
@@ -74,7 +77,10 @@ export const ReturColumn: ColumnDef<TReturSchema>[] = [
     ),
     cell: ({ row }) => (
       <div className="w-[180px]">{row.original.invoice.length}</div>
-    )
+    ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "tanggalTransaksi",

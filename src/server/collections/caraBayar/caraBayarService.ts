@@ -103,10 +103,9 @@ export class CaraBayarService {
           return tot += cur.jumlah
         }, 0)
         let selisih = r.penagihan.sisa - pembayaranBaru
-        let selisihStr = roundDecimal(selisih)
-        selisih = Number(selisihStr)
-        if (selisih > 0) ket = "PELUNASAN, Kurang " + selisihStr
-        if (selisih < 0) ket = "PELUNASAN, Lebih " + selisihStr
+        selisih = Math.round(Math.abs(selisih))
+        if (selisih > 0) ket = "PELUNASAN, Kurang " + selisih
+        if (selisih < 0) ket = "PELUNASAN, Lebih " + selisih
         if(selisih == 0) ket = "PELUNASAN"
       }
 
@@ -115,10 +114,9 @@ export class CaraBayarService {
           return tot += cur.jumlah
         }, 0)
         let selisih = r.penagihan.sisa - pembayaranBaru
-        let selisihStr = roundDecimal(selisih)
-        selisih = Number(selisihStr)
-        if (selisih < 0) ket += "Lebih " + selisihStr
-        if (selisih > 0) ket += "Kurang " + selisihStr
+        selisih = Math.round(Math.abs(selisih))
+        if (selisih < 0) ket += "Lebih " + selisih
+        if (selisih > 0) ket += "Kurang " + selisih
       }
 
       return {

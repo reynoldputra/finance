@@ -158,16 +158,16 @@ export class PenagihanService {
 
       if (d.status == "LUNAS" || d.status == "PELUNASAN") {
         let selisih = d.sisa - pembayaranBaru
-        let selisihStr = roundDecimal(selisih)
-        selisih = Number(selisihStr)
+        selisih = Math.round(Math.abs(selisih))
 
         if(d.status == "LUNAS") {
-          if (selisih > 0) keterangan = "Kurang " + selisihStr
-          if (selisih < 0) keterangan = "Lebih " + selisihStr
+          if (selisih > 0) keterangan = "Kurang " + selisih
+          if (selisih < 0) keterangan = "Lebih " + selisih
         }
+
         if(d.status == "PELUNASAN") {
-          if (selisih > 0) keterangan = "PELUNASAN, Kurang " + selisihStr
-          if (selisih < 0) keterangan = "PELUNASAN, Lebih " + selisihStr
+          if (selisih > 0) keterangan = "PELUNASAN, Kurang " + selisih
+          if (selisih < 0) keterangan = "PELUNASAN, Lebih " + selisih
         }
       }
 
@@ -301,20 +301,18 @@ export class PenagihanService {
 
       if (d.status == "PELUNASAN") {
         let selisih = d.sisa - pembayaranBaru
-        let selisihStr = roundDecimal(selisih)
-        selisih = Number(selisihStr)
+        selisih = Math.round(Math.abs(selisih))
         keterangan = "PELUNASAN"
-        if (selisih < 0) keterangan = "PELUNASAN, Lebih " + selisihStr
-        if (selisih > 0) keterangan = "PELUNASAN, Kurang " + selisihStr
+        if (selisih < 0) keterangan = "PELUNASAN, Lebih " + selisih
+        if (selisih > 0) keterangan = "PELUNASAN, Kurang " + selisih
         if (selisih == 0) keterangan = "PELUNASAN"
       }
 
       if (d.status == "LUNAS") {
         let selisih = d.sisa - pembayaranBaru
-        let selisihStr = roundDecimal(selisih)
-        selisih = Number(selisihStr)
-        if (selisih < 0) keterangan = "Lebih " + selisihStr
-        if (selisih > 0) keterangan = "Kurang " + selisihStr
+        selisih = Math.round(Math.abs(selisih))
+        if (selisih < 0) keterangan = "Lebih " + selisih
+        if (selisih > 0) keterangan = "Kurang " + selisih
       }
 
       d.status = keterangan

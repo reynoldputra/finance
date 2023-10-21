@@ -30,13 +30,10 @@ export default function ReportAccounting() {
     day2.setHours(0,0,0,0)
     setTanggalPenagihan(day2)
 
-    console.log(tanggalPenagihan.toISOString(), tanggalPembayaran.toISOString())
-
     const dateStr = tanggalPembayaran.toLocaleDateString('id', { day: '2-digit', month: 'long', year: 'numeric' })
     let dateSplit = dateStr.split(" ")
     let month = dateSplit[1].toUpperCase()
     let finaldatestr = dateSplit[0] + ` ${month} ` + dateSplit[2]
-    console.log(finaldatestr)
 
     await query.refetch()
 
@@ -48,34 +45,33 @@ export default function ReportAccounting() {
     for(let idx in queryResult) {
       let q = queryResult[idx]
       let sisa = q.sisa === q.invoice.total ? "" : q.sisa;
-      let template = ["", q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, roundDecimal(q.invoice.total), roundDecimal(sisa)]
+      const template = ["", q.namaKolektor, q.namaSales, q.namaCustomer, dmyDate(q.invoice.tanggalTransaksi), q.transaksiId, roundDecimal(q.invoice.total), roundDecimal(sisa)]
       q.distribusi.forEach((v) => {
-        const sisa = v.jumlah - q.sisa
-        const ketsisa = sisa > 0 ? `, Lebih ${sisa}` : (sisa < 0 ? `, Kurang ${sisa}` : "")
-        const ket = (q.status == "LUNAS" || q.status == "PELUNASAN") ? ketsisa : ""
         if (v.caraBayar.metodePembayaranId == 1) {
-          data.push([...template, roundDecimal(v.jumlah), "", "", "", "", toPascalCase(q.status + ket)])
+          data.push([...template, roundDecimal(v.caraBayar.total), "", "", "", "", toPascalCase(q.status)])
         }
         if (v.caraBayar.giro) {
           const giro = v.caraBayar.giro
-          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), roundDecimal(v.jumlah), toPascalCase(q.status + ket)])
+          data.push([...template, "", giro.bank, giro.nomor, dmyDate(giro.jatuhTempo), roundDecimal(v.caraBayar.total), toPascalCase(q.status)])
         }
       })
     }
+    
 
-    data = data.sort((a, b) => {
+    const sorteddata = data.sort((a, b) => {
       return (
         (a[1] as string).localeCompare(b[1] as string) ||
-        (a[2] as string).localeCompare(b[1] as string) ||
+        (a[2] as string).localeCompare(b[2] as string) ||
         (a[3] as string).localeCompare(b[3] as string) ||
         (a[10] as string).localeCompare(b[10] as string)
       )
     })
 
+
     let i = 1;
     let prev : (string | number)[] = []
 
-    data.forEach(d => {
+    sorteddata.forEach(d => {
       let temp = d
 
       if(prev[10] == d[10]){
@@ -103,9 +99,6 @@ export default function ReportAccounting() {
         prev = d
       }
     })
-
-    console.log(data)
-    console.log(finalResult)
 
     const header = [
       ["SAP LAPORAN HADIRAN TAGIHAN"],

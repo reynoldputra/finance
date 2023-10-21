@@ -22,7 +22,6 @@ export default function ReportPenagihan() {
     setDate(day)
     await query.refetch()
     console.log(date.toISOString())
-    // console.log(query.data?.data)
     const queryResult = query.data?.data ?? []
     let data = queryResult.map((q) => {
       let TT = q.tandaTerima ? "TT" : "";

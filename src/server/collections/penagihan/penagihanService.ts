@@ -158,16 +158,16 @@ export class PenagihanService {
 
       if (d.status == "LUNAS" || d.status == "PELUNASAN") {
         let selisih = d.sisa - pembayaranBaru
-        selisih = Math.round(Math.abs(selisih))
+        let selisihAbs = Math.round(Math.abs(selisih))
 
         if(d.status == "LUNAS") {
-          if (selisih > 0) keterangan = "Kurang " + selisih
-          if (selisih < 0) keterangan = "Lebih " + selisih
+          if (selisih > 0) keterangan = "Kurang " + selisihAbs
+          if (selisih < 0) keterangan = "Lebih " + selisihAbs
         }
 
         if(d.status == "PELUNASAN") {
-          if (selisih > 0) keterangan = "PELUNASAN, Kurang " + selisih
-          if (selisih < 0) keterangan = "PELUNASAN, Lebih " + selisih
+          if (selisih > 0) keterangan = "PELUNASAN, Kurang " + selisihAbs
+          if (selisih < 0) keterangan = "PELUNASAN, Lebih " + selisihAbs
         }
       }
 
@@ -301,18 +301,18 @@ export class PenagihanService {
 
       if (d.status == "PELUNASAN") {
         let selisih = d.sisa - pembayaranBaru
-        selisih = Math.round(Math.abs(selisih))
+        let selisihAbs = Math.round(Math.abs(selisih))
         keterangan = "PELUNASAN"
-        if (selisih < 0) keterangan = "PELUNASAN, Lebih " + selisih
-        if (selisih > 0) keterangan = "PELUNASAN, Kurang " + selisih
+        if (selisih < 0) keterangan = "PELUNASAN, Lebih " + selisihAbs
+        if (selisih > 0) keterangan = "PELUNASAN, Kurang " + selisihAbs
         if (selisih == 0) keterangan = "PELUNASAN"
       }
 
       if (d.status == "LUNAS") {
         let selisih = d.sisa - pembayaranBaru
-        selisih = Math.round(Math.abs(selisih))
-        if (selisih < 0) keterangan = "Lebih " + selisih
-        if (selisih > 0) keterangan = "Kurang " + selisih
+        let selisihAbs = Math.round(Math.abs(selisih))
+        if (selisih < 0) keterangan = "Lebih " + selisihAbs
+        if (selisih > 0) keterangan = "Kurang " + selisihAbs
       }
 
       d.status = keterangan

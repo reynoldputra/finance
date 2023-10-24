@@ -103,9 +103,9 @@ export class CaraBayarService {
           return tot += cur.jumlah
         }, 0)
         let selisih = r.penagihan.sisa - pembayaranBaru
-        selisih = Math.round(Math.abs(selisih))
-        if (selisih > 0) ket = "PELUNASAN, Kurang " + selisih
-        if (selisih < 0) ket = "PELUNASAN, Lebih " + selisih
+        let selisihAbs = Math.round(Math.abs(selisih))
+        if (selisih > 0) ket = "PELUNASAN, Kurang " + selisihAbs
+        if (selisih < 0) ket = "PELUNASAN, Lebih " + selisihAbs
         if(selisih == 0) ket = "PELUNASAN"
       }
 
@@ -114,9 +114,9 @@ export class CaraBayarService {
           return tot += cur.jumlah
         }, 0)
         let selisih = r.penagihan.sisa - pembayaranBaru
-        selisih = Math.round(Math.abs(selisih))
-        if (selisih < 0) ket += "Lebih " + selisih
-        if (selisih > 0) ket += "Kurang " + selisih
+        let selisihAbs = Math.round(Math.abs(selisih))
+        if (selisih < 0) ket += "Lebih " + selisihAbs
+        if (selisih > 0) ket += "Kurang " + selisihAbs
       }
 
       return {
